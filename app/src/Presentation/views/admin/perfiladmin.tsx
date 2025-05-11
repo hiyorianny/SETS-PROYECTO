@@ -14,11 +14,11 @@ type Usuario = {
   SegundoNombre: string;
   PrimerApellido: string;
   SegundoApellido: string;
-  apartamento: string;
+
   Correo: string;
   telefonoUno: number;
   telefonoDos: number | null;
-  tipo_propietario: string;
+
   Usuario: string;
   imagenPerfil: string;
   numeroDocumento: number;
@@ -26,10 +26,25 @@ type Usuario = {
   Id_tipoDocumento: string;
 };
 
+
 const PerfilAdmin = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const { user, logout, updateUser } = useAuth();
-  const [usuario, setUsuario] = useState<Usuario | null>(null);
+  const [usuario, setUsuario] = useState<Usuario>({
+    id_Registro: user?.id_Registro || 0,
+    PrimerNombre: user?.PrimerNombre || '',
+    SegundoNombre: user?.SegundoNombre || '',
+    PrimerApellido: user?.PrimerApellido || '',
+    SegundoApellido: user?.SegundoApellido || '',
+    Correo: user?.Correo || '',
+    telefonoUno: user?.telefonoUno || 0,
+    telefonoDos: user?.telefonoDos || null,
+    Usuario: user?.Usuario || '',
+    imagenPerfil: user?.imagenPerfil || '',
+    numeroDocumento: user?.numeroDocumento || 0,
+    Roldescripcion: user?.rol?.nombre || '',
+    Id_tipoDocumento: user?.Id_tipoDocumento || '1'
+  });
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [editedUser, setEditedUser] = useState<Partial<Usuario>>({});
@@ -52,7 +67,21 @@ const PerfilAdmin = () => {
         const data = await response.json();
 
         if (data.success && data.user) {
-          setUsuario(data.user);
+          setUsuario({
+            id_Registro: data.user.id_Registro,
+            PrimerNombre: data.user.PrimerNombre || '',
+            SegundoNombre: data.user.SegundoNombre || '',
+            PrimerApellido: data.user.PrimerApellido || '',
+            SegundoApellido: data.user.SegundoApellido || '',
+            Correo: data.user.Correo || '',
+            telefonoUno: data.user.telefonoUno || 0,
+            telefonoDos: data.user.telefonoDos || null,
+            Usuario: data.user.Usuario || '',
+            imagenPerfil: data.user.imagenPerfil || '',
+            numeroDocumento: data.user.numeroDocumento || 0,
+            Roldescripcion: data.user.Roldescripcion || '',
+            Id_tipoDocumento: data.user.Id_tipoDocumento || '1'
+          });
         } else {
           throw new Error('Datos de usuario no recibidos');
         }
@@ -64,11 +93,9 @@ const PerfilAdmin = () => {
           SegundoNombre: user?.SegundoNombre || '',
           PrimerApellido: user?.PrimerApellido || 'Administrador',
           SegundoApellido: user?.SegundoApellido || 'Sistema',
-          apartamento: user?.apartamento || 'N/A',
           Correo: user?.Correo || 'admin@sets.com',
           telefonoUno: user?.telefonoUno || 1234567890,
           telefonoDos: user?.telefonoDos || null,
-          tipo_propietario: user?.tipo_propietario || 'ninguno',
           Usuario: user?.Usuario || 'admin',
           imagenPerfil: user?.imagenPerfil || '',
           numeroDocumento: user?.numeroDocumento || 123456789,
@@ -88,39 +115,69 @@ const PerfilAdmin = () => {
     setEditMode(true);
   };
 
-  const handleSave = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`http://192.168.1.105:3000/api/auth/user/${user?.id_Registro}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(editedUser)
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        Alert.alert('Éxito', 'Cambios guardados correctamente');
-        const updatedUser = { ...usuario!, ...editedUser };
-        setUsuario(updatedUser);
-        await updateUser(editedUser);
-        setEditMode(false);
-      } else {
-        Alert.alert('Error', data.error || 'Error al guardar cambios');
-      }
-    } catch (error) {
-      console.error('Error saving changes:', error);
-      Alert.alert('Error', 'No se pudo conectar al servidor');
-    } finally {
-      setLoading(false);
-    }
-  };
+ const handleSave = async () => {
+     try {
+       setLoading(true);
+ 
+       // Validar campos obligatorios
+       if (!editedUser.PrimerNombre || !editedUser.PrimerApellido || !editedUser.Correo || !editedUser.telefonoUno) {
+         Alert.alert('Error', 'Por favor complete todos los campos obligatorios');
+         setLoading(false);
+         return;
+       }
+ 
+       // Preparar los datos para enviar con valores por defecto si son undefined
+       const updateData = {
+         PrimerNombre: editedUser.PrimerNombre || usuario?.PrimerNombre || '',
+         SegundoNombre: editedUser.SegundoNombre || usuario?.SegundoNombre || '',
+         PrimerApellido: editedUser.PrimerApellido || usuario?.PrimerApellido || '',
+         SegundoApellido: editedUser.SegundoApellido || usuario?.SegundoApellido || '',
+         Correo: editedUser.Correo || usuario?.Correo || '',
+         telefonoUno: editedUser.telefonoUno || usuario?.telefonoUno || 0,
+         telefonoDos: editedUser.telefonoDos || usuario?.telefonoDos || null
+       };
+ 
+       const response = await fetch(`http://192.168.1.105:3000/api/auth/user/${user?.id_Registro}`, {
+         method: 'PUT',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify(updateData)
+       });
+ 
+       const data = await response.json();
+ 
+       if (response.ok) {
+         Alert.alert('Éxito', 'Cambios guardados correctamente');
+ 
+         // Actualizar el estado local con los nuevos datos
+         if (usuario) {
+           const updatedUser: Usuario = {
+             ...usuario,
+             ...updateData
+           };
+           setUsuario(updatedUser);
+ 
+           // Actualizar el contexto de autenticación
+           await updateUser(updatedUser);
+         }
+ 
+         setEditMode(false);
+       } else {
+         Alert.alert('Error', data.error || 'Error al guardar cambios');
+       }
+     } catch (error) {
+       console.error('Error saving changes:', error);
+       Alert.alert('Error', 'No se pudo conectar al servidor');
+     } finally {
+       setLoading(false);
+     }
+   };
 
   const handleChange = (field: keyof Usuario, value: string) => {
     setEditedUser(prev => ({ ...prev, [field]: value }));
   };
+
 
   const handleLogout = async () => {
     Alert.alert(
@@ -143,6 +200,7 @@ const PerfilAdmin = () => {
     );
   };
 
+
   const getTipoDocumentoText = (id: string | undefined) => {
     switch (id) {
       case '1': return 'Cédula de Ciudadanía';
@@ -152,108 +210,137 @@ const PerfilAdmin = () => {
     }
   };
 
-  const pickImage = async (source: 'camera' | 'gallery') => {
+const pickImage = async (source: 'camera' | 'gallery') => {
     setModalVisible(false);
 
-    let result;
-
-    if (source === 'camera') {
-      const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-      if (!permissionResult.granted) {
-        Alert.alert('Permiso requerido', 'Necesitamos acceso a la cámara para tomar fotos');
-        return;
+    try {
+      let result;
+      if (source === 'camera') {
+        const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+        if (!permissionResult.granted) {
+          Alert.alert('Permiso requerido', 'Necesitamos acceso a la cámara para tomar fotos');
+          return;
+        }
+        result = await ImagePicker.launchCameraAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [1, 1],
+          quality: 0.7,
+        });
+      } else {
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (!permissionResult.granted) {
+          Alert.alert('Permiso requerido', 'Necesitamos acceso a tu galería para seleccionar fotos');
+          return;
+        }
+        result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [1, 1],
+          quality: 0.7,
+        });
       }
-      result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.7,
-      });
-    } else {
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (!permissionResult.granted) {
-        Alert.alert('Permiso requerido', 'Necesitamos acceso a tu galería para seleccionar fotos');
-        return;
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const uri = result.assets[0].uri;
+        const compressedImage = await manipulateAsync(
+          uri,
+          [{ resize: { width: 800 } }],
+          { compress: 0.7, format: SaveFormat.JPEG }
+        );
+        uploadImage(compressedImage.uri);
       }
-      result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.7,
-      });
-    }
-
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      const uri = result.assets[0].uri;
-
-      // Comprimir y redimensionar la imagen
-      const compressedImage = await manipulateAsync(
-        uri,
-        [{ resize: { width: 800 } }],
-        { compress: 0.7, format: SaveFormat.JPEG }
-      );
-
-      uploadImage(compressedImage.uri);
+    } catch (error) {
+      console.error('Error in image picker:', error);
+      Alert.alert('Error', 'No se pudo seleccionar la imagen');
     }
   };
-
-  const uploadImage = async (uri: string) => {
+  
+    const uploadImage = async (uri: string) => {
     try {
       setUploading(true);
-
+  
+      const filename = uri.split('/').pop() || 'profile.jpg';
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : 'image/jpeg';
+      
+      // Convertir la imagen a blob
+      const response = await fetch(uri);
+      const blob = await response.blob();
+  
       const formData = new FormData();
       formData.append('image', {
         uri,
-        name: 'profile.jpg',
-        type: 'image/jpeg',
+        name: filename,
+        type
       } as any);
       formData.append('userId', user?.id_Registro?.toString() || '');
-
-      const response = await fetch('http://192.168.1.105:3000/api/auth/upload-profile-image', {
+  
+      const uploadResponse = await fetch('http://192.168.1.105:3000/api/auth/upload-profile-image', {
         method: 'POST',
+        body: formData,
         headers: {
+          'Accept': 'application/json',
           'Content-Type': 'multipart/form-data',
         },
-        body: formData,
       });
-
-      const data = await response.json();
-      console.log('Respuesta del servidor:', data); // <-- Agrega este log
-
-      if (response.ok && data.success) {
-        const updatedUser = { ...usuario!, imagenPerfil: data.imageUrl };
-        setUsuario(updatedUser);
-        await updateUser({ imagenPerfil: data.imageUrl });
-        Alert.alert('Éxito', 'Imagen de perfil actualizada');
-      } else {
+  
+      const data = await uploadResponse.json();
+  
+      if (!uploadResponse.ok) {
         throw new Error(data.error || 'Error al subir la imagen');
       }
+  
+      // Actualizar el estado con la nueva URL de imagen
+      const updatedUser = { ...usuario, imagenPerfil: data.imageUrl };
+      setUsuario(updatedUser);
+      await updateUser(updatedUser);
+  
+      Alert.alert('Éxito', 'Imagen de perfil actualizada');
     } catch (error) {
       console.error('Error uploading image:', error);
-      Alert.alert('Error', 'No se pudo subir la imagen');
+      Alert.alert('Error', 'No se pudo subir la imagen: ' + error);
     } finally {
       setUploading(false);
     }
   };
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#3498db" />
-        <Text style={styles.loadingText}>Cargando perfil...</Text>
-      </View>
-    );
-  }
+  
+    if (loading) {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#3498db" />
+          <Text style={styles.loadingText}>Cargando perfil...</Text>
+        </View>
+      );
+    }
+  
+    if (!usuario) {
+      return (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>Error al cargar el perfil</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={() => navigation.replace('HomeScreen')}>
+            <Text style={styles.retryButtonText}>Volver a intentar</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
 
-  if (!usuario) {
-    return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Error al cargar el perfil</Text>
-        <TouchableOpacity style={styles.retryButton} onPress={() => navigation.replace('HomeScreen')}>
-          <Text style={styles.retryButtonText}>Volver a intentar</Text>
-        </TouchableOpacity>
-      </View>
-    );
+   const getImageUrlWithCacheBuster = (url: string) => {
+  if (!url) return '';
+  
+  // Si ya es una URL completa, solo agregar cache buster
+  if (url.startsWith('http')) {
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}ts=${new Date().getTime()}`;
   }
+  
+  // Si es una ruta relativa, construir la URL completa
+  const baseUrl = 'http://192.168.1.105:3000';
+  const fullUrl = url.startsWith('/') ? `${baseUrl}${url}` : `${baseUrl}/${url}`;
+  const separator = fullUrl.includes('?') ? '&' : '?';
+  return `${fullUrl}${separator}ts=${new Date().getTime()}`;
+}
+
 
 
 
@@ -263,17 +350,17 @@ const PerfilAdmin = () => {
         <View style={styles.header}>
           <View style={styles.avatarContainer}>
             {usuario.imagenPerfil ? (
-             <Image
-             source={{
-               uri: `http://192.168.1.105:3000${usuario.imagenPerfil}`,
-               cache: 'reload'
-             }}
-             style={styles.avatar}
-             onError={(e) => {
-               console.log('Error detallado:', e.nativeEvent.error);
-               console.log('URL fallida:', `http://192.168.1.105:3000${usuario.imagenPerfil}`);
-             }}
-           />
+              <Image
+                source={{
+                  uri: getImageUrlWithCacheBuster(usuario.imagenPerfil),
+                  cache: 'reload'
+                }}
+                style={styles.avatar}
+                onError={(e) => {
+                  console.log('Error loading image:', e.nativeEvent.error);
+                  setUsuario(prev => ({ ...prev, imagenPerfil: '' }));
+                }}
+              />
             ) : (
               <View style={styles.avatarPlaceholder}>
                 <MaterialIcons name="account-circle" size={100} color="#fff" />
@@ -293,7 +380,7 @@ const PerfilAdmin = () => {
           </View>
 
           <Text style={styles.name}>
-          {usuario.Usuario} 
+            {usuario.Usuario}
           </Text>
           <Text style={styles.role}>{usuario.Roldescripcion}</Text>
         </View>
@@ -350,7 +437,7 @@ const PerfilAdmin = () => {
                 />
               </View>
 
-              
+
 
               <View style={styles.infoItem}>
                 <Text style={styles.infoLabel}>Número de Documento:</Text>
@@ -387,22 +474,14 @@ const PerfilAdmin = () => {
                 />
               </View>
 
-              <View style={styles.infoItem}>
-                <Text style={styles.infoLabel}>Tipo de Propietario:</Text>
-                <Text style={styles.infoValue}>{usuario.tipo_propietario}</Text>
-              </View>
 
-              <View style={styles.infoItem}>
-                <Text style={styles.infoLabel}>Apartamento:</Text>
-                <Text style={styles.infoValue}>{usuario.apartamento}</Text>
-              </View>
             </>
           ) : (
             <>
               <View style={styles.infoItem}>
                 <Text style={styles.infoLabel}>Tipo de Documento:</Text>
                 <Text style={styles.infoValue}> C.C
-      
+
                 </Text>
               </View>
 
@@ -433,15 +512,7 @@ const PerfilAdmin = () => {
                 <Text style={styles.infoValue}>{usuario.Usuario}</Text>
               </View>
 
-              <View style={styles.infoItem}>
-                <Text style={styles.infoLabel}>Tipo de Propietario:</Text>
-                <Text style={styles.infoValue}>{usuario.tipo_propietario}</Text>
-              </View>
 
-              <View style={styles.infoItem}>
-                <Text style={styles.infoLabel}>Apartamento:</Text>
-                <Text style={styles.infoValue}>{usuario.apartamento}</Text>
-              </View>
             </>
           )}
         </View>

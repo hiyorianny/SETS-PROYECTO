@@ -86,8 +86,8 @@ const Anunciosguarda = () => {
                 },
                 body: JSON.stringify({
                     ...formData,
+                    apart: null, 
                     persona: user?.id_Registro || 1
-
                 })
             });
 
@@ -159,13 +159,7 @@ const Anunciosguarda = () => {
                     />
                 ) : null}
 
-                <TextInput
-                    style={styles.input}
-                    placeholder="Apartamento (ej de formato: 102A)"
-                    value={formData.apart}
-                    onChangeText={(text) => handleChange('apart', text)}
-                    editable={true}
-                />
+                
                 <View style={styles.dateContainer}>
                     <TouchableOpacity
                         style={[styles.input, dateError ? styles.inputError : null]}

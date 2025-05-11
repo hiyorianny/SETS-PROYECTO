@@ -138,11 +138,18 @@ export const RegisterScreen = () => {
     };
 
     const validateForm = (): boolean => {
-        const requiredFields = [
+        const baseRequiredFields = [
             'idRol', 'PrimerNombre', 'PrimerApellido', 'Correo', 
             'Id_tipoDocumento', 'numeroDocumento', 'telefonoUno',
-            'tipo_propietario', 'apartamento', 'Usuario', 'Clave', 'confirmPassword'
+            'Usuario', 'Clave', 'confirmPassword'
         ];
+        
+        // Solo agregar estos campos si no es Guarda de Seguridad
+        const additionalRequiredFields = userData.idRol !== '2222' 
+            ? ['tipo_propietario', 'apartamento'] 
+            : [];
+        
+        const requiredFields = [...baseRequiredFields, ...additionalRequiredFields];
         
         const newErrors: Record<string, string> = {};
         let isValid = true;
@@ -157,6 +164,11 @@ export const RegisterScreen = () => {
         
         // Validar campos con reglas específicas
         Object.keys(userData).forEach(key => {
+            // No validar tipo_propietario y apartamento si el rol es guarda
+            if (userData.idRol === '2222' && (key === 'tipo_propietario' || key === 'apartamento')) {
+                return;
+            }
+            
             const value = userData[key as keyof typeof userData];
             const error = validateField(key, value || '');
             if (error) {
@@ -176,26 +188,29 @@ export const RegisterScreen = () => {
         }
     
         try {
+            const requestData = {
+                ...userData,
+                numeroDocumento: Number(userData.numeroDocumento),
+                telefonoUno: Number(userData.telefonoUno),
+                telefonoDos: userData.telefonoDos ? Number(userData.telefonoDos) : null,
+                // Cambiar esto para enviar null en lugar de cadena vacía
+                tipo_propietario: userData.idRol === '2222' ? null : userData.tipo_propietario,
+                apartamento: userData.idRol === '2222' ? null : userData.apartamento
+            };
+    
             const response = await fetch('http://192.168.1.105:3000/api/auth/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    ...userData,
-                    numeroDocumento: Number(userData.numeroDocumento),
-                    telefonoUno: Number(userData.telefonoUno),
-                    telefonoDos: userData.telefonoDos ? Number(userData.telefonoDos) : null
-                }),
+                body: JSON.stringify(requestData),
             });
     
             const data = await response.json();
     
             if (response.ok) {
-                // Guardar datos de usuario y token
                 await login(data.user, data.token);
                 
-                // Redirección según el rol
                 switch(userData.idRol) {
                     case '1111': // Admin
                         navigation.replace('registeradminloading');
@@ -238,7 +253,7 @@ export const RegisterScreen = () => {
                 <Text style={styles.formTitle}>REGISTRARSE</Text>
                 <ScrollView contentContainerStyle={styles.scrollContainer}>
 
-                <View style={styles.formInput}>
+                    <View style={styles.formInput}>
                         <Image style={styles.formIcon} source={require('../../../../assets/recursos-humanos.png')} />
                         {loadingRoles ? (
                             <View style={styles.loadingContainer}>
@@ -352,33 +367,38 @@ export const RegisterScreen = () => {
                         {errors.numeroDocumento && <Text style={styles.errorText}>{errors.numeroDocumento}</Text>}
                     </View>
 
-                    <View style={styles.formInput}>
-                        <Image style={styles.formIcon} source={require('../../../../assets/apartamento.png')} />
-                        <Picker
-                            style={styles.formTextInput}
-                            selectedValue={userData.tipo_propietario}
-                            onValueChange={(value) => handleChange('tipo_propietario', value)}
-                        >
-                            <Picker.Item label="Seleccione tipo de propietario..." value="" />
-                            <Picker.Item label="Dueño" value="dueño" />
-                            <Picker.Item label="Residente" value="residente" />
-                            <Picker.Item label="Ambos" value="ambos" />
-                            <Picker.Item label="ninguno" value="ninguno" />
-                        </Picker>
-                        {errors.tipo_propietario && <Text style={styles.errorText}>{errors.tipo_propietario}</Text>}
-                    </View>
+                    {/* Mostrar estos campos solo si no es Guarda de Seguridad */}
+                    {userData.idRol !== '2222' && (
+                        <>
+                            <View style={styles.formInput}>
+                                <Image style={styles.formIcon} source={require('../../../../assets/apartamento.png')} />
+                                <Picker
+                                    style={styles.formTextInput}
+                                    selectedValue={userData.tipo_propietario}
+                                    onValueChange={(value) => handleChange('tipo_propietario', value)}
+                                >
+                                    <Picker.Item label="Seleccione tipo de propietario..." value="" />
+                                    <Picker.Item label="Dueño" value="dueño" />
+                                    <Picker.Item label="Residente" value="residente" />
+                                    <Picker.Item label="Ambos" value="ambos" />
+                                    <Picker.Item label="ninguno" value="ninguno" />
+                                </Picker>
+                                {errors.tipo_propietario && <Text style={styles.errorText}>{errors.tipo_propietario}</Text>}
+                            </View>
 
-                    <View style={styles.formInput}>
-                        <Image style={styles.formIcon} source={require('../../../../assets/apartamento.png')} />
-                        <TextInput
-                            style={styles.formTextInput}
-                            placeholder='Apartamento*'
-                            keyboardType='default'
-                            value={userData.apartamento}
-                            onChangeText={(text) => handleChange('apartamento', text)}
-                        />
-                        {errors.apartamento && <Text style={styles.errorText}>{errors.apartamento}</Text>}
-                    </View>
+                            <View style={styles.formInput}>
+                                <Image style={styles.formIcon} source={require('../../../../assets/apartamento.png')} />
+                                <TextInput
+                                    style={styles.formTextInput}
+                                    placeholder='Apartamento*'
+                                    keyboardType='default'
+                                    value={userData.apartamento}
+                                    onChangeText={(text) => handleChange('apartamento', text)}
+                                />
+                                {errors.apartamento && <Text style={styles.errorText}>{errors.apartamento}</Text>}
+                            </View>
+                        </>
+                    )}
 
                     <View style={styles.formInput}>
                         <Image style={styles.formIcon} source={require('../../../../assets/llamada-telefonica.png')} />
