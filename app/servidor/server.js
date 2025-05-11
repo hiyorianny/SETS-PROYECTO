@@ -12,28 +12,24 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
-const staticMiddleware = express.static(
-  path.join(__dirname, 'uploads', 'profile-images'), 
-  {
-    setHeaders: (res) => {
-      res.set('Access-Control-Allow-Origin', '*');
-      res.set('Cross-Origin-Resource-Policy', 'cross-origin');
-    }
+const uploadsPath = path.join(__dirname, '..', 'uploads');
+app.use('/uploads', express.static(uploadsPath, {
+  setHeaders: (res) => {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
   }
-);
-
-app.use('/profile-images', staticMiddleware);
+}));
 
 
 app.use('/api/auth', authRoutes);
 
 
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Algo salió mal en el servidor' });
+    console.error(err.stack);
+    res.status(500).json({ error: 'Algo salió mal en el servidor' });
 });
 
 const port = process.env.PORT || 3000;
 app.listen(port, '192.168.1.105', () => {
-  console.log(`Servidor ejecutándose en http://192.168.1.105:${port}`);
+    console.log(`Servidor ejecutándose en http://192.168.1.105:${port}`);
 });

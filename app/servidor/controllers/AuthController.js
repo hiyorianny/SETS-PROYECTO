@@ -20,6 +20,7 @@ const storage = multer.diskStorage({
         cb(null, 'profile-' + uniqueSuffix + path.extname(file.originalname));
     }
 });
+
 const upload = multer({
     storage: storage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
@@ -31,7 +32,6 @@ const upload = multer({
         }
     }
 }).single('image');
-
 
 
 
@@ -284,14 +284,14 @@ class AuthController {
                         error: err.message || 'Error al subir la imagen'
                     });
                 }
-    
+
                 if (!req.file) {
                     return res.status(400).json({
                         success: false,
                         error: 'No se proporcionó ninguna imagen'
                     });
                 }
-    
+
                 const userId = req.body.userId;
                 if (!userId) {
                     fs.unlinkSync(req.file.path);
@@ -300,10 +300,10 @@ class AuthController {
                         error: 'ID de usuario no proporcionado'
                     });
                 }
-    
+
 
                 const imageUrl = `/profile-images/${req.file.filename}`;
-    
+
                 connection.query(
                     'UPDATE registro SET imagenPerfil = ? WHERE id_Registro = ?',
                     [imageUrl, userId],
@@ -316,7 +316,7 @@ class AuthController {
                                 error: 'Error al actualizar el perfil'
                             });
                         }
-    
+
                         res.json({
                             success: true,
                             imageUrl,
@@ -333,9 +333,113 @@ class AuthController {
             });
         }
     }
+    static async updateUserProfile(req, res) {
+    try {
+        const userId = req.params.userId;
+        const updateData = req.body;
 
 
+        if (!updateData.PrimerNombre || !updateData.PrimerApellido || !updateData.Correo) {
+            return res.status(400).json({
+                success: false,
+                error: 'Datos requeridos faltantes'
+            });
+        }
 
+        connection.query(
+            'UPDATE registro SET ? WHERE id_Registro = ?',
+            [updateData, userId],
+            (err, result) => {
+                if (err) {
+                    console.error('Error updating user:', err);
+                    return res.status(500).json({
+                        success: false,
+                        error: 'Error al actualizar el perfil'
+                    });
+                }
+
+                if (result.affectedRows === 0) {
+                    return res.status(404).json({
+                        success: false,
+                        error: 'Usuario no encontrado'
+                    });
+                }
+
+                res.json({
+                    success: true,
+                    message: 'Perfil actualizado correctamente'
+                });
+            }
+        );
+    } catch (error) {
+        console.error('Error in updateUserProfile:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Error interno del servidor'
+        });
+    }
+}
+
+ static async uploadProfileImage(req, res) {
+    try {
+        upload(req, res, async (err) => {
+            if (err) {
+                console.error('Error uploading image:', err);
+                return res.status(400).json({
+                    success: false,
+                    error: err.message || 'Error al subir la imagen'
+                });
+            }
+
+            if (!req.file) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'No se proporcionó ninguna imagen'
+                });
+            }
+
+            const userId = req.body.userId;
+            if (!userId) {
+                fs.unlinkSync(req.file.path);
+                return res.status(400).json({
+                    success: false,
+                    error: 'ID de usuario no proporcionado'
+                });
+            }
+
+
+            const imageUrl = `/uploads/profile-images/${req.file.filename}`;
+            const fullUrl = `http://192.168.1.105:3000${imageUrl}`;
+
+            connection.query(
+                'UPDATE registro SET imagenPerfil = ? WHERE id_Registro = ?',
+                [fullUrl, userId],
+                (err, result) => {
+                    if (err) {
+                        console.error('Error updating profile image:', err);
+                        fs.unlinkSync(req.file.path);
+                        return res.status(500).json({
+                            success: false,
+                            error: 'Error al actualizar el perfil'
+                        });
+                    }
+
+                    res.json({
+                        success: true,
+                        imageUrl: fullUrl,
+                        message: 'Imagen de perfil actualizada correctamente'
+                    });
+                }
+            );
+        });
+    } catch (error) {
+        console.error('Error in uploadProfileImage:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Error interno del servidor'
+        });
+    }
+}
 }
 
 module.exports = AuthController;
