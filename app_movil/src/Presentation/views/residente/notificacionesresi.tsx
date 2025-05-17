@@ -32,7 +32,7 @@ const Notiresidente = () => {
     const [error, setError] = useState<string | null>(null);
     const { user, logout } = useAuth();
 
-    const BASE_URL = 'http://192.168.1.105:3001';
+    const BASE_URL = 'http://192.168.1.100:3000';
 
     const cargarNotificaciones = async () => {
         try {

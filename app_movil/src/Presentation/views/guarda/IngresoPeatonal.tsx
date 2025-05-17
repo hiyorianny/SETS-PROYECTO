@@ -69,7 +69,7 @@ const IngresoPeatonal: React.FC<IngresoPeatonalProps> = () => {
         setLoading(true);
 
         try {
-            const response = await fetch('http://192.168.1.105:3001/api/ingresos', {
+            const response = await fetch('http://192.168.1.100:3000/api/ingresos', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -45,12 +45,12 @@ const Zonasguarda = () => {
       try {
         setLoading(true);
 
-        const zonasResponse = await fetch('http://192.168.1.105:3001/api/zonas-comunes');
+        const zonasResponse = await fetch('http://192.168.1.100:3000/api/zonas-comunes');
         if (!zonasResponse.ok) throw new Error('Error al obtener zonas comunes');
         const zonasData = await zonasResponse.json();
         setZonasComunes(zonasData);
 
-        const solicitudesResponse = await fetch('http://192.168.1.105:3001/api/solicitudes-zonas');
+        const solicitudesResponse = await fetch('http://192.168.1.100:3000/api/solicitudes-zonas');
         if (!solicitudesResponse.ok) throw new Error('Error al obtener solicitudes');
         let solicitudesData = await solicitudesResponse.json();
 
@@ -157,7 +157,7 @@ const Zonasguarda = () => {
         nuevoEstado
       });
 
-      const response = await fetch('http://192.168.1.105:3001/api/actualizar-estado-solicitud', {
+      const response = await fetch('http://192.168.1.100:3000/api/actualizar-estado-solicitud', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -37,7 +37,7 @@ const GuardaPrincipal = () => {
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
   const [nuevasNotificaciones, setNuevasNotificaciones] = useState(0);
   const [cargandoNotificaciones, setCargandoNotificaciones] = useState(false);
-  const BASE_URL = 'http://192.168.1.105:3001';
+  const BASE_URL = 'http://192.168.1.100:3000';
 
   const generateUniqueId = (prefix: string, originalId: number): string => {
     return `${prefix}-${originalId}`;
@@ -47,7 +47,7 @@ const GuardaPrincipal = () => {
     const fetchAnuncios = async () => {
       try {
 
-        const response = await fetch('http://192.168.1.105:3001/api/anuncios');
+        const response = await fetch('http://192.168.1.100:3000/api/anuncios');
         if (!response.ok) {
           throw new Error('Error al obtener anuncios');
         }
@@ -226,7 +226,7 @@ const GuardaPrincipal = () => {
           text: 'Eliminar',
           onPress: async () => {
             try {
-              const response = await fetch(`http://192.168.1.105:3001/api/elanuncios/${idAnuncio}`, {
+              const response = await fetch(`${BASE_URL}/api/elanuncios/${idAnuncio}`, {
                 method: 'DELETE'
               });
 

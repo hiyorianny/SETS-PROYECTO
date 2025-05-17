@@ -58,7 +58,7 @@ const CitasScreen = () => {
 
   const fetchCitas = async () => {
     try {
-      const response = await fetch('http://192.168.1.105:3001/api/citas');
+      const response = await fetch('http://192.168.1.100:3000/api/citas');
       if (!response.ok) {
         throw new Error('Error al obtener citas');
       }
@@ -140,7 +140,7 @@ const CitasScreen = () => {
     }
 
     try {
-      const response = await fetch('http://192.168.1.105:3001/api/citassolicitud', {
+      const response = await fetch('http://192.168.1.100:3000/api/citas/solicitud', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -190,7 +190,7 @@ const CitasScreen = () => {
           text: 'Eliminar',
           onPress: async () => {
             try {
-              const response = await fetch(`http://192.168.1.105:3001/api/citas/${id}`, {
+              const response = await fetch(`http://192.168.1.100:3000/api/citas/${id}`, {
                 method: 'DELETE'
               });
 

@@ -42,7 +42,7 @@ export const RegisterScreen = () => {
     useEffect(() => {
         const fetchRoles = async () => {
             try {
-                const response = await fetch('http://192.168.1.105:3000/api/auth/roles');
+                const response = await fetch('http://192.168.1.100:3000/api/auth/roles');
                 const data = await response.json();
                 
                 if (response.ok && data.success) {
@@ -198,7 +198,7 @@ export const RegisterScreen = () => {
                 apartamento: userData.idRol === '2222' ? null : userData.apartamento
             };
     
-            const response = await fetch('http://192.168.1.105:3000/api/auth/register', {
+            const response = await fetch('http://192.168.1.100:3000/api/auth/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

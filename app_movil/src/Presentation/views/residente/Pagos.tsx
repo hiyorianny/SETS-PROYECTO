@@ -30,7 +30,7 @@ const Pagos = () => {
   const fetchPagos = async () => {
     try {
       setRefreshing(true);
-      const response = await fetch('http://192.168.1.105:3001/api/pagos');
+      const response = await fetch('http://192.168.1.100:3000/api/pagos');
       const data = await response.json();
       setPagos(data);
     } catch (error) {
@@ -47,7 +47,7 @@ const Pagos = () => {
 
   const handleDeletePago = async (idPagos: number) => {
     try {
-      const response = await fetch(`http://192.168.1.105:3001/api/pagos/${idPagos}`, {
+      const response = await fetch(`http://192.168.1.100:3000/api/pagos/${idPagos}`, {
         method: 'DELETE',
       });
 
