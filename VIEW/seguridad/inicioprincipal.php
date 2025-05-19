@@ -1,34 +1,5 @@
 <?php
-require '../../servidor/auth/authMiddleware.php';
-session_start();
-header("Access-Control-Allow-Origin: http://localhost:3000");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Credentials: true");
-$decoded = authenticate();
-
-$idRegistro = $decoded->id;
-$Usuario = $decoded->Usuario;
-$idRol = $decoded->idRol;
-
-
-if ($idRol != 2222) {
-    header("Location: http://localhost/sets/error.php");
-    exit();
-}
-
-include_once "conexion.php";
-
-$sql = "SELECT * FROM anuncio";
-
-$result = $base_de_datos->query($sql);
-if ($result->rowCount() > 0) {
-    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-        $isEvent = strpos($row["titulo"], "Evento") !== false;
-    }
-}
-$query = isset($_GET['query']) ? $_GET['query'] : '';
-
+require __DIR__ . '/../../servidor/auth/controller/guarda.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -87,7 +58,7 @@ $query = isset($_GET['query']) ? $_GET['query'] : '';
                                 </center>
                             </div>
                             <center>
-                            <li class="nav-item dropdown">
+                                <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <img src="img/hablando.png" alt="Logo" width="30" height="44" class="d-inline-block align-text-top">
                                         <b style="font-size: 20px;"> CHAT</b>
@@ -197,330 +168,355 @@ $query = isset($_GET['query']) ? $_GET['query'] : '';
                         <h2>Anuncios</h2>
                     </center>
                     <div class="search-container">
-                        <form onsubmit="return searchAnnouncements();">
+                        <form onsubmit="return searchAnnouncements(event)">
                             <input type="text" id="search-input" placeholder="Buscar Anuncio">
                             <img src="img/lupa.png" alt="Buscar" class="search-icon">
                         </form>
                     </div>
 
                     <div id="announcements">
-                        <?php
 
-                        $sql = "SELECT * FROM anuncio";
-                        $result = $base_de_datos->query($sql);
-                        if ($result->rowCount() > 0) {
-                            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                        ?>
-                                <div class="announcement" id="announcement-<?= htmlspecialchars($row['titulo']); ?>">
-                                    <img src="<?= htmlspecialchars($row['img_anuncio']); ?>" alt="Imagen" style="width:90%; max-width:90px;"><br>
-                                    <p><b>Anuncio:</b> <?= htmlspecialchars($row["titulo"]); ?><br>
-                                        <b>Descripcion:</b> <?= htmlspecialchars($row["descripcion"]); ?><br>
-                                        <b>Fecha de Publicación: </b><?= htmlspecialchars($row["fechaPublicacion"]); ?><br>
-                                        <b>Hora de Publicación:</b> <?= htmlspecialchars($row["horaPublicacion"]); ?><br>
-                                    </p>
-                                    <button class="delete-button" onclick="deleteAnnouncement('<?= htmlspecialchars($row['titulo']); ?>')">Eliminar</button>
-                                </div>
-                        <?php
-                            }
-                        } else {
-                            echo "<p>No se encontraron anuncios.</p>";
-                        }
-                        ?>
                     </div>
                 </section>
 
-                <script>
-                    function deleteAnnouncement(titulo) {
-                        if (confirm("¿Está seguro de que desea eliminar este anuncio?")) {
-
-                            fetch('../../CONTROLLER/anunciosguarda.php', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/x-www-form-urlencoded'
-                                    },
-                                    body: new URLSearchParams({
-                                        'titulo': titulo,
-                                        'accion': 'eliminar'
-                                    })
-                                })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.status === 'success') {
-
-                                        document.getElementById('announcement-' + titulo).remove();
-                                        alert(data.message);
-                                    } else {
-                                        alert(data.message);
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error al eliminar el anuncio:', error);
-                                    alert("Hubo un error al eliminar el anuncio.");
-                                });
-                        }
-                    }
-                </script>
                 <div class="icon">
                     <a href="añadiranuncio.php" class="link-button">
                         <button class="add-announcement">Añadir Anuncio</button>
                     </a>
                 </div>
             </div>
-            <script>
-                function searchAnnouncements() {
-                    var query = document.getElementById('search-input').value;
+        </main>
 
-                    var xhr = new XMLHttpRequest();
-                    xhr.open('GET', './buscador.php?query=' + encodeURIComponent(query), true);
-                    xhr.onload = function() {
-                        if (xhr.status === 200) {
-                            document.getElementById('announcements').innerHTML = xhr.responseText;
-                        } else {
-                            console.error('Error en la búsqueda:', xhr.statusText);
-                        }
-                    };
-                    xhr.send();
-                    return false;
+        <script>
+
+            const DEFAULT_ANNOUNCEMENT_IMAGE = 'img/alerta.png';
+
+            async function loadAnnouncements() {
+                try {
+                    const response = await fetch('http://192.168.1.100:3000/api/anuncios');
+                    const anuncios = await response.json();
+
+                    const announcementsContainer = document.getElementById('announcements');
+
+                    if (anuncios.length === 0) {
+                        announcementsContainer.innerHTML = "<p>No se encontraron anuncios.</p>";
+                        return;
+                    }
+
+                    let html = '';
+                    anuncios.forEach(anuncio => {
+
+                        const imagenAnuncio = anuncio.img_anuncio || DEFAULT_ANNOUNCEMENT_IMAGE;
+
+                        html += `
+                <div class="announcement" id="announcement-${anuncio.idAnuncio}">
+                    <img src="${imagenAnuncio}" alt="Imagen del anuncio" style="width:90%; max-width:90px;"><br>
+                    <p><b>Anuncio:</b> ${anuncio.titulo}<br>
+                        <b>Descripcion:</b> ${anuncio.descripcion}<br>
+                        <b>Fecha de Publicación: </b>${anuncio.fechaPublicacion}<br>
+                        <b>Hora de Publicación:</b> ${anuncio.horaPublicacion}<br>
+                    </p>
+                    <button class="delete-button" onclick="deleteAnnouncement(${anuncio.idAnuncio})">Eliminar</button>
+                </div>
+            `;
+                    });
+
+                    announcementsContainer.innerHTML = html;
+                } catch (error) {
+                    console.error('Error al cargar anuncios:', error);
+                    document.getElementById('announcements').innerHTML = "<p>Error al cargar los anuncios.</p>";
                 }
-            </script>
-            <script>
-                const searchEventInput = document.getElementById('searchEventInput');
-                const events = document.querySelectorAll('.event');
+            }
 
-                searchEventInput.addEventListener('input', function() {
-                    const filter = searchEventInput.value.toLowerCase();
+            async function searchAnnouncements(event) {
+                event.preventDefault();
+                const query = document.getElementById('search-input').value.toLowerCase();
 
-                    events.forEach(function(event) {
-                        const text = event.textContent.toLowerCase();
-                        if (text.includes(filter)) {
-                            event.style.display = 'block';
-                        } else {
-                            event.style.display = 'none';
-                        }
-                    });
-                });
-            </script>
-            <script>
-                const searchInput = document.getElementById('searchInput');
-                const announcements = document.querySelectorAll('.announcement');
-                searchInput.addEventListener('input', function() {
-                    const filter = searchInput.value.toLowerCase();
-                    announcements.forEach(function(announcement) {
-                        const text = announcement.textContent.toLowerCase();
-                        if (text.includes(filter)) {
-                            announcement.style.display = 'block';
-                        } else {
-                            announcement.style.display = 'none';
-                        }
-                    });
-                });
-            </script>
-            <script>
-                document.querySelector('.admin-img').addEventListener('click', function() {
-                    document.querySelector('.dropdown-menu').classList.toggle('show');
-                });
-                document.querySelector('.chat-button').addEventListener('click', function() {
-                    document.querySelector('.chat-menu').classList.toggle('show');
-                });
+                try {
+                    const response = await fetch('http://192.168.1.100:3000/api/anuncios');
+                    const anuncios = await response.json();
 
-                function filterChat() {
-                    const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-                    const chatItems = document.querySelectorAll('.chat-item');
-                    chatItems.forEach(item => {
-                        if (item.textContent.toLowerCase().includes(searchInput)) {
-                            item.style.display = 'block';
-                        } else {
-                            item.style.display = 'none';
-                        }
+                    const filtered = query ?
+                        anuncios.filter(a =>
+                            a.titulo.toLowerCase().includes(query) ||
+                            a.descripcion.toLowerCase().includes(query)) :
+                        anuncios;
+
+                    const announcementsContainer = document.getElementById('announcements');
+
+                    if (filtered.length === 0) {
+                        announcementsContainer.innerHTML = "<p>No se encontraron anuncios.</p>";
+                        return false;
+                    }
+
+                    let html = '';
+                    filtered.forEach(anuncio => {
+
+                        const imagenAnuncio = anuncio.img_anuncio || DEFAULT_ANNOUNCEMENT_IMAGE;
+
+                        html += `
+                <div class="announcement" id="announcement-${anuncio.idAnuncio}">
+                    <img src="${imagenAnuncio}" alt="Imagen del anuncio" style="width:90%; max-width:90px;"><br>
+                    <p><b>Anuncio:</b> ${anuncio.titulo}<br>
+                        <b>Descripcion:</b> ${anuncio.descripcion}<br>
+                        <b>Fecha de Publicación: </b>${anuncio.fechaPublicacion}<br>
+                        <b>Hora de Publicación:</b> ${anuncio.horaPublicacion}<br>
+                    </p>
+                    <button class="delete-button" onclick="deleteAnnouncement(${anuncio.idAnuncio})">Eliminar</button>
+                </div>
+            `;
                     });
+
+                    announcementsContainer.innerHTML = html;
+                } catch (error) {
+                    console.error('Error en la búsqueda:', error);
+                    document.getElementById('announcements').innerHTML = "<p>Error al buscar anuncios.</p>";
                 }
-            </script>
-            <script>
-              // Variables globales para el estado del chat
-              let currentChat = {
+
+                return false;
+            }
+
+
+            document.addEventListener('DOMContentLoaded', loadAnnouncements);
+        </script>
+        <script>
+            const searchEventInput = document.getElementById('searchEventInput');
+            const events = document.querySelectorAll('.event');
+
+            searchEventInput.addEventListener('input', function() {
+                const filter = searchEventInput.value.toLowerCase();
+
+                events.forEach(function(event) {
+                    const text = event.textContent.toLowerCase();
+                    if (text.includes(filter)) {
+                        event.style.display = 'block';
+                    } else {
+                        event.style.display = 'none';
+                    }
+                });
+            });
+        </script>
+        <script>
+            const searchInput = document.getElementById('searchInput');
+            const announcements = document.querySelectorAll('.announcement');
+            searchInput.addEventListener('input', function() {
+                const filter = searchInput.value.toLowerCase();
+                announcements.forEach(function(announcement) {
+                    const text = announcement.textContent.toLowerCase();
+                    if (text.includes(filter)) {
+                        announcement.style.display = 'block';
+                    } else {
+                        announcement.style.display = 'none';
+                    }
+                });
+            });
+        </script>
+        <script>
+            document.querySelector('.admin-img').addEventListener('click', function() {
+                document.querySelector('.dropdown-menu').classList.toggle('show');
+            });
+            document.querySelector('.chat-button').addEventListener('click', function() {
+                document.querySelector('.chat-menu').classList.toggle('show');
+            });
+
+            function filterChat() {
+                const searchInput = document.querySelector('.search-bar').value.toLowerCase();
+                const chatItems = document.querySelectorAll('.chat-item');
+                chatItems.forEach(item => {
+                    if (item.textContent.toLowerCase().includes(searchInput)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            }
+        </script>
+        <script>
+            // Variables globales para el estado del chat
+            let currentChat = {
+                type: null,
+                targetId: null,
+                name: null
+            };
+
+            // Función para obtener cookies
+            function getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+            }
+
+            // Función para abrir un chat
+            function openChat(chatName, targetId = null, isGroup = false) {
+                currentChat = {
+                    type: isGroup ? 'grupal' : 'privado',
+                    targetId: targetId,
+                    name: chatName
+                };
+
+                const chatContainer = document.getElementById('chatContainer');
+                const chatHeader = document.getElementById('chatHeader');
+
+                chatHeader.textContent = chatName;
+                chatContainer.style.display = 'flex';
+                document.getElementById('chatMessages').innerHTML = '';
+
+                fetchMessages();
+
+                const chatInput = document.getElementById('chatInput');
+                chatInput.focus();
+                chatInput.onkeypress = function(e) {
+                    if (e.key === 'Enter') {
+                        sendMessage();
+                    }
+                };
+            }
+
+            // Función para cerrar el chat
+            function closeChat() {
+                document.getElementById('chatContainer').style.display = 'none';
+                currentChat = {
                     type: null,
                     targetId: null,
                     name: null
                 };
+            }
 
-                // Función para obtener cookies
-                function getCookie(name) {
-                    const value = `; ${document.cookie}`;
-                    const parts = value.split(`; ${name}=`);
-                    if (parts.length === 2) return parts.pop().split(';').shift();
+            // Función para enviar mensajes
+            async function sendMessage() {
+                const messageInput = document.getElementById('chatInput');
+                const chatMessages = document.getElementById('chatMessages');
+
+                if (!currentChat.type || !currentChat.targetId) {
+                    alert('Por favor, selecciona un chat primero');
+                    return;
                 }
 
-                // Función para abrir un chat
-                function openChat(chatName, targetId = null, isGroup = false) {
-                    currentChat = {
-                        type: isGroup ? 'grupal' : 'privado',
-                        targetId: targetId,
-                        name: chatName
-                    };
-
-                    const chatContainer = document.getElementById('chatContainer');
-                    const chatHeader = document.getElementById('chatHeader');
-
-                    chatHeader.textContent = chatName;
-                    chatContainer.style.display = 'flex';
-                    document.getElementById('chatMessages').innerHTML = '';
-
-                    fetchMessages();
-
-                    const chatInput = document.getElementById('chatInput');
-                    chatInput.focus();
-                    chatInput.onkeypress = function(e) {
-                        if (e.key === 'Enter') {
-                            sendMessage();
-                        }
-                    };
+                const messageText = messageInput.value.trim();
+                if (messageText === '') {
+                    alert('Mensaje Enviado Correctamente');
+                    return;
                 }
 
-                // Función para cerrar el chat
-                function closeChat() {
-                    document.getElementById('chatContainer').style.display = 'none';
-                    currentChat = {
-                        type: null,
-                        targetId: null,
-                        name: null
-                    };
-                }
-
-                // Función para enviar mensajes
-                async function sendMessage() {
-                    const messageInput = document.getElementById('chatInput');
-                    const chatMessages = document.getElementById('chatMessages');
-
-                    if (!currentChat.type || !currentChat.targetId) {
-                        alert('Por favor, selecciona un chat primero');
-                        return;
-                    }
-
-                    const messageText = messageInput.value.trim();
-                    if (messageText === '') {
-                        alert('Mensaje Enviado Correctamente');
-                        return;
-                    }
-
-                    // Mostrar mensaje localmente inmediatamente
-                    const tempMessageId = 'temp-' + Date.now();
-                    const tempMessage = document.createElement('div');
-                    tempMessage.id = tempMessageId;
-                    tempMessage.className = 'message sent pending';
-                    tempMessage.innerHTML = `
+                // Mostrar mensaje localmente inmediatamente
+                const tempMessageId = 'temp-' + Date.now();
+                const tempMessage = document.createElement('div');
+                tempMessage.id = tempMessageId;
+                tempMessage.className = 'message sent pending';
+                tempMessage.innerHTML = `
         <div class="message-header">
             <span class="sender-name">Tú</span>
             <span class="message-time">Enviando...</span>
         </div>
         <div class="message-content">${messageText}</div>
     `;
-                    chatMessages.appendChild(tempMessage);
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                chatMessages.appendChild(tempMessage);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
 
-                    // Limpiar el input
-                    messageInput.value = '';
+                // Limpiar el input
+                messageInput.value = '';
 
-                    try {
-                        const requestData = {
-                            action: 'send',
-                            content: messageText,
-                            chat_type: currentChat.type,
-                            receiver_id: currentChat.type === 'privado' ? currentChat.targetId : null,
-                            group_chat: currentChat.type === 'grupal' ? currentChat.targetId : null
-                        };
+                try {
+                    const requestData = {
+                        action: 'send',
+                        content: messageText,
+                        chat_type: currentChat.type,
+                        receiver_id: currentChat.type === 'privado' ? currentChat.targetId : null,
+                        group_chat: currentChat.type === 'grupal' ? currentChat.targetId : null
+                    };
 
-                        const response = await fetch('./chat/chat.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + getCookie('token')
-                            },
-                            body: JSON.stringify(requestData)
-                        });
+                    const response = await fetch('./chat/chat.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + getCookie('token')
+                        },
+                        body: JSON.stringify(requestData)
+                    });
 
-                        const data = await response.json();
+                    const data = await response.json();
 
-                        if (!response.ok || data.status !== 'success') {
-                            throw new Error(data.message || 'Error al enviar el mensaje');
-                        }
+                    if (!response.ok || data.status !== 'success') {
+                        throw new Error(data.message || 'Error al enviar el mensaje');
+                    }
 
-                        // Actualizar el mensaje temporal con la información real
-                        const messageTime = new Date().toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        });
-                        tempMessage.innerHTML = `
+                    // Actualizar el mensaje temporal con la información real
+                    const messageTime = new Date().toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    tempMessage.innerHTML = `
             <div class="message-header">
                 <span class="sender-name">Tú</span>
                 <span class="message-time">${messageTime}</span>
             </div>
             <div class="message-content">${messageText}</div>
         `;
-                        tempMessage.classList.remove('pending');
+                    tempMessage.classList.remove('pending');
 
-                        // Forzar actualización de mensajes
-                        setTimeout(fetchMessages, 500);
-                    } catch (error) {
-                        console.error('Error:', error);
-                        tempMessage.innerHTML += `<div class="message-error">Error: ${error.message}</div>`;
-                        alert('Error al enviar el mensaje: ' + error.message);
-                    }
+                    // Forzar actualización de mensajes
+                    setTimeout(fetchMessages, 500);
+                } catch (error) {
+                    console.error('Error:', error);
+                    tempMessage.innerHTML += `<div class="message-error">Error: ${error.message}</div>`;
+                    alert('Error al enviar el mensaje: ' + error.message);
                 }
+            }
 
-                // Función para obtener mensajes
-                async function fetchMessages() {
-                    if (!currentChat.type || !currentChat.targetId) return;
+            // Función para obtener mensajes
+            async function fetchMessages() {
+                if (!currentChat.type || !currentChat.targetId) return;
 
-                    try {
-                        const response = await fetch('./chat/chat.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + getCookie('token')
-                            },
-                            body: JSON.stringify({
-                                action: 'get_messages',
-                                chat_type: currentChat.type,
-                                target_id: currentChat.targetId
-                            })
-                        });
+                try {
+                    const response = await fetch('./chat/chat.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + getCookie('token')
+                        },
+                        body: JSON.stringify({
+                            action: 'get_messages',
+                            chat_type: currentChat.type,
+                            target_id: currentChat.targetId
+                        })
+                    });
 
-                        const data = await response.json();
+                    const data = await response.json();
 
-                        if (!response.ok || data.status !== 'success') {
-                            throw new Error(data.message || 'Error al obtener mensajes');
-                        }
-
-                        displayMessages(data.messages, data.current_user_id);
-                    } catch (error) {
-                        console.error('Error:', error);
+                    if (!response.ok || data.status !== 'success') {
+                        throw new Error(data.message || 'Error al obtener mensajes');
                     }
+
+                    displayMessages(data.messages, data.current_user_id);
+                } catch (error) {
+                    console.error('Error:', error);
                 }
+            }
 
-                // Función para mostrar mensajes
-                // Función para mostrar mensajes
-                function displayMessages(messages, currentUserId) {
-                    const chatMessages = document.getElementById('chatMessages');
+            // Función para mostrar mensajes
+            // Función para mostrar mensajes
+            function displayMessages(messages, currentUserId) {
+                const chatMessages = document.getElementById('chatMessages');
 
-                    // Conservar los mensajes temporales (los que están siendo enviados)
-                    const tempMessages = Array.from(chatMessages.querySelectorAll('.message.pending'))
-                        .map(el => el.outerHTML);
+                // Conservar los mensajes temporales (los que están siendo enviados)
+                const tempMessages = Array.from(chatMessages.querySelectorAll('.message.pending'))
+                    .map(el => el.outerHTML);
 
-                    chatMessages.innerHTML = '';
+                chatMessages.innerHTML = '';
 
-                    // Mostrar todos los mensajes del servidor
-                    messages.forEach(message => {
-                        const isCurrentUser = message.id_remitente == currentUserId;
-                        const messageElement = document.createElement('div');
-                        messageElement.className = isCurrentUser ? 'message sent' : 'message received';
-                        messageElement.dataset.messageId = message.id_mensaje;
+                // Mostrar todos los mensajes del servidor
+                messages.forEach(message => {
+                    const isCurrentUser = message.id_remitente == currentUserId;
+                    const messageElement = document.createElement('div');
+                    messageElement.className = isCurrentUser ? 'message sent' : 'message received';
+                    messageElement.dataset.messageId = message.id_mensaje;
 
-                        const messageTime = new Date(message.fecha_envio).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        });
+                    const messageTime = new Date(message.fecha_envio).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
 
-                        messageElement.innerHTML = `
+                    messageElement.innerHTML = `
             <div class="message-header">
                 <span class="sender-name">${message.PrimerNombre} ${message.PrimerApellido} (${message.Roldescripcion})</span>
                 <span class="message-time">${messageTime}</span>
@@ -529,125 +525,125 @@ $query = isset($_GET['query']) ? $_GET['query'] : '';
             </div>
             <div class="message-content">${message.contenido}</div>
         `;
-                        chatMessages.appendChild(messageElement);
+                    chatMessages.appendChild(messageElement);
+                });
+
+                // Restaurar mensajes temporales
+                tempMessages.forEach(html => {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = html;
+                    chatMessages.appendChild(tempDiv.firstChild);
+                });
+
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            // Función para eliminar mensajes (actualizada)
+            async function deleteMessage(event, messageId) {
+                event.stopPropagation();
+
+                if (!confirm('¿Estás seguro de que quieres eliminar este mensaje?\nSolo desaparecerá de tu vista.')) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch('./chat/chat.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + getCookie('token')
+                        },
+                        body: JSON.stringify({
+                            action: 'delete_message',
+                            message_id: messageId
+                        })
                     });
 
-                    // Restaurar mensajes temporales
-                    tempMessages.forEach(html => {
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = html;
-                        chatMessages.appendChild(tempDiv.firstChild);
+                    const data = await response.json();
+
+                    if (!response.ok || data.status !== 'success') {
+                        throw new Error(data.message || 'Error al eliminar el mensaje');
+                    }
+
+                    // Eliminar el mensaje del DOM sin recargar todos los mensajes
+                    const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+                    if (messageElement) {
+                        messageElement.style.opacity = '0.5';
+                        messageElement.style.textDecoration = 'line-through';
+                        messageElement.querySelector('.delete-message-btn').remove();
+
+                        // Opcional: eliminar completamente el mensaje después de una animación
+                        setTimeout(() => {
+                            messageElement.remove();
+                        }, 500);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error al eliminar el mensaje: ' + error.message);
+                }
+            }
+
+            // Función para cargar usuarios disponibles
+            async function loadChatUsers() {
+                try {
+                    const response = await fetch('./chat/chat.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + getCookie('token')
+                        },
+                        body: JSON.stringify({
+                            action: 'get_users'
+                        })
                     });
 
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    const data = await response.json();
+
+                    if (!response.ok || data.status !== 'success') {
+                        throw new Error(data.message || 'Error al cargar usuarios');
+                    }
+
+                    updateChatMenu(data.users, data.groups, data.current_user_id);
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+
+            // Función para actualizar el menú de chat
+            function updateChatMenu(users, groups, currentUserId) {
+                const chatMenu = document.getElementById('chatDropdownMenu');
+
+                if (!chatMenu) {
+                    console.error('No se encontró el menú de chat en el DOM');
+                    return;
                 }
 
-                // Función para eliminar mensajes (actualizada)
-                async function deleteMessage(event, messageId) {
-                    event.stopPropagation();
+                // Limpiar solo elementos dinámicos (conservar elementos estáticos)
+                const dynamicItems = Array.from(chatMenu.querySelectorAll('li:not(.static)'));
+                dynamicItems.forEach(item => item.remove());
 
-                    if (!confirm('¿Estás seguro de que quieres eliminar este mensaje?\nSolo desaparecerá de tu vista.')) {
-                        return;
-                    }
-
-                    try {
-                        const response = await fetch('./chat/chat.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + getCookie('token')
-                            },
-                            body: JSON.stringify({
-                                action: 'delete_message',
-                                message_id: messageId
-                            })
-                        });
-
-                        const data = await response.json();
-
-                        if (!response.ok || data.status !== 'success') {
-                            throw new Error(data.message || 'Error al eliminar el mensaje');
-                        }
-
-                        // Eliminar el mensaje del DOM sin recargar todos los mensajes
-                        const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
-                        if (messageElement) {
-                            messageElement.style.opacity = '0.5';
-                            messageElement.style.textDecoration = 'line-through';
-                            messageElement.querySelector('.delete-message-btn').remove();
-
-                            // Opcional: eliminar completamente el mensaje después de una animación
-                            setTimeout(() => {
-                                messageElement.remove();
-                            }, 500);
-                        }
-                    } catch (error) {
-                        console.error('Error:', error);
-                        alert('Error al eliminar el mensaje: ' + error.message);
-                    }
-                }
-
-                // Función para cargar usuarios disponibles
-                async function loadChatUsers() {
-                    try {
-                        const response = await fetch('./chat/chat.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + getCookie('token')
-                            },
-                            body: JSON.stringify({
-                                action: 'get_users'
-                            })
-                        });
-
-                        const data = await response.json();
-
-                        if (!response.ok || data.status !== 'success') {
-                            throw new Error(data.message || 'Error al cargar usuarios');
-                        }
-
-                        updateChatMenu(data.users, data.groups, data.current_user_id);
-                    } catch (error) {
-                        console.error('Error:', error);
-                    }
-                }
-
-                // Función para actualizar el menú de chat
-                function updateChatMenu(users, groups, currentUserId) {
-                    const chatMenu = document.getElementById('chatDropdownMenu');
-
-                    if (!chatMenu) {
-                        console.error('No se encontró el menú de chat en el DOM');
-                        return;
-                    }
-
-                    // Limpiar solo elementos dinámicos (conservar elementos estáticos)
-                    const dynamicItems = Array.from(chatMenu.querySelectorAll('li:not(.static)'));
-                    dynamicItems.forEach(item => item.remove());
-
-                    // Agregar barra de búsqueda
-                    const searchItem = document.createElement('li');
-                    searchItem.innerHTML = `
+                // Agregar barra de búsqueda
+                const searchItem = document.createElement('li');
+                searchItem.innerHTML = `
         <div class="chat-search-container p-2">
             <input type="text" class="form-control form-control-sm chat-search-input" 
                    placeholder="Buscar contacto..." oninput="filterChatContacts()">
         </div>
     `;
-                    chatMenu.appendChild(searchItem);
+                chatMenu.appendChild(searchItem);
 
-                    // Agregar usuarios disponibles
-                    users.forEach(user => {
-                        if (user.id_Registro != currentUserId) {
-                            const li = document.createElement('li');
-                            li.className = 'chat-contact-item';
+                // Agregar usuarios disponibles
+                users.forEach(user => {
+                    if (user.id_Registro != currentUserId) {
+                        const li = document.createElement('li');
+                        li.className = 'chat-contact-item';
 
-                            // Usar imagen de perfil si existe, sino una por defecto
-                            const userImage = user.imagenPerfil ?
-                                `uploads/${user.imagenPerfil}` : // Asumiendo que las imágenes están en una carpeta uploads
-                                'img/c.jpg'; // Imagen por defecto
+                        // Usar imagen de perfil si existe, sino una por defecto
+                        const userImage = user.imagenPerfil ?
+                            `uploads/${user.imagenPerfil}` : // Asumiendo que las imágenes están en una carpeta uploads
+                            'img/c.jpg'; // Imagen por defecto
 
-                            li.innerHTML = `
+                        li.innerHTML = `
                 <a href="#" class="chat-item d-flex align-items-center" 
                    onclick="openChat('${user.PrimerNombre} ${user.PrimerApellido}', ${user.id_Registro}, false)">
                    
@@ -657,21 +653,21 @@ $query = isset($_GET['query']) ? $_GET['query'] : '';
                     </div>
                 </a>
             `;
-                            chatMenu.appendChild(li);
-                        }
-                    })
+                        chatMenu.appendChild(li);
+                    }
+                })
 
-                    // Agregar grupos
-                    if (groups && groups.length > 0) {
-                        const groupHeader = document.createElement('li');
-                        groupHeader.className = 'dropdown-header';
-                        groupHeader.textContent = 'Grupos';
-                        chatMenu.appendChild(groupHeader);
+                // Agregar grupos
+                if (groups && groups.length > 0) {
+                    const groupHeader = document.createElement('li');
+                    groupHeader.className = 'dropdown-header';
+                    groupHeader.textContent = 'Grupos';
+                    chatMenu.appendChild(groupHeader);
 
-                        groups.forEach(group => {
-                            const li = document.createElement('li');
-                            li.className = 'chat-contact-item';
-                            li.innerHTML = `
+                    groups.forEach(group => {
+                        const li = document.createElement('li');
+                        li.className = 'chat-contact-item';
+                        li.innerHTML = `
                 <a href="#" class="chat-item d-flex align-items-center" 
                    onclick="openChat('${group.PrimerNombre}', '${group.id_Registro}', true)">
                     <img src="img/c.png" alt="${group.PrimerNombre}" class="rounded-circle me-2" width="30" height="30">
@@ -681,57 +677,57 @@ $query = isset($_GET['query']) ? $_GET['query'] : '';
                     </div>
                 </a>
             `;
-                            chatMenu.appendChild(li);
-                        });
-                    }
-                }
-
-                // Función para filtrar contactos en el chat
-                function filterChatContacts() {
-                    const searchInput = document.querySelector('.chat-search-input');
-                    const filter = searchInput.value.toLowerCase();
-                    const items = document.querySelectorAll('.chat-contact-item');
-
-                    items.forEach(item => {
-                        const text = item.textContent.toLowerCase();
-                        if (text.includes(filter)) {
-                            item.style.display = 'block';
-                        } else {
-                            item.style.display = 'none';
-                        }
+                        chatMenu.appendChild(li);
                     });
                 }
+            }
 
-                // Inicialización del chat al cargar la página
-                document.addEventListener('DOMContentLoaded', function() {
-                    loadChatUsers();
+            // Función para filtrar contactos en el chat
+            function filterChatContacts() {
+                const searchInput = document.querySelector('.chat-search-input');
+                const filter = searchInput.value.toLowerCase();
+                const items = document.querySelectorAll('.chat-contact-item');
 
-                    // Configurar evento para el botón de enviar
-                    document.querySelector('.chat-input button').addEventListener('click', sendMessage);
-
-                    // Actualizar mensajes periódicamente cada 3 segundos si el chat está abierto
-                    setInterval(() => {
-                        if (document.getElementById('chatContainer').style.display === 'flex') {
-                            fetchMessages();
-                        }
-                    }, 3000);
+                items.forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    if (text.includes(filter)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
                 });
-            </script>
-            <br>
-            <br>
-            <br>
-            <footer>
-                <div class="footer-content">
-                    <li>&copy; 2025 SETS. Todos los derechos reservados.</li>
-                    <ul>
-                        <li><a href="#">Términos y Condiciones</a></li>
-                        <li><a href="#">Política de Privacidad</a></li>
-                        <li><a href="#">Contacto</a></li>
-                    </ul>
-                </div>
-            </footer>
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-        </main>
+            }
+
+            // Inicialización del chat al cargar la página
+            document.addEventListener('DOMContentLoaded', function() {
+                loadChatUsers();
+
+                // Configurar evento para el botón de enviar
+                document.querySelector('.chat-input button').addEventListener('click', sendMessage);
+
+                // Actualizar mensajes periódicamente cada 3 segundos si el chat está abierto
+                setInterval(() => {
+                    if (document.getElementById('chatContainer').style.display === 'flex') {
+                        fetchMessages();
+                    }
+                }, 3000);
+            });
+        </script>
+        <br>
+        <br>
+        <br>
+        <footer>
+            <div class="footer-content">
+                <li>&copy; 2025 SETS. Todos los derechos reservados.</li>
+                <ul>
+                    <li><a href="#">Términos y Condiciones</a></li>
+                    <li><a href="#">Política de Privacidad</a></li>
+                    <li><a href="#">Contacto</a></li>
+                </ul>
+            </div>
+        </footer>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    </main>
     </main>
     </header>
 </body>
