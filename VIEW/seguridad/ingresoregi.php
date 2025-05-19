@@ -84,7 +84,7 @@ $Ingreso_Peatonal = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                 <center><a href="Perfil.php">Editar Datos</a></center>
                                             </li>
                                             <li>
-                                                <center> <a href="../../MODEL/backend/logout.php">Cerrar sesión</a></center>
+                                                <center> <a href="../../servidor/auth/logout.php">Cerrar sesión</a></center>
                                             </li>
                                         </ul>
                                 </center>

@@ -186,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         </li>
 
                                         <li>
-                                            <center> <a href="../../MODEL/backend/logout.php">Cerrar Sesión</a></center>
+                                            <center> <a href="../../servidor/auth/logout.php">Cerrar Sesión</a></center>
                                         </li>
                                     </ul>
                             </center>

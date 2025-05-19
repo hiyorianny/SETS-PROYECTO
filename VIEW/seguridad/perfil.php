@@ -134,7 +134,7 @@ if (!$userData) {
                                         </li>
 
                                         <li>
-                                            <center> <a href="../../MODEL/backend/logout.php">Cerrar sesión</a></center>
+                                            <center> <a href="../../servidor/auth/logout.php">Cerrar sesión</a></center>
 
                                         </li>
                                     </ul>

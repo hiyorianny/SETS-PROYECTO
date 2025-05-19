@@ -46,7 +46,7 @@ require __DIR__ . '/../../servidor/auth/controller/guarda.php';
                                         </li>
 
                                         <li>
-                                            <center> <a href="../../MODEL/backend/logout.php">Cerrar Sesión</a></center>
+                                            <center> <a href="../../servidor/auth/logout.php">Cerrar Sesión</a></center>
                                         </li>
                                     </ul>
                             </center>
@@ -65,21 +65,13 @@ require __DIR__ . '/../../servidor/auth/controller/guarda.php';
 
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-chat dropdown-menu-end" id="chatDropdownMenu" role="menu">
-
-
                                         <li>
                                             <div class="chat-search-container p-2">
                                                 <input type="text" class="form-control form-control-sm chat-search-input"
                                                     placeholder="Buscar contacto..." oninput="filterChatContacts()">
                                             </div>
                                         </li>
-
-
                                         <li class="dropdown-header">Contactos</li>
-
-
-
-
                                     </ul>
                                 </li>
                             </center>

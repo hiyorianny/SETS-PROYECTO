@@ -19,6 +19,6 @@ if (session_destroy()) {
     echo "Error al destruir la sesión.<br>";
 }
 
-header("Location: http://localhost/sets/VIEW/");
+header("Location: http://localhost/SETS-PROYECTO/VIEW/");
 exit();
 ?>
