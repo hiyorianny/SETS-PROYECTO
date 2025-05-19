@@ -33,12 +33,12 @@ const Registro = () => {
     const fetchData = async () => {
       try {
         const rolResponse = await axios.get(
-          "http://localhost/sets/MODEL/backend/regi.php?tipo=roles"
+          "http://localhost/SETS-PROYECTO/servidor/auth/regi.php?tipo=roles"
         );
         setRoles(rolResponse.data);
 
         const tipoDocResponse = await axios.get(
-          "http://localhost/sets/MODEL/backend/regi.php?tipo=tipodocs"
+          "http://localhost/SETS-PROYECTO/servidor/auth/regi.php?tipo=tipodocs"
         );
         setTipodocs(tipoDocResponse.data);
       } catch (error) {
@@ -126,7 +126,7 @@ const Registro = () => {
 
     try {
         const response = await axios.post(
-            "http://localhost/sets/MODEL/backend/regi.php",
+            "http://localhost/SETS-PROYECTO/servidor/auth/regi.php",
             dataToSend,
             {
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -148,10 +148,9 @@ const Registro = () => {
                 autoClose: 2000, 
                 onClose: () => {
                     const rutas = {
-                        1111: "http://localhost/sets/VIEW/admin/BIENVENIDOADMI.php",
-                        2222: "http://localhost/sets/VIEW/seguridad/BIENVENIDOGUARDA.php",
-                        3333: "http://localhost/sets/VIEW/residente/BIENVENIDORESIDENTE.php",
-                        4444: "http://localhost/sets/VIEW/dueño/BIENVENIDORESIDENTE.php",
+                        1111: "http://localhost/SETS-PROYECTO/VIEW/admin/BIENVENIDOADMI.php",
+                        2222: "http://localhost/SETS-PROYECTO/VIEW/seguridad/BIENVENIDOGUARDA.php",
+                        3333: "http://localhost/SETS-PROYECTO/VIEW/residente/BIENVENIDORESIDENTE.php",
                         error: "http://localhost/SETS/error.html",
                     };
                     window.location.href = rutas[redirect] || rutas["error"];
@@ -370,7 +369,7 @@ const Registro = () => {
         <a href="http://localhost:3000/recuperarcontrase%C3%B1a" className="e">
           Recuperar Contraseña
         </a>
-        <a href="http://localhost/sets/VIEW/" className="r">
+        <a href="http://localhost/SETS-PROYECTO/VIEW/" className="r">
           Volver
         </a>
       </div>

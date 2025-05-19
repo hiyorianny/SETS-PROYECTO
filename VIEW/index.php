@@ -277,7 +277,7 @@ header('Access-Control-Allow-Headers: Content-Type');
 	<section class="contact" id="contact">
 		<div class="row">
 			<div class="form-container">
-				<form action="../CONTROLLER/contacto.php" method="POST">
+				<form id="contactForm">
 					<h1 class="heading-12">Contáctanos</h1><br>
 					<input type="text" name="nombre" placeholder="Nombre" required>
 					<input type="email" name="correo" placeholder="Correo" required>
@@ -285,11 +285,50 @@ header('Access-Control-Allow-Headers: Content-Type');
 					<div class="mb-3">
 						<textarea class="form-control" name="comentario" rows="3" placeholder="Escribe tu comentario" required></textarea>
 					</div>
-					<input type="submit" class="btn btn-success" value="Enviar">
+					<button type="submit" class="btn btn-success" style="font-size: 34px;">Enviar</button>
+					<div id="responseMessage" class="mt-3"></div>
 				</form>
 			</div>
 		</div>
 	</section>
+
+	<script>
+		document.getElementById('contactForm').addEventListener('submit', async function(e) {
+			e.preventDefault();
+
+			const formData = {
+				nombre: this.nombre.value,
+				correo: this.correo.value,
+				telefono: this.telefono.value,
+				comentario: this.comentario.value
+			};
+
+			try {
+				const response = await fetch('http://192.168.1.100:3000/api/contactarnos', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(formData)
+				});
+
+				const data = await response.json();
+
+				if (response.ok) {
+					document.getElementById('responseMessage').innerHTML = `
+                <div class="alert alert-success">Mensaje enviado con éxito</div>
+            `;
+					this.reset();
+				} else {
+					throw new Error(data.message || 'Error al enviar el mensaje');
+				}
+			} catch (error) {
+				document.getElementById('responseMessage').innerHTML = `
+            <div class="alert alert-danger">${error.message}</div>
+        `;
+			}
+		});
+	</script>
 
 	</main>
 	<footer class="footer col-12 col-6 col-2  ">

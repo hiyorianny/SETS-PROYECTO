@@ -1,5 +1,5 @@
 <?php
-require '../../MODEL/backend/authMiddleware.php';
+require '../../servidor/auth/authMiddleware.php';
 
 $decoded = authenticate();
 

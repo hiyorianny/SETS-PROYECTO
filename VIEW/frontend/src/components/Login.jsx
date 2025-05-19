@@ -25,7 +25,7 @@ const Login = () => {
 
         try {
             const response = await axios.post(
-                "http://localhost/sets/MODEL/backend/login.php",
+                "http://localhost/SETS-PROYECTO/servidor/auth/login.php",
                 formData,
                 {
                     headers: { "Content-Type": "application/json" },
@@ -45,11 +45,11 @@ const Login = () => {
                     autoClose: 2000, 
                     onClose: () => {
                         const rutas = {
-                            1111: "http://localhost/sets/VIEW/admin/inicioprincipal.php",
-                            2222: "http://localhost/sets/VIEW/seguridad/inicioprincipal.php",
-                            3333: "http://localhost/sets/VIEW/residente/inicioprincipal.php",
-                            4444: "http://localhost/sets/VIEW/gestor_inmobiliaria/inicioprincipal.php",
-                            error: "http://localhost/SETS/error.html",
+                            1111: "http://localhost/SETS-PROYECTO/VIEW/admin/inicioprincipal.php",
+                            2222: "http://localhost/SETS-PROYECTO/VIEW/seguridad/inicioprincipal.php",
+                            3333: "http://localhost/SETS-PROYECTO/VIEW/residente/inicioprincipal.php",
+                            4444: "http://localhost/SETS-PROYECTO/VIEW/gestor_inmobiliaria/inicioprincipal.php",
+                            error: "http://localhost/SETS-PROYECTO/VIEW/error.html",
                         };
                    
                         window.location.href = rutas[redirect] || rutas["error"];
@@ -98,7 +98,7 @@ const Login = () => {
             <div className="d-flex justify-content-between">
                 <a href="http://localhost:3000/registro">Registrarse</a>
                 <a href="http://localhost:3000/recuperarcontrase%C3%B1a">Recuperar Contraseña</a>
-                <a href="http://localhost/sets/VIEW/">Volver</a>
+                <a href="http://localhost/SETS-PROYECTO/VIEW/">Volver</a>
             </div>
         </div>
     );

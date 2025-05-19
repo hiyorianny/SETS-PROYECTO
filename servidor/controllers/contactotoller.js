@@ -15,6 +15,34 @@ class ContactoController {
         }
     }
 
+    static async create(req, res) {
+        try {
+            const { nombre, correo, telefono, comentario } = req.body;
+            
+            // Validación básica
+            if (!nombre || !correo || !comentario) {
+                return res.status(400).json({ error: 'Faltan campos obligatorios' });
+            }
+
+            ContactoModel.create(
+                { nombre, correo, telefono, comentario },
+                (err, insertId) => {
+                    if (err) {
+                        console.error('Error al crear contacto:', err);
+                        return res.status(500).json({ error: 'Error al crear contacto' });
+                    }
+                    res.status(201).json({ 
+                        success: true,
+                        id: insertId,
+                        message: 'Contacto creado exitosamente' 
+                    });
+                }
+            );
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
     static async delete(req, res) {
         try {
             const { id } = req.params;

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 const Redirect = () => {
   useEffect(() => {
     // Redirige a una URL completa
-    window.location.replace("http://localhost/SETS/VIEW/");
+    window.location.replace("http://localhost/SETS-PROYECTO/VIEW/");
   }, []);
 
   return null; // Este componente no renderiza nada
