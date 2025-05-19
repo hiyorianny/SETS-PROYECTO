@@ -8,7 +8,7 @@ require 'vendor/autoload.php';
 
 use Firebase\JWT\JWT;
 
-include_once "conexion.php";
+include_once "../db/conexion.php";
 
 $secret_key = "tu_clave_secreta";
 
@@ -96,15 +96,21 @@ try {
         $idRegistro = $base_de_datos->lastInsertId();
 
         // Generar token JWT
-        $payload = [
-            "id" => $idRegistro,
-            "Usuario" => $Usuario,
-            "Correo" => $Correo,
-            "idRol" => $idRol,
-            "exp" => time() + 3600
+       $payload = [
+            'iss' => "localhost",
+            'aud' => "localhost",
+            'iat' => time(),
+            'exp' => time() + 4600,
+            'data' => [ 
+                'id_Registro' => $idRegistro,
+                'Usuario' => $Usuario,
+                'Correo' => $Correo,
+                'idRol' => $idRol,
+                'Roldescripcion' => ''
+            ]
         ];
 
-        $jwt = JWT::encode($payload, $secret_key, 'HS256');
+         $jwt = JWT::encode($payload, $secret_key, 'HS256');
 
         $sqlToken = "INSERT INTO tokens (id_Registro, token, fecha_expiracion) VALUES (?, ?, ?)";
         $stmtToken = $base_de_datos->prepare($sqlToken);
@@ -113,7 +119,7 @@ try {
 
         $base_de_datos->commit();
 
-        setcookie("token", $jwt, time() + 3600, "/", "localhost", false, true);
+        setcookie("token", $jwt, time() + 4600, "/", "localhost", false, true);
 
 
         $redirectMap = [

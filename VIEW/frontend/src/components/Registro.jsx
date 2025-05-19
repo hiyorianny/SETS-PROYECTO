@@ -33,12 +33,12 @@ const Registro = () => {
     const fetchData = async () => {
       try {
         const rolResponse = await axios.get(
-          "http://localhost/SETS-PROYECTO/servidor/auth/regi.php?tipo=roles"
+          "http://localhost/sets/servidor/auth/regi.php?tipo=roles"
         );
         setRoles(rolResponse.data);
 
         const tipoDocResponse = await axios.get(
-          "http://localhost/SETS-PROYECTO/servidor/auth/regi.php?tipo=tipodocs"
+          "http://localhost/sets/servidor/auth/regi.php?tipo=tipodocs"
         );
         setTipodocs(tipoDocResponse.data);
       } catch (error) {
@@ -126,7 +126,7 @@ const Registro = () => {
 
     try {
         const response = await axios.post(
-            "http://localhost/SETS-PROYECTO/servidor/auth/regi.php",
+            "http://localhost/sets/servidor/auth/regi.php",
             dataToSend,
             {
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -148,9 +148,10 @@ const Registro = () => {
                 autoClose: 2000, 
                 onClose: () => {
                     const rutas = {
-                        1111: "http://localhost/SETS-PROYECTO/VIEW/admin/BIENVENIDOADMI.php",
-                        2222: "http://localhost/SETS-PROYECTO/VIEW/seguridad/BIENVENIDOGUARDA.php",
-                        3333: "http://localhost/SETS-PROYECTO/VIEW/residente/BIENVENIDORESIDENTE.php",
+                        1111: "http://localhost/sets/VIEW/admin/BIENVENIDOADMI.php",
+                        2222: "http://localhost/sets/VIEW/seguridad/BIENVENIDOGUARDA.php",
+                        3333: "http://localhost/sets/VIEW/residente/BIENVENIDORESIDENTE.php",
+                        4444: "http://localhost/sets/VIEW/dueño/BIENVENIDORESIDENTE.php",
                         error: "http://localhost/SETS/error.html",
                     };
                     window.location.href = rutas[redirect] || rutas["error"];
