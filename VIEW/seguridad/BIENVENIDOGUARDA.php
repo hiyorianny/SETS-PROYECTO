@@ -1,16 +1,5 @@
 <?php
-require '../../servidor/auth/authMiddleware.php';
-
-$decoded = authenticate();
-
-$idRegistro = $decoded->id;
-$Usuario = $decoded->Usuario;
-$idRol = $decoded->idRol;
-
-if ($idRol != 2222) {
-    header("Location: http://localhost/sets/error.php");
-    exit();
-}
+require __DIR__.'/../../servidor/auth/controller/guarda.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
