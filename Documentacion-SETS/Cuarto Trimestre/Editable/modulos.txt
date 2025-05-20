@@ -1,0 +1,13 @@
+modulos
+
+-rol- registro- tipodoc - ingreso peatonal  = gestion registros
+
+-anuncio -notificaciones - gestion informacion
+
+-torre - piso -apartamento -gestion de copropiedad
+-parqueadero- solicitud- tipo de vehiculo  ingreso vehicular -gestion vehiculos
+
+-zonas comunes - solicitud - apartamento - gestion de acciones
+
+-citas -apartament - gestion de reunion
+-pagos - apartament -gestion  aportes

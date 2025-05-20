@@ -1,0 +1,18 @@
+.collapse {
+    font-size: 30px;
+
+}
+
+.nav-link {
+    color: blue;
+}
+
+.alert {
+    color: blue;
+    text-align: center;
+    font-size: 30px;
+}
+
+.body {
+   overflow-y: scroll;
+}
