@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SETS - Registrarse Eventos</title>
+    <link rel="stylesheet" href="css/eventosregistro.css">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a81368914c.js"></script>
+    <link rel="shortcut icon" href="img/c.png" type="image/x-icon" />
+</head>
+<body>
+    <header>
+        <div class="topbar">
+            <div class="menu-left">
+                <div class="admin-container">
+                    <img src="img/ajustes.png" alt="Admin" class="admin-img">
+                    <a href="#" class="menu-button">Admin</a>
+                    <div class="dropdown-menu">
+                        <a href="Perfil.html">Editar datos</a>
+                        <a href="#">Reportar problema</a>
+                        <a href="index.html">Cerrar sesión</a>
+                    </div>
+                </div>
+                <img src="img/notificacion.png" alt="Notificaciones" class="notification">
+            </div>
+            <div class="menu-right">
+                <div class="chat">
+                    <img src="img/hablando.png" alt="Chat" class="chat-button">
+                    <a href="#" class="menu-button">SETS</a>
+                    <img src="img/C.png" alt="Chat" class="chat-button">
+                    <div class="chat-menu">
+                        <div class="search-container">
+                            <input type="text" placeholder="Buscar" class="search-bar" onkeyup="filterChat()">
+                        </div>
+                        <div class="chat-links">
+                            <a href="#" class="chat-item">ADMINISTRADOR</a>
+                            <a href="#" class="chat-item">GUARDA DE SEGURIDAD</a>
+                            <a href="#" class="chat-item">Chat Comunal</a>
+                            <a href="#" class="chat-item">Añadir Persona</a>
+                            <a href="#" class="chat-item">Eliminar Persona</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <div class="login-content">
+            <form action="recuperar.html" method="post">
+                <h2 class="title">Registrarse Evento</h2>
+                
+                <div class="input-div one">
+                    <div class="i">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                    <div class="div">
+                        <h5>Nombres Del Residente</h5>
+                        <input type="text" class="input" name="nombre_evento" required>
+                    </div>
+                </div>
+                <div class="input-div one">
+                    <div class="i">
+                        <i class="fas fa-address-card"></i>
+                    </div>
+                    <div class="div">
+                        <h5>Numero de Documento</h5>
+                        <input type="number" class="input" name="descripcion_evento" required>
+                    </div>
+                </div>
+                <div class="input-div one">
+                    <div class="i">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div class="div">
+                        <h5>Teléfono</h5>
+                        <input type="number" class="input" name="organizador" required>
+                    </div>
+                </div>
+                <div class="input-div one">
+                    <div class="i">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="div">
+                        <h5>Correo</h5>
+                        <input type="email" value="@" class="input" name="organizador" required>
+                    </div>
+                </div>
+               
+                <input type="submit" class="btn" value="Enviar">
+                <a href="inicioprincipal.html" class="btn small-btn">VOLVER</a>
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript" src="JAVA/main.js"></script>
+    <script>
+        document.querySelector('.admin-img').addEventListener('click', function() {
+            document.querySelector('.dropdown-menu').classList.toggle('show');
+        });
+
+        document.querySelector('.chat-button').addEventListener('click', function() {
+            document.querySelector('.chat-menu').classList.toggle('show');
+        });
+
+        function filterChat() {
+            const searchInput = document.querySelector('.search-bar').value.toLowerCase();
+            const chatItems = document.querySelectorAll('.chat-item');
+            chatItems.forEach(item => {
+                if (item.textContent.toLowerCase().includes(searchInput)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
