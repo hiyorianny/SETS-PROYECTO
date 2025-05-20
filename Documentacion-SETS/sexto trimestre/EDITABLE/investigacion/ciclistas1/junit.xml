@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\xampp\htdocs\ciclistas1\phpunit.xml" tests="7" assertions="12" errors="0" failures="0" skipped="0" time="0.110486">
+    <testsuite name="Ciclistas Test Suite" tests="7" assertions="12" errors="0" failures="0" skipped="0" time="0.110486">
+      <testsuite name="App\Tests\CiclistaModelTest" file="C:\xampp\htdocs\ciclistas1\tests\CiclistaModelTest.php" tests="7" assertions="12" errors="0" failures="0" skipped="0" time="0.110486">
+        <testcase name="testGetAll" file="C:\xampp\htdocs\ciclistas1\tests\CiclistaModelTest.php" line="9" class="App\Tests\CiclistaModelTest" classname="App.Tests.CiclistaModelTest" assertions="2" time="0.017476"/>
+        <testcase name="testGetByEspecialidad" file="C:\xampp\htdocs\ciclistas1\tests\CiclistaModelTest.php" line="16" class="App\Tests\CiclistaModelTest" classname="App.Tests.CiclistaModelTest" assertions="2" time="0.012158"/>
+        <testcase name="testGetById" file="C:\xampp\htdocs\ciclistas1\tests\CiclistaModelTest.php" line="23" class="App\Tests\CiclistaModelTest" classname="App.Tests.CiclistaModelTest" assertions="1" time="0.014963"/>
+        <testcase name="testCreate" file="C:\xampp\htdocs\ciclistas1\tests\CiclistaModelTest.php" line="30" class="App\Tests\CiclistaModelTest" classname="App.Tests.CiclistaModelTest" assertions="2" time="0.013830"/>
+        <testcase name="testUpdate" file="C:\xampp\htdocs\ciclistas1\tests\CiclistaModelTest.php" line="54" class="App\Tests\CiclistaModelTest" classname="App.Tests.CiclistaModelTest" assertions="2" time="0.019936"/>
+        <testcase name="testDelete" file="C:\xampp\htdocs\ciclistas1\tests\CiclistaModelTest.php" line="80" class="App\Tests\CiclistaModelTest" classname="App.Tests.CiclistaModelTest" assertions="2" time="0.018406"/>
+        <testcase name="testGetTotalPresupuesto" file="C:\xampp\htdocs\ciclistas1\tests\CiclistaModelTest.php" line="90" class="App\Tests\CiclistaModelTest" classname="App.Tests.CiclistaModelTest" assertions="1" time="0.013716"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

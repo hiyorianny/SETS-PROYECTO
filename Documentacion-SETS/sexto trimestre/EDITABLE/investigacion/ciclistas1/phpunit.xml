@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="vendor/autoload.php"
+         colors="true"
+         verbose="true">
+    <testsuites>
+        <testsuite name="Ciclistas Test Suite">
+            <directory>tests</directory>
+            <exclude>tests/DatabaseTest.php</exclude>
+        </testsuite>
+    </testsuites>
+    
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">src</directory>
+        </whitelist>
+    </filter>
+       <logging>
+        <log type="testdox-html" target="report.html"/>
+    </logging>
+    <coverage>
+        <report>
+            <html outputDirectory="coverage-report"/>
+        </report>
+    </coverage>
+</phpunit>
