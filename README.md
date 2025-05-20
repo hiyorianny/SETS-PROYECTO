@@ -1,2 +1,0 @@
-# SETS-PROYECTO
-
