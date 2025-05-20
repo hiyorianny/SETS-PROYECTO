@@ -1,0 +1,265 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "./registro.css";
+import logo from "../assets/img/c.png";  // Cambia esta ruta si tu logo está en otro directorio
+
+const Registro = () => {
+    const [formData, setFormData] = useState({
+        PrimerNombre: "",
+        SegundoNombre: "",
+        PrimerApellido: "",
+        SegundoApellido: "",
+        Correo: "",
+        Usuario: "",
+        Clave: "",
+        Id_tipoDocumento: "",
+        numeroDocumento: "",
+        telefonoUno: "",
+        telefonoDos: "",
+        idRol: "",  // Guardamos el rol como un valor numérico
+    });
+
+    const [tipodocs, setTipodocs] = useState([]);  // Estado para los tipos de documento
+    const [roles, setRoles] = useState([]);  // Estado para los roles
+    const [mensaje, setMensaje] = useState("");
+    const [errors, setErrors] = useState({
+        PrimerNombre: "",
+        SegundoNombre: "",
+        PrimerApellido: "",
+        SegundoApellido: "",
+        Correo: "",
+        telefonoUno: "",
+        telefonoDos: "",
+        numeroDocumento: "",
+    });
+
+
+    
+    // Fetch datos de la API cuando el componente se monta
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Solicitar roles desde el endpoint correspondiente
+                const rolResponse = await axios.get("http://localhost/sets/backend/regi.php?tipo=roles");
+                console.log("Roles:", rolResponse.data);  // Ver la respuesta de roles
+                setRoles(rolResponse.data);
+
+                // Solicitar tipos de documentos desde el endpoint correspondiente
+                const tipoDocResponse = await axios.get("http://localhost/sets/backend/regi.php?tipo=tipodocs");
+                console.log("Tipo de documentos:", tipoDocResponse.data);  // Ver la respuesta de tipos de documentos
+                setTipodocs(tipoDocResponse.data);
+            } catch (error) {
+                setMensaje("Error al cargar los datos.");
+                console.error("Error al cargar los datos:", error);
+            }
+        };
+
+        fetchData();
+    }, []);  // Este efecto se ejecuta solo una vez al montar el componente
+
+    // Función para manejar los cambios en los campos
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+
+        // Actualizar el formulario
+        setFormData({ ...formData, [name]: value });
+
+        // Validación
+        let errorMessage = "";
+
+        switch (name) {
+            case "PrimerNombre":
+            case "SegundoNombre":
+            case "PrimerApellido":
+            case "SegundoApellido":
+                // Verificar si contiene números
+                if (/\d/.test(value)) {
+                    errorMessage = "Solo se deben colocar letras";
+                } else {
+                    errorMessage = "";
+                }
+                break;
+            case "Correo":
+                // Verificar si es un correo válido
+                const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+                if (!emailRegex.test(value)) {
+                    errorMessage = "Correo no válido";
+                } else {
+                    errorMessage = "";
+                }
+                break;
+            case "telefonoUno":
+            case "telefonoDos":
+            case "numeroDocumento":
+                // Verificar si es un número
+                if (!/^\d+$/.test(value)) {
+                    errorMessage = "Solo se deben ingresar números";
+                } else {
+                    errorMessage = "";
+                }
+                break;
+            default:
+                break;
+        }
+
+        setErrors({ ...errors, [name]: errorMessage });
+    };
+
+    // Manejar el envío del formulario
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        console.log("Datos enviados:", formData);  // Log de los datos enviados
+
+        // Verificar si hay errores antes de enviar el formulario
+        if (Object.values(errors).some(error => error !== "")) {
+            setMensaje("Por favor, corrija los errores.");
+            return;
+        }
+
+        try {
+            const response = await axios.post(
+                "http://localhost/sets/backend/regi.php",
+                formData,
+                {
+                    headers: { "Content-Type": "application/json" },
+                }
+            );
+            setMensaje(response.data.message);
+
+            // Redirigir según el rol
+            if (formData.idRol === "1") {
+                window.location.href = "http://localhost/sets/admin/BIENVENIDOADMI.php";
+            } else if (formData.idRol === "4") {
+                window.location.href = "http://localhost/sets/residente/BIENVENIDORESIDENTE.php";
+            } else if (formData.idRol === "2") {
+                window.location.href = "http://localhost/sets/gestor_inmobiliaria/BIENVENIDOADMINISTRADOR.php";
+            } else if (formData.idRol === "3") {
+                window.location.href = "http://localhost/sets/seguridad/BIENVENIDOGUARDA.php";
+            } else {
+                window.location.href = "http://localhost/SETS/error.html";
+            }
+
+            // Limpiar el formulario
+            setFormData({
+                PrimerNombre: "",
+                SegundoNombre: "",
+                PrimerApellido: "",
+                SegundoApellido: "",
+                Correo: "",
+                Usuario: "",
+                Clave: "",
+                Id_tipoDocumento: "",
+                numeroDocumento: "",
+                telefonoUno: "",
+                telefonoDos: "",
+                idRol: "", // Limpiar también el rol
+            });
+        } catch (error) {
+            setMensaje(error.response?.data?.error || "Error al registrar el usuario.");
+        }
+    };
+
+    return (
+        <div className="container">
+            <br /> <p /><p />
+            <header className="text-center mb-4 d-flex flex-column align-items-center">
+                <img src={logo} alt="Logo" /><br /> <p /><p />
+                <h2 className="title">SETS<br />BIENVENIDO</h2>
+            </header>
+
+            <h2>Registro de Usuario</h2>
+
+            {mensaje && <p>{mensaje}</p>}
+
+            <form onSubmit={handleSubmit}>
+                {/* Campos del formulario */}
+                <input
+                    type="text"
+                    name="PrimerNombre"
+                    placeholder="Primer Nombre"
+                    value={formData.PrimerNombre}
+                    onChange={handleChange}
+                    required
+                />
+                {errors.PrimerNombre && <p className="error">{errors.PrimerNombre}</p>}
+
+                <input
+                    type="text"
+                    name="SegundoNombre"
+                    placeholder="Segundo Nombre"
+                    value={formData.SegundoNombre}
+                    onChange={handleChange}
+                />
+                {errors.SegundoNombre && <p className="error">{errors.SegundoNombre}</p>}
+
+                <input
+                    type="text"
+                    name="PrimerApellido"
+                    placeholder="Primer Apellido"
+                    value={formData.PrimerApellido}
+                    onChange={handleChange}
+                    required
+                />
+                {errors.PrimerApellido && <p className="error">{errors.PrimerApellido}</p>}
+
+                <input
+                    type="text"
+                    name="SegundoApellido"
+                    placeholder="Segundo Apellido"
+                    value={formData.SegundoApellido}
+                    onChange={handleChange}
+                />
+                {errors.SegundoApellido && <p className="error">{errors.SegundoApellido}</p>}
+
+                <input
+                    type="email"
+                    name="Correo"
+                    placeholder="Correo"
+                    value={formData.Correo}
+                    onChange={handleChange}
+                    required
+                />
+                {errors.Correo && <p className="error">{errors.Correo}</p>}
+
+                <input
+                    type="number"
+                    name="telefonoUno"
+                    placeholder="Teléfono 1"
+                    value={formData.telefonoUno}
+                    onChange={handleChange}
+                    required
+                />
+                {errors.telefonoUno && <p className="error">{errors.telefonoUno}</p>}
+
+                <input
+                    type="number"
+                    name="telefonoDos"
+                    placeholder="Teléfono 2"
+                    value={formData.telefonoDos}
+                    onChange={handleChange}
+                />
+                {errors.telefonoDos && <p className="error">{errors.telefonoDos}</p>}
+
+                <input
+                    type="number"
+                    name="numeroDocumento"
+                    placeholder="Número de Documento"
+                    value={formData.numeroDocumento}
+                    onChange={handleChange}
+                    required
+                />
+                {errors.numeroDocumento && <p className="error">{errors.numeroDocumento}</p>}
+
+                <button type="submit">Registrar</button>
+            </form>
+
+            <div className="d-flex justify-content-between">
+                <a href="http://localhost:3000/login">Iniciar Sesion</a>
+                <a href="http://localhost/SETS/recuperarcontrase%C3%B1a.php">Recuperar Contraseña</a>
+                <a href="http://localhost/SETS/">Volver</a>
+            </div>
+        </div>
+    );
+};
+
+export default Registro;
