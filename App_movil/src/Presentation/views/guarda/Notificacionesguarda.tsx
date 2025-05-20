@@ -95,22 +95,6 @@ const Notificacionesguarda = () => {
               });
             });
             break;
-  
-          case 'zona_comun':
-            limitData.forEach((solicitud: any) => {
-              if (!solicitud.ID_zonaComun || !solicitud.fechainicio) return;
-              todasNotificaciones.push({
-                id: generateUniqueId(prefix, solicitud.ID_zonaComun),
-                titulo: 'Solicitud de zona común',
-                mensaje: `Solicitud para ${solicitud.descripcion || 'zona común'}`,
-                fecha: solicitud.fechainicio,
-                leida: false,
-                tipo: 'informativa',
-                origen: 'zona_comun',
-                originalId: solicitud.ID_zonaComun
-              });
-            });
-            break;
         }
       }
   
