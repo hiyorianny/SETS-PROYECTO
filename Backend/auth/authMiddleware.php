@@ -15,7 +15,7 @@ function authenticate() {
     if (!isset($_COOKIE['token'])) {
         error_log("No se encontró token en las cookies");
         header("HTTP/1.1 401 Unauthorized");
-        header("Location: http://localhost/sets/VIEW/error.php");
+        header("Location: http://localhost/SETS-PROYECTO/frontend-web/");
         exit();
     }
 
@@ -36,7 +36,7 @@ function authenticate() {
         if (!isset($userData->idRol)) {
             error_log("Token no contiene idRol");
             header("HTTP/1.1 403 Forbidden");
-            header("Location: http://localhost/sets/VIEW/error.php");
+            header("Location: http://localhost/SETS-PROYECTO/frontend-web/");
             exit();
         }
 
@@ -49,7 +49,7 @@ function authenticate() {
     } catch (Exception $e) {
         error_log("Error al decodificar token: " . $e->getMessage());
         header("HTTP/1.1 401 Unauthorized");
-        header("Location: http://localhost/sets/VIEW/error.php");
+        header("Location: http://localhost/SETS-PROYECTO/frontend-web/");
         exit();
     }
 }

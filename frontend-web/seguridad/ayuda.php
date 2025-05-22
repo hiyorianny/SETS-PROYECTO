@@ -1,5 +1,5 @@
 <?php
-require __DIR__.'/../../Backend/auth/controller/guarda.php';
+require __DIR__ . '/../../Backend/auth/controller/guarda.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -25,7 +25,7 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
                 <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation" style="background-color: white;">
                     <span class="navbar-toggler-icon" style="color: white;"></span>
                 </button>
-                <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
                     <div class="offcanvas-header">
                         <img src="img/C.png" alt="Logo" width="90" height="94" class="d-inline-block align-text-top">
                         <center>
@@ -78,7 +78,7 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
 
                          
 
-                         <div class="offcanvas-header">
+                            <div class="offcanvas-header">
                                 <img src="img/ayudar (1).png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
                                 <center>
                                     <a href="./ayuda.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Ayuda</b></a>
@@ -89,27 +89,83 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
                 </div>
             </div>
         </nav>
-    </header>
     <main>
         <br><br>
         <br><br>
         <br><br>
-    <center>   <h1 class="responsive-title"><b>Normas De Convivencia !</b></h1></center> 
+        <h1 class="responsive-title"><b>Manuales de Ayuda!</b></h1>
         <br>
         <center>
             <div class="page-container">
                 <section class="document-section">
 
                     <div class="document-content">
-                        <iframe src="manual.pdf" style="width: 100%; height: 1800px;" frameborder="0"></iframe>
+                        <iframe src="../../Documentacion-SETS/sexto trimestre/MANUALES/Manuales de usuario/manual guarda .pdf" style="width: 100%; height: 1800px;" frameborder="0"></iframe>
                     </div>
                 </section>
             </div>
         </center>
     </main>
-       <a href="inicioprincipal.php" class="btn-volver" style="text-decoration: none;">
-            <i class="fas fa-arrow-left" ></i> VOLVER
-        </a>
+    <a href="inicioprincipal.php" class="btn btn-outline-success btn-lg" style="font-size: 40px;">VOLVER</a>
+    <script>
+        document.querySelector('.admin-img').addEventListener('click', function() {
+            document.querySelector('.dropdown-menu').classList.toggle('show');
+        });
+
+        document.querySelector('.chat-button').addEventListener('click', function() {
+            document.querySelector('.chat-menu').classList.toggle('show');
+        });
+
+        function filterChat() {
+            const searchInput = document.querySelector('.search-bar').value.toLowerCase();
+            const chatItems = document.querySelectorAll('.chat-item');
+            chatItems.forEach(item => {
+                if (item.textContent.toLowerCase().includes(searchInput)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    </script>
+    <script>
+        function openChat(chatName) {
+            const chatContainer = document.getElementById('chatContainer');
+            const chatHeader = document.getElementById('chatHeader');
+            chatHeader.textContent = chatName;
+            chatContainer.classList.add('show');
+        }
+
+        function closeChat() {
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.classList.remove('show');
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById('chatInput');
+            const messageText = messageInput.value.trim();
+            if (messageText) {
+                const chatMessages = document.getElementById('chatMessages');
+                const messageElement = document.createElement('p');
+                messageElement.textContent = messageText;
+                chatMessages.appendChild(messageElement);
+                messageInput.value = '';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        }
+
+        function filterChat() {
+            const searchInput = document.querySelector('.search-bar').value.toLowerCase();
+            const chatItems = document.querySelectorAll('.chat-item');
+            chatItems.forEach(item => {
+                if (item.textContent.toLowerCase().includes(searchInput)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    </script>
     <br>
     <footer>
         <div class="footer-content">

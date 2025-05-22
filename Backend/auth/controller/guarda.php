@@ -13,7 +13,7 @@ error_log("Datos después de autenticar: " . print_r($decoded, true));
 error_log("Datos de sesión: " . print_r($_SESSION, true));
 if ($_SESSION['user_role'] != 2222) {
     error_log("Acceso denegado: Rol " . $_SESSION['user_role'] . " intentando acceder a página de seguridad");
-    header("Location: http://localhost/sets/VIEW/error.php");
+    header("Location: http://localhost/SETS-PROYECTO/frontend-web/");
     exit();
 }
 $idRegistro = $_SESSION['user_id'];

@@ -100,7 +100,7 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
                             <div class="offcanvas-header">
                                 <img src="img/ayudar (1).png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
                                 <center>
-                                    <a href="notificaciones.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Ayuda</b></a>
+                                    <a href="./ayuda.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Ayuda</b></a>
                                 </center>
                             </div>
                             <center>
@@ -211,7 +211,7 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
 
             async function loadAnnouncements() {
                 try {
-                    const response = await fetch('http://192.168.1.100:3000/api/anuncios');
+                    const response = await fetch('http://192.168.1.100:3001/api/anuncios');
                     const anuncios = await response.json();
 
                     const announcementsContainer = document.getElementById('announcements');
@@ -251,7 +251,7 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
                 const query = document.getElementById('search-input').value.toLowerCase();
 
                 try {
-                    const response = await fetch('http://192.168.1.100:3000/api/anuncios');
+                    const response = await fetch('http://192.168.1.100:3001/api/anuncios');
                     const anuncios = await response.json();
 
                     const filtered = query ?

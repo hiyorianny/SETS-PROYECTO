@@ -1,18 +1,5 @@
 <?php
-include_once "conexion.php";
-
-$query = "SELECT id_Parqueadero, numero_Parqueadero, disponibilidad , uso FROM parqueadero";
-try {
-    $statement = $base_de_datos->prepare($query);
-    $statement->execute();
-    $parqueaderos = $statement->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    echo "Error al ejecutar la consulta: " . $e->getMessage();
-    exit();
-}
-?>
-<?php
-require __DIR__.'/../../Backend/auth/controller/guarda.php';
+require __DIR__ . '/../../Backend/auth/controller/guarda.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -46,57 +33,48 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
                     </div>
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                            <li class="nav-item">
-                                <center><a class="nav-link active" aria-current="page" href="#" style="font-size: 20px;"><b>Inicio</b></a></center>
-                            </li>
+                            <div class="offcanvas-header">
+                                <img src="img/pagina-de-inicio.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                <center>
+                                    <a href="./inicioprincipal.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Inicio</b></a>
+                                </center>
+                            </div>
+
                             <center>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <img src="img/usuario.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
+
                                         <b style="font-size: 20px;"> Perfil</b>
                                     </a>
                                     <ul class="dropdown-menu" role="menu">
                                         <li>
-                                            <center><a href="Perfil.php">Editar Datos</a></center>
+                                            <center><a href="Perfil.php"><b>Perfil</b></a></center>
                                         </li>
 
                                         <li>
-                                            <center> <a href="../../servidor/auth/logout.php">Cerrar sesión</a></center>
+                                            <center> <a href="../../Backend/auth/logout.php"><b>Cerrar Sesión</b></a></center>
                                         </li>
                                     </ul>
                             </center>
                             </li>
                             <div class="offcanvas-header">
                                 <img src="img/notificacion.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
-
                                 <center>
                                     <a href="notificaciones.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;">Notificaciones</a>
                                 </center>
                             </div>
-
-                        </ul>
-                        <form class="d-flex mt-3" role="search">
-                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                            <button class="btn btn-outline-success" type="submit">Buscar</button>
-                        </form>
+                             <div class="offcanvas-header">
+                                <img src="img/ayudar (1).png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                <center>
+                                    <a href="./ayuda.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Ayuda</b></a>
+                                </center>
+                            </div>
+                            <center>
                     </div>
                 </div>
-            </div>
         </nav>
     </header>
-    <main>
-        <div id="chatContainer" class="chat-container">
-            <div class="chat-header">
-                <span id="chatHeader">Chat</span>
-                <button class="close-btn" onclick="closeChat()">×</button>
-            </div>
-            <div class="chat-messages" id="chatMessages">
-            </div>
-            <div class="chat-input">
-                <input type="text" id="chatInput" style="font-size: 14px;" placeholder="Escribe tu mensaje...">
-                <button onclick="sendMessage()">Enviar</button>
-            </div>
-        </div>
-    </main>
     <br><br>
     <br><br>
     <br><br>
@@ -126,28 +104,15 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
                 <center>
                     <div class="container">
                         <div class="row" id="parqueaderosContainer">
-                            <?php if (!empty($parqueaderos)): ?>
-                                <?php foreach ($parqueaderos as $index => $parqueadero): ?>
-                                    <div class="col-6 col-md-2 mb-4 product-card" data-number="<?= htmlspecialchars($parqueadero['numero_Parqueadero']); ?>">
-                                        <div class="card text-center">
-                                            <h3 class="torres-title"><?= htmlspecialchars($parqueadero['numero_Parqueadero']); ?></h3>
-                                            <img src="img/moto.png" alt="" class="product-img">
-                                            <button class="btn <?= ($parqueadero['disponibilidad'] === 'SI ESTA DISPONIBLE') ? 'btn-success' : 'btn-danger'; ?>" style="font-size: 13px;">
-                                                <?= htmlspecialchars($parqueadero['disponibilidad']); ?>
-                                            </button>
-                                            <br>
-                                            <h8 style="font-size: 14PX;"><b> DISPONIBLE DESDE O APARTIR DE :</b></h8>
-                                            <button class="btn <?= isset($parqueadero['uso']) && $parqueadero['uso'] !== NULL ? 'btn-success' : 'btn-danger'; ?>" style="font-size: 13px;">
-                                                <?= isset($parqueadero['uso']) && $parqueadero['uso'] !== NULL ? date('Y-m-d H:i:s', strtotime($parqueadero['uso'])) : ''; ?>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <?php if (($index + 1) % 5 == 0): ?>
+
+                            <div class="text-center">
+                                <div class="spinner-border text-success" role="status">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                                <p>Cargando datos de parqueaderos...</p>
+                            </div>
                         </div>
-                        <div class="row">
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                    </div>
                 </center>
             </div>
         </div>
@@ -158,6 +123,21 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
             </a>
         </div>
         </main>
+        <script>
+            document.getElementById('searchInput').addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                const cards = document.querySelectorAll('.product-card');
+
+                cards.forEach(card => {
+                    const number = card.getAttribute('data-number').toLowerCase();
+                    if (number.includes(query)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        </script>
         <script>
             document.querySelector('.admin-img').addEventListener('click', function() {
                 document.querySelector('.dropdown-menu').classList.toggle('show');
@@ -191,72 +171,77 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
             }
         </script>
         <script>
-            document.getElementById('searchInput').addEventListener('input', function() {
-                const query = this.value.toLowerCase();
-                const cards = document.querySelectorAll('.product-card');
-
-                cards.forEach(card => {
-                    const number = card.getAttribute('data-number').toLowerCase();
-                    if (number.includes(query)) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
+            // Función para cargar los parqueaderos desde la API
+            async function cargarParqueaderos() {
+                try {
+                    const response = await fetch('http://192.168.1.100:3001/api/parqueaderos');
+                    if (!response.ok) {
+                        throw new Error('Error al obtener los datos');
                     }
-                });
-            });
-        </script>
-        <script>
-            document.getElementById('searchInput').addEventListener('input', function() {
-                const query = this.value.toLowerCase();
-                const cards = document.querySelectorAll('.product-card');
+                    const parqueaderos = await response.json();
 
-                cards.forEach(card => {
-                    const number = card.getAttribute('data-number').toLowerCase();
-                    if (number.includes(query)) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
+                    const container = document.getElementById('parqueaderosContainer');
+
+                    if (parqueaderos.length === 0) {
+                        container.innerHTML = `
+                        <div class="alert alert-warning">
+                            No se encontraron parqueaderos registrados
+                        </div>
+                    `;
+                        return;
                     }
-                });
-            });
-        </script>
-        <script>
-            function openChat(chatName) {
-                const chatContainer = document.getElementById('chatContainer');
-                const chatHeader = document.getElementById('chatHeader');
-                chatHeader.textContent = chatName;
-                chatContainer.classList.add('show');
-            }
 
-            function closeChat() {
-                const chatContainer = document.getElementById('chatContainer');
-                chatContainer.classList.remove('show');
-            }
+                    let html = '';
+                    parqueaderos.forEach((parqueadero, index) => {
+                        html += `
+                        <div class="col-6 col-md-2 mb-4 product-card" data-number="${parqueadero.numero_Parqueadero}">
+                            <div class="card text-center">
+                                <h3 class="torres-title">${parqueadero.id_parqueadero}</h3>
+                                <img src="img/moto.png" alt="" class="product-img">
+                                <button class="btn ${parqueadero.disponibilidad === 'SI ESTA DISPONIBLE' ? 'btn-success' : 'btn-danger'}" style="font-size: 13px;">
+                                    ${parqueadero.disponibilidad}
+                                </button>
+                                <br>
+                                <h8 style="font-size: 14PX;"><b> DISPONIBLE DESDE O APARTIR DE :</b></h8>
+                                <button class="btn ${parqueadero.uso ? 'btn-success' : 'btn-danger'}" style="font-size: 13px;">
+                                    ${parqueadero.uso ? new Date(parqueadero.uso).toLocaleString() : ''}
+                                </button>
+                            </div>
+                        </div>
+                    `;
 
-            function sendMessage() {
-                const messageInput = document.getElementById('chatInput');
-                const messageText = messageInput.value.trim();
-                if (messageText) {
-                    const chatMessages = document.getElementById('chatMessages');
-                    const messageElement = document.createElement('p');
-                    messageElement.textContent = messageText;
-                    chatMessages.appendChild(messageElement);
-                    messageInput.value = '';
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                        // Agregar nueva fila cada 5 elementos
+                        if ((index + 1) % 5 === 0) {
+                            html += `</div><div class="row">`;
+                        }
+                    });
+
+                    container.innerHTML = html;
+
+                    // Configurar el buscador
+                    document.getElementById('searchInput').addEventListener('input', function() {
+                        const query = this.value.toLowerCase();
+                        const cards = document.querySelectorAll('.product-card');
+
+                        cards.forEach(card => {
+                            const number = card.getAttribute('data-number').toLowerCase();
+                            card.style.display = number.includes(query) ? 'block' : 'none';
+                        });
+                    });
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    document.getElementById('parqueaderosContainer').innerHTML = `
+                    <div class="alert alert-danger">
+                        Error al cargar los parqueaderos: ${error.message}
+                        <button onclick="cargarParqueaderos()" class="btn btn-sm btn-warning mt-2">Reintentar</button>
+                    </div>
+                `;
                 }
             }
 
-            function filterChat() {
-                const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-                const chatItems = document.querySelectorAll('.chat-item');
-                chatItems.forEach(item => {
-                    if (item.textContent.toLowerCase().includes(searchInput)) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
-            }
+            // Cargar los parqueaderos cuando la página esté lista
+            document.addEventListener('DOMContentLoaded', cargarParqueaderos);
         </script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

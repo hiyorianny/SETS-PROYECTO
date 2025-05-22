@@ -1,33 +1,5 @@
 <?php
-
-
-include_once "conexion.php";
-
-$query = "SELECT numApartamento, pisos, torre FROM apartamento ORDER BY torre, pisos, numApartamento";
-$stmt = $base_de_datos->prepare($query);
-$stmt->execute();
-$resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$torres = [];
-foreach ($resultados as $fila) {
-  $torre = $fila['torre'];
-  $piso = $fila['pisos'];
-
-  if (!isset($torres[$torre])) {
-    $torres[$torre] = [];
-  }
-
-  if (!isset($torres[$torre][$piso])) {
-    $torres[$torre][$piso] = [];
-  }
-
-  $torres[$torre][$piso][] = [
-    'numApartamento' => $fila['numApartamento']
-  ];
-}
-?>
-<?php
-require __DIR__.'/../../Backend/auth/controller/guarda.php';
+require __DIR__ . '/../../Backend/auth/controller/guarda.php';
 ?>
 
 <!DOCTYPE html>
@@ -61,59 +33,51 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
           </div>
           <div class="offcanvas-body">
             <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-              <li class="nav-item">
-                <center><a class="nav-link active" aria-current="page" href="#" style="font-size: 20px;"><b>Inicio</b></a></center>
-              </li>
+              <div class="offcanvas-header">
+                <img src="img/pagina-de-inicio.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                <center>
+                  <a href="./inicioprincipal.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Inicio</b></a>
+                </center>
+              </div>
+
               <center>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="img/usuario.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
+
                     <b style="font-size: 20px;"> Perfil</b>
                   </a>
                   <ul class="dropdown-menu" role="menu">
                     <li>
-                      <center><a href="Perfil.php">Editar Datos</a></center>
+                      <center><a href="Perfil.php"><b>Perfil</b></a></center>
                     </li>
-                    <li>
-                      <center> <a href="../../servidor/auth/logout.php">Cerrar sesión</a></center>
 
+                    <li>
+                      <center> <a href="../../Backend/auth/logout.php"><b>Cerrar Sesión</b></a></center>
                     </li>
                   </ul>
               </center>
               </li>
               <div class="offcanvas-header">
                 <img src="img/notificacion.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
-
                 <center>
                   <a href="notificaciones.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;">Notificaciones</a>
                 </center>
               </div>
-            
+              <div class="offcanvas-header">
+                <img src="img/ayudar (1).png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                <center>
+                  <a href="./ayuda.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Ayuda</b></a>
+                </center>
+              </div>
+              <center>
             </ul>
-            <form class="d-flex mt-3" role="search">
-              <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-              <button class="btn btn-outline-success" type="submit">Buscar</button>
-            </form>
           </div>
         </div>
       </div>
     </nav>
   </header>
   <br><br>
-  <main>
-    <div id="chatContainer" class="chat-container">
-      <div class="chat-header">
-        <span id="chatHeader">Chat</span>
-        <button class="close-btn" onclick="closeChat()">×</button>
-      </div>
-      <div class="chat-messages" id="chatMessages">
-      </div>
-      <div class="chat-input">
-        <input type="text" id="chatInput" style="font-size: 14px;" placeholder="Escribe tu mensaje...">
-        <button onclick="sendMessage()">Enviar</button>
-      </div>
-    </div>
-
-  </main>
   <br>
   <br>
   <br>
@@ -125,7 +89,7 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
   <div class="container">
     <div class="barra">
       <div class="sombra"></div>
-      <input type="text" placeholder="Buscar Piso...">
+      <input type="text" id="buscarPiso" placeholder="Buscar Piso..." onkeyup="filtrarPisos()">
       <ion-icon name="search-outline"></ion-icon>
     </div>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
@@ -135,35 +99,17 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
       <div class="col-md-12 mb-4">
         <div class="d-flex justify-content-between">
           <button class="btn btn-outline-success" onclick="cambiarTorre(-1)">← Anterior</button>
-          <h2 id="torreActual" style="text-align: center;">Torre 1</h2>
+          <h2 id="torreActual" style="text-align: center;">Cargando torres...</h2>
           <button class="btn btn-outline-success" onclick="cambiarTorre(1)">Siguiente →</button>
         </div>
         <div id="contenidoTorre">
-          <?php foreach ($torres as $torre => $pisos): ?>
-            <div class="torre" data-torre="<?= $torre ?>" style="display: <?= $torre == 1 ? 'block' : 'none' ?>;">
-              <?php foreach ($pisos as $piso => $apartamentos): ?>
-                <div class="card shadow mb-4">
-                  <div class="card-header bg-success text-white">
-                    <h2 class="mb-0" style="text-align: center;"><b>Piso: <?= htmlspecialchars($piso) ?></b></h2>
-                  </div>
-                  <div class="card-body">
-                    <h4 style="text-align: center;"><b>Apartamentos:</b></h4>
-                    <div class="row">
-                      <?php foreach ($apartamentos as $apartamento): ?>
-                        <div class="col-md-6 mb-3">
-                          <div class="card card-apartamento">
-                            <div class="card-body">
-                              <strong>Número:</strong> <?= htmlspecialchars($apartamento['numApartamento']) ?><br>
-                            </div>
-                          </div>
-                        </div>
-                      <?php endforeach; ?>
-                    </div>
-                  </div>
-                </div>
-              <?php endforeach; ?>
+
+          <div class="text-center">
+            <div class="spinner-border text-success" role="status">
+              <span class="visually-hidden">Cargando...</span>
             </div>
-          <?php endforeach; ?>
+            <p>Cargando datos de torres y apartamentos...</p>
+          </div>
         </div>
       </div>
     </div>
@@ -174,105 +120,175 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
     <a href="./ingresoregi.php" class="btn btn-outline-success" style="font-size: 30px;">Ingreso Peatonal</a>
   </div>
   <a href="inicioprincipal.php" class="btn btn-outline-success" style="font-size: 30px;">Volver</a>
-
-  <script type="text/javascript" src="JAVA/main.js"></script>
   <script>
-    let torres = <?= json_encode(array_keys($torres)) ?>;
+    let torresData = {};
+    let torresList = [];
     let torreActual = 1;
+    let torresCargadas = false;
 
-    function cambiarTorre(direccion) {
-      torreActual += direccion;
-      if (torreActual < 1) torreActual = torres.length;
-      if (torreActual > torres.length) torreActual = 1;
+    async function cargarDatosTorres() {
+      try {
+        const response = await fetch('http://192.168.1.100:3001/api/torres');
+        if (!response.ok) {
+          throw new Error('Error al obtener los datos');
+        }
+        const data = await response.json();
+        console.log('Datos recibidos:', data);
+        if (!data || !data.torres) {
+          throw new Error('La API no devolvió datos en el formato esperado');
+        }
+        torresData = data.torres;
+        torresList = [...new Set(data.torresList || Object.keys(data.torres))]
+          .map(torre => {
 
-      document.querySelectorAll('.torre').forEach(torre => {
-        torre.style.display = 'none';
+            const num = torre.replace(/\D/g, '');
+            return num ? parseInt(num) : 0;
+          })
+          .filter(num => num > 0)
+          .sort((a, b) => a - b);
+        torresList = [...new Set(torresList)];
+
+        torresCargadas = true;
+
+        if (torresList.length > 0) {
+          torreActual = torresList[0];
+          mostrarTorre(torreActual.toString());
+          actualizarTituloTorre();
+        } else {
+          mostrarEstado('No se encontraron torres registradas.', 'warning');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        mostrarEstado(`Error al cargar los datos: ${error.message}`, 'error');
+      }
+    }
+
+    function mostrarEstado(mensaje, tipo = 'info') {
+      const contenido = document.getElementById('contenidoTorre');
+      const alertClass = tipo === 'error' ? 'alert-danger' : 'alert-warning';
+
+      contenido.innerHTML = `
+      <div class="alert ${alertClass}" role="alert">
+        ${mensaje}
+      </div>
+    `;
+    }
+
+    function mostrarTorre(torre) {
+      if (!torresCargadas) return;
+
+      const contenido = document.getElementById('contenidoTorre');
+
+      const torreKey = Object.keys(torresData).find(key => key.startsWith(torre)) || torre;
+      const torreInfo = torresData[torreKey];
+
+      if (!torreInfo) {
+        mostrarEstado(`No se encontró información para la torre ${torre}.`, 'warning');
+        return;
+      }
+
+      let html = '';
+
+
+      const pisos = Object.keys(torreInfo).sort((a, b) => {
+        const numA = parseInt(a.replace(/\D/g, '')) || 0;
+        const numB = parseInt(b.replace(/\D/g, '')) || 0;
+        return numA - numB;
       });
 
-      document.querySelector(`.torre[data-torre="${torreActual}"]`).style.display = 'block';
+      pisos.forEach(piso => {
+        const apartamentos = torreInfo[piso];
+
+        if (!Array.isArray(apartamentos)) {
+          console.warn(`Piso ${piso} no tiene array de apartamentos`);
+          return;
+        }
+
+        html += `
+        <div class="card shadow mb-4">
+          <div class="card-header bg-success text-white">
+            <h2 class="mb-0" style="text-align: center;"><b>Piso: ${piso}</b></h2>
+          </div>
+          <div class="card-body">
+            <h4 style="text-align: center;"><b>Apartamentos:</b></h4>
+            <div class="row">
+      `;
+
+        apartamentos.forEach(apartamento => {
+          const numApto = apartamento.numApartamento || 'N/A';
+          html += `
+          <div class="col-md-6 mb-3">
+            <div class="card card-apartamento">
+              <div class="card-body">
+                <strong>Número:</strong> ${numApto}<br>
+              </div>
+            </div>
+          </div>
+        `;
+        });
+
+        html += `
+            </div>
+          </div>
+        </div>
+      `;
+      });
+
+      contenido.innerHTML = html || `
+      <div class="alert alert-warning">
+        No se encontraron datos para mostrar en esta torre
+      </div>
+    `;
+    }
+
+    function actualizarTituloTorre() {
       document.getElementById('torreActual').textContent = `Torre ${torreActual}`;
     }
-  </script>
-  <br>
-  <br>
-  <br>
-  <br>
 
-  <script type="text/javascript" src="JAVA/main.js"></script>
-  <script>
-    document.querySelector('.admin-img').addEventListener('click', function() {
-      document.querySelector('.dropdown-menu').classList.toggle('show');
-    });
-    document.querySelector('.chat-button').addEventListener('click', function() {
-      document.querySelector('.chat-menu').classList.toggle('show');
-    });
+    function cambiarTorre(direccion) {
+      if (!torresCargadas || torresList.length === 0) return;
 
-    function filterChat() {
-      const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-      const chatItems = document.querySelectorAll('.chat-item');
-      chatItems.forEach(item => {
-        if (item.textContent.toLowerCase().includes(searchInput)) {
-          item.style.display = 'block';
-        } else {
-          item.style.display = 'none';
+      const indiceActual = torresList.indexOf(torreActual);
+      let nuevoIndice = indiceActual + direccion;
+
+
+      if (nuevoIndice < 0) {
+        nuevoIndice = torresList.length - 1;
+      } else if (nuevoIndice >= torresList.length) {
+        nuevoIndice = 0;
+      }
+
+      torreActual = torresList[nuevoIndice];
+      mostrarTorre(torreActual.toString());
+      actualizarTituloTorre();
+    }
+
+    function filtrarPisos() {
+      if (!torresCargadas) return;
+
+      const busqueda = document.getElementById('buscarPiso').value.toLowerCase();
+      const cards = document.querySelectorAll('.card.shadow.mb-4');
+
+      cards.forEach(card => {
+        const pisoText = card.querySelector('.card-header h2').textContent.toLowerCase();
+        const apartamentos = card.querySelectorAll('.card.card-apartamento');
+        let mostrarCard = pisoText.includes(busqueda);
+
+        if (!mostrarCard) {
+          apartamentos.forEach(apto => {
+            if (apto.textContent.toLowerCase().includes(busqueda)) {
+              mostrarCard = true;
+            }
+          });
         }
+
+        card.style.display = mostrarCard ? 'block' : 'none';
       });
     }
+
+    document.addEventListener('DOMContentLoaded', cargarDatosTorres);
   </script>
-  <script>
-    function buscar() {
-      var input = document.getElementById("inputBusqueda").value.toLowerCase();
-      var lista = document.getElementById("listaElementos");
-      var items = lista.getElementsByTagName("li");
-      for (var i = 0; i < items.length; i++) {
-        var elemento = items[i].textContent || items[i].innerText;
-        if (elemento.toLowerCase().indexOf(input) > -1) {
-          items[i].style.display = "";
-        } else {
-          items[i].style.display = "none";
-        }
-      }
-    }
-  </script>
-  <script>
-    function openChat(chatName) {
-      const chatContainer = document.getElementById('chatContainer');
-      const chatHeader = document.getElementById('chatHeader');
-      chatHeader.textContent = chatName;
-      chatContainer.classList.add('show');
-    }
-
-    function closeChat() {
-      const chatContainer = document.getElementById('chatContainer');
-      chatContainer.classList.remove('show');
-    }
-
-    function sendMessage() {
-      const messageInput = document.getElementById('chatInput');
-      const messageText = messageInput.value.trim();
-      if (messageText) {
-        const chatMessages = document.getElementById('chatMessages');
-        const messageElement = document.createElement('p');
-        messageElement.textContent = messageText;
-        chatMessages.appendChild(messageElement);
-        messageInput.value = '';
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
-    }
-
-    function filterChat() {
-      const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-      const chatItems = document.querySelectorAll('.chat-item');
-      chatItems.forEach(item => {
-        if (item.textContent.toLowerCase().includes(searchInput)) {
-          item.style.display = 'block';
-        } else {
-          item.style.display = 'none';
-        }
-      });
-    }
-  </script>
-
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <br>
   <br>
   <br>
@@ -287,8 +303,6 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
       </ul>
     </div>
   </footer>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  </header>
 </body>
 
 </html>

@@ -1,53 +1,5 @@
 <?php
-include_once "conexion.php";
-
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete'])) {
-    $id_solicitud = $_POST['delete_id_solicitud'];
-
-    $sql = "DELETE FROM solicitud_parqueadero WHERE id_solicitud = :id_solicitud";
-    $stmt = $base_de_datos->prepare($sql);
-
-    if ($stmt->execute(['id_solicitud' => $id_solicitud])) {
-       
-    } else {
-        echo "Error al eliminar la solicitud.";
-    }
-}
-
-
-$sql = "SELECT * FROM solicitud_parqueadero";
-$stmt = $base_de_datos->query($sql);
-$solicitudes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
-$sql_estado = "SELECT 
-    p.parqueadero_visitante AS parqueadero,
-    CASE 
-        WHEN p.estado = 'aprobado' AND NOW() BETWEEN p.fecha_inicio AND p.fecha_final THEN 'ocupado'
-        WHEN p.estado = 'aprobado' AND NOW() < p.fecha_inicio THEN 'reservado'
-        ELSE 'disponible'
-    END AS estado,
-    IFNULL(p.nombre_visitante, '') AS visitante,
-    IFNULL(p.placaVehiculo, '') AS placa,
-    IFNULL(CONCAT(DATE_FORMAT(p.fecha_inicio, '%d/%m/%Y %H:%i'), ' - ', DATE_FORMAT(p.fecha_final, '%d/%m/%Y %H:%i')), '') AS horario
-FROM 
-    (SELECT 'V1' AS parqueadero_visitante UNION SELECT 'V2' UNION SELECT 'V3' UNION 
-     SELECT 'V4' UNION SELECT 'V5' UNION SELECT 'V6' UNION 
-     SELECT 'V7' UNION SELECT 'V8' UNION SELECT 'V9' UNION SELECT 'V10') AS todos_parqueaderos
-LEFT JOIN solicitud_parqueadero p ON 
-    todos_parqueaderos.parqueadero_visitante = p.parqueadero_visitante AND
-    p.estado = 'aprobado' AND
-    NOW() <= p.fecha_final
-GROUP BY 
-    todos_parqueaderos.parqueadero_visitante
-ORDER BY parqueadero";
-
-$stmt_estado = $base_de_datos->query($sql_estado);
-$estado_parqueaderos = $stmt_estado->fetchAll(PDO::FETCH_ASSOC);
-?>
-
-<?php
-require __DIR__.'/../../Backend/auth/controller/guarda.php';
+require __DIR__ . '/../../Backend/auth/controller/guarda.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -83,23 +35,29 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
                         </div>
                         <div class="offcanvas-body">
                             <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                                <li class="nav-item">
-                                    <center><a class="nav-link active" aria-current="page" href="#" style="font-size: 20px;"><b>Inicio</b></a></center>
-                                </li>
+                                <div class="offcanvas-header">
+                                    <img src="img/pagina-de-inicio.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                    <center>
+                                        <a href="./inicioprincipal.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Inicio</b></a>
+                                    </center>
+                                </div>
                                 <center>
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <b style="font-size: 20px;"> Perfil</b>
-                                        </a>
-                                        <ul class="dropdown-menu" role="menu">
-                                            <li>
-                                                <center><a href="Perfil.php">Editar Datos</a></center>
-                                            </li>
-                                            <li>
-                                                <center> <a href="../../servidor/auth/logout.php">Cerrar sesión</a></center>
-                                            </li>
-                                        </ul>
-                                </center>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                          <img src="img/usuario.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
+                               
+                                        <b style="font-size: 20px;"> Perfil</b>
+                                    </a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li>
+                                            <center><a href="Perfil.php"><b>Perfil</b></a></center>
+                                        </li>
+
+                                        <li>
+                                            <center> <a href="../../Backend/auth/logout.php"><b>Cerrar Sesión</b></a></center>
+                                        </li>
+                                    </ul>
+                            </center>
                                 </li>
                                 <div class="offcanvas-header">
                                     <img src="img/notificacion.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
@@ -108,10 +66,13 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
                                     </center>
                                 </div>
                             </ul>
-                            <form class="d-flex mt-3" role="search">
-                                <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-                                <button class="btn btn-outline-success" type="submit">Buscar</button>
-                            </form>
+                            <div class="offcanvas-header">
+                                <img src="img/ayudar (1).png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                <center>
+                                    <a href="./ayuda.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Ayuda</b></a>
+                                </center>
+                            </div>
+                            <center>
                         </div>
                     </div>
                 </div>
@@ -124,188 +85,303 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
         <br><br>
 
         <div class="container">
-        
+
             <div class="alert alert-success" role="alert" style="text-align: center; font-size: 24px;">
                 <b>Estado de Parqueaderos Visitantes</b>
             </div>
-            
-            <div class="row mb-5">
-                <?php foreach ($estado_parqueaderos as $parqueadero): ?>
-                    <div class="col-md-4 mb-4">
-                        <div class="card parking-card parking-status-<?php echo $parqueadero['estado']; ?>">
-                            <div class="card-header">
-                                <h5 class="card-title">Parqueadero <?php echo htmlspecialchars($parqueadero['parqueadero']); ?></h5>
-                            </div>
-                            <div class="card-body">
-                                <p class="card-text">
-                                    <strong>Estado:</strong> <?php echo ucfirst(htmlspecialchars($parqueadero['estado'])); ?><br>
-                                    <?php if ($parqueadero['estado'] != 'disponible'): ?>
-                                        <strong>Visitante:</strong> <?php echo htmlspecialchars($parqueadero['visitante']); ?><br>
-                                        <strong>Placa:</strong> <?php echo htmlspecialchars($parqueadero['placa']); ?><br>
-                                        <strong>Horario:</strong> <?php echo htmlspecialchars($parqueadero['horario']); ?>
-                                    <?php else: ?>
-                                        <strong>Disponible para reserva</strong>
-                                    <?php endif; ?>
-                                </p>
-                            </div>
-                        </div>
+            <div class="row mb-5" id="estadoParqueaderosContainer">
+                <div class="text-center">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">Cargando...</span>
                     </div>
-                <?php endforeach; ?>
+                    <p>Cargando estado de parqueaderos...</p>
+                </div>
             </div>
 
- 
+
             <div class="alert alert-success" role="alert" style="text-align: center; font-size: 24px;"><b>Solicitudes de Parqueadero Visitante</b></div>
+
 
             <div class="col-sm-12 col-md-12 col-lg-12 mt-5">
                 <br>
                 <table class="table">
                     <thead>
                         <tr>
-                            <th scope="col" style="font-size: 20px;">ID Solicitud</th>
-                            <th scope="col" style="font-size: 20px;">Apartamento</th>
-                            <th scope="col" style="font-size: 20px;">Parqueadero Visitante</th>
-                            <th scope="col" style="font-size: 20px;">Nombre del Visitante</th>
-                            <th scope="col" style="font-size: 20px;">Placa del Vehículo</th>
-                            <th scope="col" style="font-size: 20px;">Color del Vehículo</th>
-                            <th scope="col" style="font-size: 20px;">Tipo de Vehículo</th>
-                            <th scope="col" style="font-size: 20px;">Modelo</th>
-                            <th scope="col" style="font-size: 20px;">Marca</th>
-                            <th scope="col" style="font-size: 20px;">Fecha de Inicio</th>
-                            <th scope="col" style="font-size: 20px;">Fecha Final</th>
-                            <th scope="col" style="font-size: 20px;">Estado</th>
-                            <th scope="col" style="font-size: 20px;">Acciones</th>
+                            <th scope="col">ID Solicitud</th>
+                            <th scope="col">Apartamento</th>
+                            <th scope="col">Parqueadero</th>
+                            <th scope="col">Visitante</th>
+                            <th scope="col">Placa</th>
+                            <th scope="col">Color</th>
+                            <th scope="col">Tipo</th>
+                            <th scope="col">Modelo</th>
+                            <th scope="col">Marca</th>
+                            <th scope="col">Fecha Inicio</th>
+                            <th scope="col">Fecha Final</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <?php foreach ($solicitudes as $solicitud): ?>
-                            <tr style="font-size: 15px;">
-                                <td style="font-size: 15px;"><?php echo htmlspecialchars($solicitud['id_solicitud']); ?></td>
-                                <td><?php echo htmlspecialchars($solicitud['id_apartamento']); ?></td>
-                                <td><?php echo htmlspecialchars($solicitud['parqueadero_visitante']); ?></td>
-                                <td><?php echo htmlspecialchars($solicitud['nombre_visitante']); ?></td>
-                                <td><?php echo htmlspecialchars($solicitud['placaVehiculo']); ?></td>
-                                <td><?php echo htmlspecialchars($solicitud['colorVehiculo']); ?></td>
-                                <td><?php echo htmlspecialchars($solicitud['tipoVehiculo']); ?></td>
-                                <td><?php echo htmlspecialchars($solicitud['modelo']); ?></td>
-                                <td><?php echo htmlspecialchars($solicitud['marca']); ?></td>
-                                <td><?php echo htmlspecialchars($solicitud['fecha_inicio']); ?></td>
-                                <td><?php echo htmlspecialchars($solicitud['fecha_final']); ?></td>
-                                <td><?php echo htmlspecialchars($solicitud['estado']); ?></td>
-                                <td>
-                                    <form action="" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta solicitud?');">
-                                        <input type="hidden" name="delete_id_solicitud" value="<?php echo $solicitud['id_solicitud']; ?>">
-                                        <button class="btn btn-danger mt-3" type="submit" name="delete">Eliminar</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
+                    <tbody id="solicitudesTableBody">
+                        <!-- Las solicitudes se cargarán aquí dinámicamente -->
+                        <tr>
+                            <td colspan="13" class="text-center">
+                                <div class="spinner-border text-success" role="status">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                                <p>Cargando solicitudes...</p>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
             <br>
 
-            <div class="container mt-5">
-                <a href="parqueaderocarro.php" class="btn btn-success">Volver</a>
+        </div>
+        <div class="container mt-5">
+            <a href="parqueaderocarro.php" class="btn btn-success">Volver</a>
+        </div>
+        </div>
+        <!-- Modal para confirmar eliminación -->
+        <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        ¿Estás seguro de que deseas eliminar esta solicitud?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Eliminar</button>
+                    </div>
+                </div>
             </div>
         </div>
-
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
+            const API_BASE_URL = 'http://192.168.1.100:3001/api';
+            let solicitudes = [];
+            let deleteId = null;
+            let confirmDeleteModal = null;
 
-            document.getElementById('searchInput').addEventListener('input', function() {
-                const query = this.value.toLowerCase();
-                const cards = document.querySelectorAll('.product-card');
+            // Función para manejar errores de fetch
+            async function handleFetch(url, options = {}) {
+                try {
+                    const response = await fetch(url, {
+                        ...options,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...options.headers
+                        }
+                    });
 
-                cards.forEach(card => {
-                    const number = card.getAttribute('data-number').toLowerCase();
-                    if (number.includes(query)) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.message || `Error HTTP: ${response.status}`);
                     }
-                });
-            });
 
-            document.querySelector('.admin-img').addEventListener('click', function() {
-                document.querySelector('.dropdown-menu').classList.toggle('show');
-            });
-
-            document.querySelector('.chat-button').addEventListener('click', function() {
-                document.querySelector('.chat-menu').classList.toggle('show');
-            });
-
-            function filterChat() {
-                const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-                const chatItems = document.querySelectorAll('.chat-item');
-                chatItems.forEach(item => {
-                    if (item.textContent.toLowerCase().includes(searchInput)) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
-            }
-
-            function showTab(tabId) {
-                document.querySelectorAll('.tab-content').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-                document.querySelectorAll('.tab-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                document.getElementById(tabId).classList.add('active');
-                document.querySelector(`.tab-btn[onclick="showTab('${tabId}')"]`).classList.add('active');
-            }
-
-            function openChat(chatName) {
-                const chatContainer = document.getElementById('chatContainer');
-                const chatHeader = document.getElementById('chatHeader');
-                chatHeader.textContent = chatName;
-                chatContainer.classList.add('show');
-            }
-
-            function closeChat() {
-                const chatContainer = document.getElementById('chatContainer');
-                chatContainer.classList.remove('show');
-            }
-
-            function sendMessage() {
-                const messageInput = document.getElementById('chatInput');
-                const messageText = messageInput.value.trim();
-                if (messageText) {
-                    const chatMessages = document.getElementById('chatMessages');
-                    const messageElement = document.createElement('p');
-                    messageElement.textContent = messageText;
-                    chatMessages.appendChild(messageElement);
-                    messageInput.value = '';
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    return await response.json();
+                } catch (error) {
+                    console.error(`Error en petición a ${url}:`, error);
+                    throw error;
                 }
             }
+
+            async function initApp() {
+                try {
+                    // Verificar que el modal existe antes de inicializarlo
+                    const modalElement = document.getElementById('confirmDeleteModal');
+                    if (!modalElement) {
+                        throw new Error('No se encontró el elemento del modal');
+                    }
+
+                    // Inicializar componentes
+                    confirmDeleteModal = new bootstrap.Modal(modalElement);
+                    document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDelete);
+
+                    // Cargar datos iniciales
+                    await Promise.all([
+                        cargarEstadoParqueaderos(),
+                        cargarSolicitudes()
+                    ]);
+
+                } catch (error) {
+                    console.error('Error al inicializar:', error);
+                    mostrarError('Error al cargar la aplicación', error);
+                }
+            }
+
+            // Función para mostrar errores
+            function mostrarError(titulo, error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: titulo,
+                    text: error.message || 'Error desconocido',
+                    footer: 'Intente recargar la página'
+                });
+            }
+
+            // Cargar estado de parqueaderos
+            async function cargarEstadoParqueaderos() {
+                try {
+                    const data = await handleFetch(`${API_BASE_URL}/solicitudes-parqueadero/estado`);
+                    mostrarEstadoParqueaderos(data);
+                } catch (error) {
+                    document.getElementById('estadoParqueaderosContainer').innerHTML = `
+                <div class="alert alert-danger">
+                    Error: ${error.message}
+                    <button onclick="cargarEstadoParqueaderos()" class="btn btn-sm btn-warning">Reintentar</button>
+                </div>
+            `;
+                }
+            }
+
+
+            function mostrarEstadoParqueaderos(parqueaderos) {
+                const container = document.getElementById('estadoParqueaderosContainer');
+
+                if (parqueaderos.length === 0) {
+                    container.innerHTML = '<div class="alert alert-warning">No hay parqueaderos registrados</div>';
+                    return;
+                }
+
+                container.innerHTML = parqueaderos.map(parqueadero => {
+
+                    const numeroParqueadero = parqueadero.parqueadero || parqueadero.parqueadero_visitante || 'N/A';
+                    const estado = parqueadero.estado || 'desconocido';
+
+                    return `
+            <div class="col-md-4 mb-4">
+                <div class="card parking-card parking-status-${estado.toLowerCase()}">
+                    <div class="card-header">
+                        <h5 class="card-title">Parqueadero ${parqueadero.visitante}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            <strong>Estado:</strong> ${estado.charAt(0).toUpperCase() + estado.slice(1)}<br>
+                            ${estado !== 'disponible' ? `
+                                <strong>Visitante:</strong> ${parqueadero.visitante || 'N/A'}<br>
+                                <strong>Placa:</strong> ${parqueadero.placa || 'N/A'}<br>
+                                <strong>Horario:</strong> ${parqueadero.horario || 'N/A'}
+                            ` : '<strong>Disponible para reserva</strong>'}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `;
+                }).join('');
+            }
+
+            // Cargar solicitudes
+            async function cargarSolicitudes() {
+                try {
+                    const data = await handleFetch(`${API_BASE_URL}/solicitudes-parqueadero`);
+                    solicitudes = data;
+                    mostrarSolicitudes();
+                } catch (error) {
+                    document.getElementById('solicitudesTableBody').innerHTML = `
+                <tr>
+                    <td colspan="13" class="text-center text-danger">
+                        Error: ${error.message}
+                        <button onclick="cargarSolicitudes()" class="btn btn-sm btn-warning">Reintentar</button>
+                    </td>
+                </tr>
+            `;
+                }
+            }
+
+            // Mostrar solicitudes
+            function mostrarSolicitudes() {
+                const tbody = document.getElementById('solicitudesTableBody');
+
+                if (!Array.isArray(solicitudes) || solicitudes.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="13" class="text-center">No hay solicitudes</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = solicitudes.map(solicitud => `
+            <tr>
+                <td>${solicitud.id_solicitud}</td>
+                <td>${solicitud.id_apartamento || 'N/A'}</td>
+                <td>${solicitud.parqueadero_visitante}</td>
+                <td>${solicitud.nombre_visitante || 'N/A'}</td>
+                <td>${solicitud.placaVehiculo || 'N/A'}</td>
+                <td>${solicitud.colorVehiculo || 'N/A'}</td>
+                <td>${solicitud.tipoVehiculo || 'N/A'}</td>
+                <td>${solicitud.modelo || 'N/A'}</td>
+                <td>${solicitud.marca || 'N/A'}</td>
+                <td>${solicitud.fecha_inicio ? new Date(solicitud.fecha_inicio).toLocaleString() : 'N/A'}</td>
+                <td>${solicitud.fecha_final ? new Date(solicitud.fecha_final).toLocaleString() : 'N/A'}</td>
+                <td>${solicitud.estado || 'N/A'}</td>
+                <td>
+                    <button class="btn btn-danger btn-sm" onclick="mostrarConfirmacionEliminar(${solicitud.id_solicitud})">
+                        Eliminar
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+            }
+
+            // Funciones para eliminar
+            function mostrarConfirmacionEliminar(id) {
+                deleteId = id;
+                confirmDeleteModal.show();
+            }
+
+            async function confirmDelete() {
+                if (!deleteId) return;
+
+                try {
+                    await handleFetch(`${API_BASE_URL}/solicitudes-parqueadero/${deleteId}`, {
+                        method: 'DELETE'
+                    });
+
+                    Swal.fire('Éxito', 'Solicitud eliminada', 'success');
+                    await cargarSolicitudes();
+                    await cargarEstadoParqueaderos();
+                } catch (error) {
+                    mostrarError('Error al eliminar', error);
+                } finally {
+                    confirmDeleteModal.hide();
+                    deleteId = null;
+                }
+            }
+
+            // Iniciar la aplicación
+            document.addEventListener('DOMContentLoaded', initApp);
         </script>
     </main>
     <style>
         .parking-card {
             transition: all 0.3s ease;
         }
+
         .parking-card:hover {
             transform: scale(1.03);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
+
         .parking-status-ocupado {
             background-color: #ff6b6b;
             color: white;
         }
+
         .parking-status-reservado {
-            background-color:rgb(102, 255, 153);
+            background-color: rgb(102, 255, 153);
             color: black;
         }
+
         .parking-status-disponible {
-            background-color:rgb(19, 88, 70);
+            background-color: rgb(19, 88, 70);
             color: white;
         }
     </style>
     <br>
-    <footer> 
+    <footer>
         <div class="footer-content">
             <p>&copy; 2025 SETS. Todos los derechos reservados.</p>
             <ul>
@@ -316,4 +392,5 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
         </div>
     </footer>
 </body>
+
 </html>

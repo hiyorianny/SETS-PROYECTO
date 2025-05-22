@@ -14,7 +14,7 @@ const parqueaderoRoutes = require('./routes/parqueaderoRoutes');
 const usuarioRoutes = require('./routes/usuarioRoutes');
 const zonaComunRoutes = require('./routes/zonaComunRoutes');
 const solicitudZonaRoutes = require('./routes/solicitudZonaRoutes');
-
+const solicitudParqueaderoRoutes = require('./routes/solicitudParqueaderoRoutes');
 const mysql = require('mysql');
 
 
@@ -76,7 +76,7 @@ app.use('/api/parqueaderos', parqueaderoRoutes);
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/zonas-comunes', zonaComunRoutes);
 app.use('/api/solicitudes-zonas', solicitudZonaRoutes);
-
+app.use('/api/solicitudes-parqueadero', solicitudParqueaderoRoutes);
 
 
 
@@ -84,6 +84,16 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ error: 'Algo salió mal en el servidor' });
 });
+
+app.use(cors({
+  origin: 'http://localhost', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
+app.options('*', cors());
+
 
 const port = process.env.PORT || 3001;
 app.listen(port, '192.168.1.100', () => {
