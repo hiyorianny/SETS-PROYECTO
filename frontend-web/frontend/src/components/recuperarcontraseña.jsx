@@ -108,7 +108,7 @@ const RecuperarContraseña = () => {
               <a href="http://localhost:3000/registro" className="text-decoration-none">
                 Registrarse
               </a>
-              <a href="http://localhost/SETS-PROYECTO/VIEW/" className="text-decoration-none">
+              <a href="http://localhost/SETS-PROYECTO/frontend-web/" className="text-decoration-none">
                 Volver al inicio
               </a>
             </div>

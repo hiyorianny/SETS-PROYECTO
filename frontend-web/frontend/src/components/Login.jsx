@@ -118,7 +118,7 @@ const Login = () => {
         <a href="http://localhost:3000/recuperarcontrase%C3%B1a">
           Recuperar Contraseña
         </a>
-        <a href="http://localhost/SETS-PROYECTO/VIEW/">Volver</a>
+        <a href="http://localhost/SETS-PROYECTO/frontend-web/">Volver</a>
       </div>
     </div>
   );

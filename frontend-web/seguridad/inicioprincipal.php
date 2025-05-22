@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . '/../../servidor/auth/controller/guarda.php';
+require __DIR__ . '/../../Backend/auth/controller/guarda.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -26,42 +26,50 @@ require __DIR__ . '/../../servidor/auth/controller/guarda.php';
                     <div class="offcanvas-header">
                         <img src="img/C.png" alt="Logo" width="90" height="94" class="d-inline-block align-text-top">
                         <center>
-                            <h5 class="offcanvas-title" id="offcanvasNavbarLabel" style="text-align: center;">SETS</h5>
+                            <h5 class="offcanvas-title" id="offcanvasNavbarLabel" style="text-align: center;"><b>SETS</b></h5>
                         </center>
                         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                     </div>
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                            <li class="nav-item">
-                                <center><a class="nav-link active" aria-current="page" href="#" style="font-size: 20px;"><b>Inicio</b></a></center>
-                            </li>
+                            <form class="d-flex mt-3" role="search">
+                                <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
+                                <button class="btn btn-outline-success" type="submit">Buscar</button>
+                            </form>
+                            <br>
+                            <br>
+                        
+                               <div class="offcanvas-header">
+                                <img src="img/pagina-de-inicio.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                <center>
+                                    <a href="./inicioprincipal.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Inicio</b></a>
+                                </center>
+                            </div>
+                            <br>
                             <center>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                          <img src="img/usuario.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
+                               
                                         <b style="font-size: 20px;"> Perfil</b>
                                     </a>
                                     <ul class="dropdown-menu" role="menu">
                                         <li>
-                                            <center><a href="Perfil.php">Editar Datos</a></center>
+                                            <center><a href="Perfil.php"><b>Perfil</b></a></center>
                                         </li>
 
                                         <li>
-                                            <center> <a href="../../servidor/auth/logout.php">Cerrar Sesión</a></center>
+                                            <center> <a href="../../Backend/auth/logout.php"><b>Cerrar Sesión</b></a></center>
                                         </li>
                                     </ul>
                             </center>
                             </li>
-                            <div class="offcanvas-header">
-                                <img src="img/notificacion.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
-                                <center>
-                                    <a href="notificaciones.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;">Notificaciones</a>
-                                </center>
-                            </div>
+                            <br>
                             <center>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <img src="img/hablando.png" alt="Logo" width="30" height="44" class="d-inline-block align-text-top">
-                                        <b style="font-size: 20px;"> CHAT</b>
+                                        <b style="font-size: 20px;">CHAT</b>
 
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-chat dropdown-menu-end" id="chatDropdownMenu" role="menu">
@@ -75,11 +83,30 @@ require __DIR__ . '/../../servidor/auth/controller/guarda.php';
                                     </ul>
                                 </li>
                             </center>
+                            <div class="offcanvas-header">
+                                <img src="img/notificacion.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                <center>
+                                    <a href="notificaciones.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Notificaciones</b></a>
+                                </center>
+                            </div>
+
+                            <div class="offcanvas-header">
+                                <img src="img/reporte-de-negocios.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                <center>
+                                    <a href="notificaciones.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Informes</b></a>
+                                </center>
+                            </div>
+
+                            <div class="offcanvas-header">
+                                <img src="img/ayudar (1).png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                <center>
+                                    <a href="notificaciones.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Ayuda</b></a>
+                                </center>
+                            </div>
+                            <center>
+
                         </ul>
-                        <form class="d-flex mt-3" role="search">
-                            <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-                            <button class="btn btn-outline-success" type="submit">Buscar</button>
-                        </form>
+
                     </div>
                 </div>
             </div>
@@ -180,7 +207,6 @@ require __DIR__ . '/../../servidor/auth/controller/guarda.php';
         </main>
 
         <script>
-
             const DEFAULT_ANNOUNCEMENT_IMAGE = 'img/alerta.png';
 
             async function loadAnnouncements() {

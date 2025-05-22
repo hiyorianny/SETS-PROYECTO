@@ -1,8 +1,4 @@
-<?php
-header('Access-Control-Allow-Origin: http://localhost:3000/');
-header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -304,7 +300,7 @@ header('Access-Control-Allow-Headers: Content-Type');
 			};
 
 			try {
-				const response = await fetch('http://192.168.1.100:3000/api/contactarnos', {
+				const response = await fetch('http://192.168.1.100:3001/api/contactarnos', {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',

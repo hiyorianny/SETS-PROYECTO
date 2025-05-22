@@ -370,7 +370,7 @@ const Registro = () => {
         <a href="http://localhost:3000/recuperarcontrase%C3%B1a" className="e">
           Recuperar Contraseña
         </a>
-        <a href="http://localhost/SETS-PROYECTO/VIEW/" className="r">
+        <a href="http://localhost/SETS-PROYECTO/frontend-web/" className="r">
           Volver
         </a>
       </div>

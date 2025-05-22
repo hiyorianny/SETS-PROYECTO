@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . '/../../servidor/auth/controller/guarda.php';
+require __DIR__.'/../../Backend/auth/controller/guarda.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">

@@ -1,6 +1,6 @@
 <?php
 require './conexion.php';
-require '../../../MODEL/backend/authMiddleware.php';
+require '../../../Backend/auth/chatmiddleware.php';
 
 // Configuración de errores
 ini_set('display_errors', 1);

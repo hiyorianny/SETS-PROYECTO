@@ -1,21 +1,4 @@
 <?php
-require '../../servidor/auth/authMiddleware.php';
-session_start();
-header("Access-Control-Allow-Origin: http://localhost:3000");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Credentials: true");
-$decoded = authenticate();
-
-$idRegistro = $decoded->id;
-$Usuario = $decoded->Usuario;
-$idRol = $decoded->idRol;
-
-
-if ($idRol != 2222) {
-    header("Location: http://localhost/sets/error.php");
-    exit();
-}
 
 include_once "conexion.php";
 
@@ -37,6 +20,10 @@ $sql = "SELECT * FROM  ingreso_peatonal";
 $stmt = $base_de_datos->query($sql);
 $Ingreso_Peatonal = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
+<?php
+require __DIR__.'/../../Backend/auth/controller/guarda.php';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 

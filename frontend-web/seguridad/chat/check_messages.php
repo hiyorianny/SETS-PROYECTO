@@ -1,6 +1,6 @@
 <?php
-require '../../../MODEL/backend/authMiddleware.php';
-include_once "conexion.php";
+require '/../../../Backend/auth/chatmiddleware.php';
+include_once "./conexion.php";
 
 $decoded = authenticate();
 $idUsuario = $decoded->id;

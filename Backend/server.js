@@ -85,7 +85,7 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Algo salió mal en el servidor' });
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 app.listen(port, '192.168.1.100', () => {
     console.log(`Servidor ejecutándose en http://192.168.1.100:${port}`);
 });

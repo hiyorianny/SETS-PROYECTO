@@ -21,5 +21,5 @@ $Usuario = $_SESSION['username'];
 $idRol = $_SESSION['user_role'];
 
 
-include_once "conexion.php";
+include_once "./conexion.php";
 ?>

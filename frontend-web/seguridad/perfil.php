@@ -1,5 +1,5 @@
 <?php
-require '../../servidor/auth/authMiddleware.php';
+require '../../Backend/auth/controller/guarda.php';
 session_start();
 header("Access-Control-Allow-Origin: http://localhost:3000");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
