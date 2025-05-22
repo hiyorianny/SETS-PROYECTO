@@ -35,7 +35,7 @@ const RecuperarContraseña = () => {
     }
 
     try {
-      const response = await fetch("http://localhost/sets/MODEL/backend/recuperarcontrsena.php", {
+      const response = await fetch("http://localhost/SETS-PROYECTO/Backend/auth/recuperarcontrsena.php", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

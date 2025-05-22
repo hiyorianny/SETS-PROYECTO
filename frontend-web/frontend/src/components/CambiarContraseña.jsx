@@ -43,7 +43,7 @@ const CambiarContraseña = () => {
 
     try {
       const response = await fetch(
-        "http://localhost/sets/MODEL/backend/cambiarcontrasena.php",
+        "http://localhost/SETS-PROYECTO/Backend/auth/cambiarcontrasena.php",
         {
           method: "POST",
           headers: {

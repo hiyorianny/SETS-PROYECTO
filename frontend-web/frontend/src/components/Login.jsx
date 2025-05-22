@@ -25,7 +25,7 @@ const Login = () => {
 
     try {
       const response = await axios.post(
-      "http://localhost/SETS-PROYECTO/servidor/auth/login.php",
+      "http://localhost/SETS-PROYECTO/Backend/auth/login.php",
       formData,
       {
         headers: { 
@@ -54,13 +54,13 @@ const Login = () => {
 
       if (redirect) {
         const rutas = {
-          1111: "http://localhost/SETS-PROYECTO/VIEW/admin/inicioprincipal.php",
-          2222: "http://localhost/SETS-PROYECTO/VIEW/seguridad/inicioprincipal.php",
-          3333: "http://localhost/SETS-PROYECTO/VIEW/residente/inicioprincipal.php",
-          error: "http://localhost/SETS-PROYECTO/VIEW/error.php",
+          1111: "http://localhost/SETS-PROYECTO/frontend-web/admin/inicioprincipal.php",
+          2222: "http://localhost/SETS-PROYECTO/frontend-web/seguridad/inicioprincipal.php",
+          3333: "http://localhost/SETS-PROYECTO/frontend-web/residente/inicioprincipal.php",
+          error: "http://localhost/SETS-PROYECTO/frontend-web/error.php",
         };
 
-        console.log("Intentando redirigir a:", rutas[redirect]); // Debug
+        console.log("Intentando redirigir a:", rutas[redirect]); 
 
         toast.success("Inicio de sesión exitoso", {
           position: "top-right",
