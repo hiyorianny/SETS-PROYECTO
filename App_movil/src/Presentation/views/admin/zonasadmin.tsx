@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   solicitudItem: {
-    backgroundColor: '#0d4706',
+    backgroundColor: '#062408',
     borderRadius: 8,
     padding: 15,
     marginBottom: 12,
