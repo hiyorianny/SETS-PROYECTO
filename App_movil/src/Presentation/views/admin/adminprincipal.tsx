@@ -39,7 +39,7 @@ const AdminPrincipal = () => {
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
   const [nuevasNotificaciones, setNuevasNotificaciones] = useState(0);
   const [cargandoNotificaciones, setCargandoNotificaciones] = useState(false);
-  const BASE_URL = 'http://192.168.1.100:3000';
+  const BASE_URL = 'http://192.168.1.100:3001';
   const generateUniqueId = (prefix: string, originalId: number): string => {
     return `${prefix}-${originalId}`;
   };
@@ -48,7 +48,7 @@ const AdminPrincipal = () => {
   useEffect(() => {
     const fetchAnuncios = async () => {
       try {
-        const response = await fetch('http://192.168.1.100:3000/api/anuncios');
+        const response = await fetch('http://192.168.1.100:3001/api/anuncios');
         if (!response.ok) throw new Error('Error al obtener anuncios');
         const data = await response.json();
         setAnuncios(data);

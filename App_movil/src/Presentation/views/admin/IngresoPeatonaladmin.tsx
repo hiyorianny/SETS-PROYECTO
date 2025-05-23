@@ -26,7 +26,7 @@ const IngresoPeatonalAdmin = () => {
 
     const fetchIngresos = async () => {
         try {
-            const response = await fetch('http://192.168.1.100:3000/api/ingresos');
+            const response = await fetch('http://192.168.1.100:3001/api/ingresos');
             if (!response.ok) {
                 throw new Error('Error al obtener ingresos peatonales');
             }
@@ -56,7 +56,7 @@ const IngresoPeatonalAdmin = () => {
                     text: 'Eliminar',
                     onPress: async () => {
                         try {
-                            const response = await fetch(`http://192.168.1.100:3000/api/ingresos/${id}`, {
+                            const response = await fetch(`http://192.168.1.100:3001/api/ingresos/${id}`, {
                                 method: 'DELETE',
                             });
 

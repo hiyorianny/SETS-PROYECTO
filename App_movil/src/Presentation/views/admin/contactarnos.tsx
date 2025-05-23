@@ -31,7 +31,7 @@ const Contactanosadmin = () => {
     const fetchContactos = async () => {
         try {
             setLoading(true);
-            const response = await fetch('http://192.168.1.100:3000/api/contactarnos');
+            const response = await fetch('http://192.168.1.100:3001/api/contactarnos');
             if (!response.ok) {
                 throw new Error('Error al obtener contactos');
             }
@@ -46,7 +46,7 @@ const Contactanosadmin = () => {
 
     const handleDelete = async (id: number) => {
         try {
-            const response = await fetch(`http://192.168.1.100:3000/api/contactarnos/${id}`, {
+            const response = await fetch(`http://192.168.1.100:3001/api/contactarnos/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     },
     mainContainer: {
         flex: 1,
-        marginBottom: 60, // Ajuste para el bottom nav
+        marginBottom: 60, 
     },
     container: {
         flex: 1,
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     listWrapper: {
-        flex: 1, // Esto permite que el FlatList ocupe el espacio restante
+        flex: 1, 
     },
     header: {
         flexDirection: 'row',
