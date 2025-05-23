@@ -29,7 +29,7 @@ const Parqueaderoguarda = () => {
   const fetchParqueaderos = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://192.168.1.100:3000/api/parqueaderos');
+      const response = await fetch('http://192.168.1.100:3001/api/parqueaderos');
       if (!response.ok) throw new Error('Error al obtener parqueaderos');
       const data = await response.json();
 
