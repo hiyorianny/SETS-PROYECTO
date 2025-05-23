@@ -1,13 +1,13 @@
 const db = require('../db/db');
 
 class SolicitudZonaModel {
-    static getAll(callback) {
-        const query = 'SELECT * FROM solicitud_zona';
-        db.query(query, (err, results) => {
-            if (err) return callback(err, null);
-            callback(null, results);
-        });
-    }
+   static getByZona(zonaId, callback) {
+    const query = 'SELECT * FROM solicitud_zona WHERE ID_zonaComun  = ?';
+    db.query(query, [zonaId], (err, results) => {
+        if (err) return callback(err, null);
+        callback(null, results);
+    });
+}
 
     static updateStatus({ ID_Apartamentooss, ID_zonaComun, fechainicio, estado }, callback) {
         const query = `

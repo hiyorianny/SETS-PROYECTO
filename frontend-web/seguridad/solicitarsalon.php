@@ -1,20 +1,5 @@
 <?php
-
-include_once "conexion.php";
-
-
-$sql = "SELECT *  FROM solicitud_zona sz  WHERE sz.ID_zonaComun = 3;
-";
-$stmt = $base_de_datos->query($sql);
-$solicitudes = [];
-if ($stmt->rowCount() > 0) {
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $solicitudes[] = $row;
-    }
-}
-?>
-<?php
-require __DIR__.'/../../Backend/auth/controller/guarda.php';
+require __DIR__ . '/../../Backend/auth/controller/guarda.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -48,22 +33,26 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
                     </div>
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                            <li class="nav-item">
-                                <center><a class="nav-link active" aria-current="page" href="#" style="font-size: 20px;"><b>Inicio</b></a></center>
-                            </li>
+                            <div class="offcanvas-header">
+                                <img src="img/pagina-de-inicio.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                <center>
+                                    <a href="./inicioprincipal.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Inicio</b></a>
+                                </center>
+                            </div>
                             <center>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <img src="img/usuario.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
+
                                         <b style="font-size: 20px;"> Perfil</b>
                                     </a>
                                     <ul class="dropdown-menu" role="menu">
                                         <li>
-                                            <center><a href="Perfil.php">Editar Datos</a></center>
+                                            <center><a href="Perfil.php"><b>Perfil</b></a></center>
                                         </li>
 
                                         <li>
-                                            <center> <a href="../../servidor/auth/logout.php">Cerrar sesión</a></center>
-
+                                            <center> <a href="../../Backend/auth/logout.php"><b>Cerrar Sesión</b></a></center>
                                         </li>
                                     </ul>
                             </center>
@@ -77,10 +66,6 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
                             </div>
 
                         </ul>
-                        <form class="d-flex mt-3" role="search">
-                            <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-                            <button class="btn btn-outline-success" type="submit">Buscar</button>
-                        </form>
                     </div>
                 </div>
             </div>
@@ -99,84 +84,47 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
             <div class="calendar-container">
                 <div class="calendar">
                     <div class="calendar-header">
-                        <h2 id="calendar-title">Calendario de Disponibilidad</h2>
-                        <br>
-                        <p>
-                            <span id="month-year" style="color: #0e2c0a;"><b></b></span>
-                        <div id="calendar-controls">
-                            <button id="prev-month" onclick="prevMonth()">
-                                <
-                                    <span id="month-year"></span>
-                                    <button id="next-month" onclick="nextMonth()">></button>
-                        </div>
+                        <button onclick="prevMonth()" class="as"> <</button>
+                                <h2 id="month-year">Mes y Año</h2>
+                                <button onclick="nextMonth()" class="as">></button>
                     </div>
-                    <table id="calendar-table">
+                    <table>
                         <thead>
                             <tr>
-                                <th>Lu</th>
-                                <th>Ma</th>
-                                <th>Mi</th>
-                                <th>Ju</th>
-                                <th>Vi</th>
-                                <th>Sa</th>
-                                <th>Do</th>
+                                <th>Lun</th>
+                                <th>Mar</th>
+                                <th>Mié</th>
+                                <th>Jue</th>
+                                <th>Vie</th>
+                                <th>Sáb</th>
+                                <th>Dom</th>
                             </tr>
                         </thead>
-                        <tbody id="calendar-body">
-                            <!-- Las fechas serán generadas aquí por JavaScript -->
-                        </tbody>
+                        <tbody id="calendar-body"></tbody>
                     </table>
                     <br>
-                    <h2 id="calendar-title" style="font-size: 15px;"><b>Verde : Aceptada , Amarilla:Pendiente , Rojo: Rechazada</b></h2>
-
+                    <h2 id="calendar-title" style="font-size: 15px;"><b>Verde :🟩 Aceptada , Amarilla:🟨 Pendiente , Rojo:🟥 Rechazada</b></h2>
 
                 </div>
             </div>
-            <aside class="sidebar">
-                <h2>Agendadas</h2>
-                <div class="search-bar">
-                    <input type="search" id="searchInput" placeholder="Buscar ..." />
-                    <ion-icon name="search-outline"></ion-icon>
+           <aside class="sidebar">
+            <h2>Agendaciones</h2>
+            <div class="search-bar">
+                <input type="search" id="searchInput" placeholder="Buscar ..." />
+                <ion-icon name="search-outline"></ion-icon>
+            </div>
+            <center>
+            <div class="appointment-list" id="appointmentList">
+
+                <div class="text-center">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p>Cargando solicitudes...</p>
                 </div>
-                <div class="appointment-list" id="appointmentList">
-                    <?php foreach ($solicitudes as $solicitud): ?>
-                        <div class="appointment"
-                            data-fecha-inicio="<?= date('d/m/Y', strtotime($solicitud['fechainicio'])) ?>"
-                            data-fecha-final="<?= date('d/m/Y', strtotime($solicitud['fechafinal'])) ?>"
-                            data-hora-inicio="<?= date('h:i A', strtotime($solicitud['Hora_inicio'])) ?>"
-                            data-hora-final="<?= date('h:i A', strtotime($solicitud['Hora_final'])) ?>"
-                            data-apartamento="<?= $solicitud['ID_Apartamentooss'] ?>"
-                            data-estado="<?= $solicitud['estado'] ?>">
-                            <h3>SALON COMUNAL</h3>
-                            <p><strong>Fecha Inicio:</strong> <?= date('d/m/Y', strtotime($solicitud['fechainicio'])) ?></p>
-                            <p><strong>Fecha Final:</strong> <?= date('d/m/Y', strtotime($solicitud['fechafinal'])) ?></p>
-                            <p><strong>Hora_inicio:</strong> <?= date('h:i A', strtotime($solicitud['Hora_inicio'])) ?></p>
-                            <p><strong>Hora_final:</strong> <?= date('h:i A', strtotime($solicitud['Hora_final'])) ?></p>
-                            <p><strong>Apartamento:</strong> <?= $solicitud['ID_Apartamentooss'] ?></p>
-                            <p><strong>SOLICITUD FUE:</strong>
-                                <span class="badge 
-                                    <?php
-                                    switch (strtolower($solicitud['estado'])) {
-                                        case 'aprobado':
-                                            echo 'bg-success';
-                                            break;
-                                        case 'pendiente':
-                                            echo 'bg-warning';
-                                            break;
-                                        case 'rechazado':
-                                            echo 'bg-danger';
-                                            break;
-                                        default:
-                                            echo 'bg-secondary';
-                                    }
-                                    ?>">
-                                    <?= $solicitud['estado'] ?>
-                                </span>
-                            </p>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            </aside>
+            </div>
+            </center>
+        </aside>
         </div>
         <a href="zonas_comunes.php" class="btn btn-success" style="font-size: 30px;">
             <center>VOLVER</center>
@@ -195,11 +143,92 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
         </div>
     </main>
     <script>
-        // Convertir los datos de PHP a JavaScript
-        const solicitudes = <?php echo json_encode($solicitudes); ?>;
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        // Variables globales
+        let solicitudes = [];
+        const zonaId = 3; // ID de la zona BBQ (cambiar según corresponda)
+
+        // Función para cargar las solicitudes desde la API
+        async function cargarSolicitudes() {
+            try {
+                const response = await fetch(`http://192.168.1.100:3001/api/solicitudes-zonas?zona=${zonaId}`);
+
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Verifica que data sea un array
+                if (!Array.isArray(data)) {
+                    throw new Error('La respuesta no es un array válido');
+                }
+
+                solicitudes = data;
+
+                // Verifica que los elementos del DOM existan antes de usarlos
+                const calendarBody = document.getElementById('calendar-body');
+                const monthYearDisplay = document.getElementById('month-year');
+                const appointmentList = document.getElementById('appointmentList');
+
+                if (!calendarBody || !monthYearDisplay || !appointmentList) {
+                    throw new Error('Elementos del DOM no encontrados');
+                }
+
+                mostrarSolicitudes();
+                generarCalendario();
+            } catch (error) {
+                console.error('Error:', error);
+                const container = document.getElementById('appointmentList') || document.body;
+                container.innerHTML = `
+            <div class="alert alert-danger">
+                Error al cargar: ${error.message}
+                <button onclick="cargarSolicitudes()" class="btn btn-sm btn-warning mt-2">
+                    Reintentar
+                </button>
+            </div>
+        `;
+            }
+        }
+
+        // Función para mostrar las solicitudes en el HTML
+        function mostrarSolicitudes() {
+            const container = document.getElementById('appointmentList');
+            let html = '';
+
+            solicitudes.forEach(solicitud => {
+                const estadoClass = obtenerClaseEstado(solicitud.estado);
+
+                html += `
+                    <div class="appointment"
+                        data-fecha-inicio="${formatearFecha(solicitud.fechainicio)}"
+                        data-fecha-final="${formatearFecha(solicitud.fechafinal)}"
+                        data-hora-inicio="${formatearHora(solicitud.Hora_inicio)}"
+                        data-hora-final="${formatearHora(solicitud.Hora_final)}"
+                        data-apartamento="${solicitud.ID_Apartamentooss}"
+                        data-estado="${solicitud.estado.toLowerCase()}">
+                        <h3>Salon comunal</h3>
+                        <p><strong>Fecha Inicio:</strong> ${formatearFecha(solicitud.fechainicio)}</p>
+                        <p><strong>Fecha Final:</strong> ${formatearFecha(solicitud.fechafinal)}</p>
+                        <p><strong>Hora_inicio:</strong> ${formatearHora(solicitud.Hora_inicio)}</p>
+                        <p><strong>Hora_final:</strong> ${formatearHora(solicitud.Hora_final)}</p>
+                        <p><strong>Apartamento:</strong> ${solicitud.ID_Apartamentooss}</p>
+                        <p><strong>SOLICITUD FUE:</strong>
+                            <span class="badge ${estadoClass}">
+                                ${solicitud.estado}
+                            </span>
+                        </p>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+
+            // Inicializar el buscador
+            inicializarBuscador();
+        }
+
+        // Función para generar el calendario
+        function generarCalendario() {
             const calendarBody = document.getElementById('calendar-body');
             const monthYearDisplay = document.getElementById('month-year');
             const today = new Date();
@@ -210,19 +239,19 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
             let currentYear = today.getFullYear();
             let currentMonth = today.getMonth();
 
-            // Función para generar el calendario del mes y año dados
-            function generarCalendario(mes, anio) {
+            // Función interna para generar el calendario
+            function generarMes(mes, anio) {
                 calendarBody.innerHTML = '';
                 monthYearDisplay.textContent = `${months[mes]} ${anio}`;
                 const firstDayOfMonth = new Date(anio, mes, 1).getDay() || 7;
                 const daysInMonth = new Date(anio, mes + 1, 0).getDate();
                 let date = 1;
 
-                // Crear un mapa de fechas con sus estados para mejor performance
+                // Mapa de fechas con estados
                 const fechasConEstado = {};
                 solicitudes.forEach(solicitud => {
                     const fecha = new Date(solicitud.fechainicio).toISOString().split('T')[0];
-                    fechasConEstado[fecha] = solicitud.estado.toUpperCase(); // Aseguramos mayúsculas
+                    fechasConEstado[fecha] = solicitud.estado.toUpperCase();
                 });
 
                 for (let i = 0; i < 6; i++) {
@@ -242,24 +271,12 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
                             cell.textContent = date;
                             cell.setAttribute('data-date', fechaActualStr);
 
-                            // Verificar si la fecha tiene una solicitud
                             if (fechasConEstado[fechaActualStr]) {
                                 const estado = fechasConEstado[fechaActualStr];
-
-                                // Aplicar clases según el estado
-                                if (estado === 'ACEPTADA') {
-                                    cell.classList.add('estado-aceptada');
-                                } else if (estado === 'PENDIENTE') {
-                                    cell.classList.add('estado-pendiente');
-                                } else if (estado === 'RECHAZADA' || estado === 'RECHAZADO') {
-                                    cell.classList.add('estado-rechazada');
-                                }
-
-                                // Tooltip con información
+                                cell.classList.add(`estado-${estado.toLowerCase()}`);
                                 cell.setAttribute('title', `Estado: ${estado}`);
                             }
 
-                            // Resaltar fines de semana
                             if (j === 6 || j === 7) {
                                 cell.classList.add('fin-de-semana');
                             }
@@ -272,104 +289,64 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
                 }
             }
 
-            function prevMonth() {
+            // Funciones de navegación del calendario
+            window.prevMonth = function() {
                 currentMonth = (currentMonth - 1 + 12) % 12;
                 if (currentMonth === 11) currentYear--;
-                generarCalendario(currentMonth, currentYear);
+                generarMes(currentMonth, currentYear);
             }
 
-            function nextMonth() {
+            window.nextMonth = function() {
                 currentMonth = (currentMonth + 1) % 12;
                 if (currentMonth === 0) currentYear++;
-                generarCalendario(currentMonth, currentYear);
+                generarMes(currentMonth, currentYear);
             }
 
             // Inicializar calendario
-            generarCalendario(currentMonth, currentYear);
+            generarMes(currentMonth, currentYear);
+        }
 
-            // Event listeners
-            document.getElementById('prev-month').addEventListener('click', prevMonth);
-            document.getElementById('next-month').addEventListener('click', nextMonth);
-        });
-    </script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        // Función para inicializar el buscador
+        function inicializarBuscador() {
             const searchInput = document.getElementById('searchInput');
-            const appointmentList = document.getElementById('appointmentList');
-            const appointments = appointmentList.getElementsByClassName('appointment');
+            const appointments = document.querySelectorAll('.appointment');
 
-            // Función para filtrar 
             function filterAppointments(searchText) {
-                Array.from(appointments).forEach(function(appointment) {
-                    const fechaInicio = appointment.getAttribute('data-fecha-inicio').toLowerCase();
-                    const fechaFinal = appointment.getAttribute('data-fecha-final').toLowerCase();
-                    const horaInicio = appointment.getAttribute('data-hora-inicio').toLowerCase();
-                    const horaFinal = appointment.getAttribute('data-hora-final').toLowerCase();
-                    const apartamento = appointment.getAttribute('data-apartamento').toLowerCase();
-                    const estado = appointment.getAttribute('data-estado').toLowerCase();
-
-                    if (
-                        fechaInicio.includes(searchText) ||
-                        fechaFinal.includes(searchText) ||
-                        horaInicio.includes(searchText) ||
-                        horaFinal.includes(searchText) ||
-                        apartamento.includes(searchText) ||
-                        estado.includes(searchText)
-                    ) {
-                        appointment.style.display = 'block'; // Muestra
-                    } else {
-                        appointment.style.display = 'none'; // Oculta 
-                    }
+                Array.from(appointments).forEach(appointment => {
+                    const textoAppointment = appointment.textContent.toLowerCase();
+                    appointment.style.display = textoAppointment.includes(searchText) ? 'block' : 'none';
                 });
             }
 
             searchInput.addEventListener('input', function() {
-                const searchText = searchInput.value.toLowerCase();
-                filterAppointments(searchText);
-            });
-
-
-            filterAppointments('');
-        });
-    </script>
-    <script>
-        function openChat(chatName) {
-            const chatContainer = document.getElementById('chatContainer');
-            const chatHeader = document.getElementById('chatHeader');
-            chatHeader.textContent = chatName;
-            chatContainer.classList.add('show');
-        }
-
-        function closeChat() {
-            const chatContainer = document.getElementById('chatContainer');
-            chatContainer.classList.remove('show');
-        }
-
-        function sendMessage() {
-            const messageInput = document.getElementById('chatInput');
-            const messageText = messageInput.value.trim();
-            if (messageText) {
-                const chatMessages = document.getElementById('chatMessages');
-                const messageElement = document.createElement('p');
-                messageElement.textContent = messageText;
-                chatMessages.appendChild(messageElement);
-                messageInput.value = '';
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-        }
-
-        function filterChat() {
-            const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-            const chatItems = document.querySelectorAll('.chat-item');
-            chatItems.forEach(item => {
-                if (item.textContent.toLowerCase().includes(searchInput)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
+                filterAppointments(this.value.toLowerCase());
             });
         }
+
+        // Funciones auxiliares
+        function formatearFecha(fechaString) {
+            const fecha = new Date(fechaString);
+            return fecha.toLocaleDateString('es-ES');
+        }
+
+        function formatearHora(horaString) {
+            const hora = new Date(`2000-01-01T${horaString}`);
+            return hora.toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function obtenerClaseEstado(estado) {
+            estado = estado.toLowerCase();
+            if (estado === 'aprobado') return 'bg-success';
+            if (estado === 'pendiente') return 'bg-warning';
+            if (estado === 'rechazado') return 'bg-danger';
+            return 'bg-secondary';
+        }
+
+        // Cargar las solicitudes cuando la página esté lista
+        document.addEventListener('DOMContentLoaded', cargarSolicitudes);
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

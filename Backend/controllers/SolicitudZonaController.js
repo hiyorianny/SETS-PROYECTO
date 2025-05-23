@@ -1,19 +1,21 @@
 const SolicitudZonaModel = require('../models/SolicitudZonaModel');
 
 class SolicitudZonaController {
-    static async getAll(req, res) {
-        try {
-            SolicitudZonaModel.getAll((err, solicitudes) => {
-                if (err) {
-                    console.error('Error al obtener solicitudes de zonas:', err);
-                    return res.status(500).json({ error: 'Error al obtener solicitudes' });
-                }
-                res.json(solicitudes);
-            });
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
+   static async getAll(req, res) {
+    try {
+        const { zona } = req.query;
+        
+        SolicitudZonaModel.getByZona(zona, (err, solicitudes) => {
+            if (err) {
+                console.error('Error al obtener solicitudes de zonas:', err);
+                return res.status(500).json({ error: 'Error al obtener solicitudes' });
+            }
+            res.json(solicitudes);
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
+}
 
     static async updateStatus(req, res) {
         try {
