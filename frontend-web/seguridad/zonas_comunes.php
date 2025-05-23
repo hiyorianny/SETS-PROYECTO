@@ -1,19 +1,4 @@
 <?php
-
-include_once "conexion.php";
-
-
-$query = "SELECT idZona, descripcion, url_videos FROM zona_comun";
-try {
-    $statement = $base_de_datos->prepare($query);
-    $statement->execute();
-    $zonas_comunes = $statement->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    echo "Error al ejecutar la consulta: " . $e->getMessage();
-    exit();
-}
-?>
-<?php
 require __DIR__.'/../../Backend/auth/controller/guarda.php';
 ?>
 <!DOCTYPE html>
@@ -26,6 +11,8 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
     <link rel="stylesheet" href="css/zonas_comunes.css?v=<?php echo (rand()); ?>">
     <link rel="shortcut icon" href="img/c.png" type="image/x-icon" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 </head>
 
 <body>
@@ -47,22 +34,26 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
                     </div>
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                            <li class="nav-item">
-                                <center><a class="nav-link active" aria-current="page" href="#" style="font-size: 20px;"><b>Inicio</b></a></center>
-                            </li>
-                            <center>
+                             <div class="offcanvas-header">
+                                <img src="img/pagina-de-inicio.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                <center>
+                                    <a href="./inicioprincipal.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Inicio</b></a>
+                                </center>
+                            </div>
+                       <center>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                          <img src="img/usuario.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
+                               
                                         <b style="font-size: 20px;"> Perfil</b>
                                     </a>
                                     <ul class="dropdown-menu" role="menu">
                                         <li>
-                                            <center><a href="Perfil.php">Editar Datos</a></center>
+                                            <center><a href="Perfil.php"><b>Perfil</b></a></center>
                                         </li>
 
                                         <li>
-                                            <center> <a href=".../../servidor/auth/logout.php">Cerrar sesión</a></center>
-
+                                            <center> <a href="../../Backend/auth/logout.php"><b>Cerrar Sesión</b></a></center>
                                         </li>
                                     </ul>
                             </center>
@@ -74,147 +65,125 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
                                     <a href="notificaciones.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;">Notificaciones</a>
                                 </center>
                             </div>
-                           
+                            <div class="offcanvas-header">
+                                <img src="img/ayudar (1).png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                <center>
+                                    <a href="./ayuda.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Ayuda</b></a>
+                                </center>
+                            </div>
+                            <center>
                         </ul>
-                        <form class="d-flex mt-3" role="search">
-                            <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-                            <button class="btn btn-outline-success" type="submit">Buscar</button>
-                        </form>
                     </div>
                 </div>
             </div>
         </nav>
     </header>
     <br><br>
-    <main>
-        <div id="chatContainer" class="chat-container">
-            <div class="chat-header">
-                <span id="chatHeader">Chat</span>
-                <button class="close-btn" onclick="closeChat()">×</button>
-            </div>
-            <div class="chat-messages" id="chatMessages">
-            </div>
-            <div class="chat-input">
-                <input type="text" id="chatInput" style="font-size: 14px;" placeholder="Escribe tu mensaje...">
-                <button onclick="sendMessage()">Enviar</button>
-            </div>
-        </div>
 
-    </main>
-    <main>
-        <br>
-        <br>
+     <main>
+        <br><br>
         <section class="zones-section container mt-5">
             <h1 class="title text-center mb-5"><b>Zonas Comunes</b></h1>
-            <div class="row">
-                <?php if (!empty($zonas_comunes)): ?>
-                    <?php foreach ($zonas_comunes as $zona): ?>
-                        <div class="col-12 col-md-6 ">
-                            <article class="zone">
-                                <button class="zone-type-btn">
-                                    <h3><?= htmlspecialchars($zona['idZona']); ?></h3>
-                                </button>
-                                <div class="video-wrapper">
-                                    <video src="<?= htmlspecialchars($zona['url_videos']); ?>" autoplay loop muted></video>
-                                </div>
-                                <h2 class="zone-description"><?= htmlspecialchars($zona['descripcion']); ?></h2>
-                                <?php
-                                $pagina = '';
-                                switch ($zona['idZona']) {
-                                    case '2':
-                                        $pagina = 'solicitarbbq.php';
-                                        break;
-                                    case '1':
-                                        $pagina = 'solicitarfutbol.php';
-                                        break;
-                                    case '3':
-                                        $pagina = 'solicitarsalon.php';
-                                        break;
-                                    case '4':
-                                        $pagina = 'solicitarvoley.php';
-                                        break;
-                                    case '5':
-                                        $pagina = 'solicitargym.php';
-                                        break;
-                                    default:
-                                        $pagina = '#';
-                                        break;
-                                }
-                                ?>
-                                <a href="<?= htmlspecialchars($pagina); ?>?id=<?= htmlspecialchars($zona['idZona']); ?>" class="btn btn-outline-success">
-                                    Ver Horario Disponible
-                                </a><br>
-                            </article>
-                            <br>
-                            <br>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+            <div class="row" id="zonasContainer">
+                <!-- Las zonas se cargarán aquí dinámicamente -->
+                <div class="text-center">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p>Cargando zonas comunes...</p>
+                </div>
             </div>
         </section>
-        <a href="inicioprincipal.php" class="btn btn-outline-danger  btn-lg">Volver</a>
+        <a href="inicioprincipal.php" class="btn btn-outline-danger btn-lg">Volver</a>
     </main>
     </section>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script type="text/javascript" src="JAVA/main.js"></script>
-    <script>
-        document.querySelector('.admin-img').addEventListener('click', function() {
-            document.querySelector('.dropdown-menu').classList.toggle('show');
-        });
 
-        document.querySelector('.chat-button').addEventListener('click', function() {
-            document.querySelector('.chat-menu').classList.toggle('show');
-        });
-
-        function filterChat() {
-            const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-            const chatItems = document.querySelectorAll('.chat-item');
-            chatItems.forEach(item => {
-                if (item.textContent.toLowerCase().includes(searchInput)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
+ <script>
+        // Función para cargar las zonas comunes desde la API
+        async function cargarZonasComunes() {
+            try {
+                const response = await fetch('http://192.168.1.100:3001/api/zonas-comunes');
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
                 }
-            });
-        }
-    </script>
-    <script>
-        function openChat(chatName) {
-            const chatContainer = document.getElementById('chatContainer');
-            const chatHeader = document.getElementById('chatHeader');
-            chatHeader.textContent = chatName;
-            chatContainer.classList.add('show');
-        }
-
-        function closeChat() {
-            const chatContainer = document.getElementById('chatContainer');
-            chatContainer.classList.remove('show');
-        }
-
-        function sendMessage() {
-            const messageInput = document.getElementById('chatInput');
-            const messageText = messageInput.value.trim();
-            if (messageText) {
-                const chatMessages = document.getElementById('chatMessages');
-                const messageElement = document.createElement('p');
-                messageElement.textContent = messageText;
-                chatMessages.appendChild(messageElement);
-                messageInput.value = '';
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                const zonas = await response.json();
+                
+                if (!zonas || zonas.length === 0) {
+                    throw new Error('No se encontraron zonas comunes');
+                }
+                
+                mostrarZonas(zonas);
+            } catch (error) {
+                console.error('Error al cargar zonas:', error);
+                document.getElementById('zonasContainer').innerHTML = `
+                    <div class="alert alert-danger">
+                        Error al cargar las zonas comunes: ${error.message}
+                        <button onclick="cargarZonasComunes()" class="btn btn-sm btn-warning mt-2">
+                            Reintentar
+                        </button>
+                    </div>
+                `;
             }
         }
 
-        function filterChat() {
-            const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-            const chatItems = document.querySelectorAll('.chat-item');
-            chatItems.forEach(item => {
-                if (item.textContent.toLowerCase().includes(searchInput)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
+        // Función para mostrar las zonas en el HTML
+        function mostrarZonas(zonas) {
+            const container = document.getElementById('zonasContainer');
+            let html = '';
+            
+            zonas.forEach(zona => {
+                const pagina = obtenerPaginaPorZona(zona.idZona);
+                
+                html += `
+                    <div class="col-12 col-md-6">
+                        <article class="zone">
+                            <button class="zone-type-btn">
+                                <h3>${escapeHtml(zona.idZona)}</h3>
+                            </button>
+                            <div class="video-wrapper">
+                                <video src="${escapeHtml(zona.url_videos)}" autoplay loop muted></video>
+                            </div>
+                            <h2 class="zone-description">${escapeHtml(zona.descripcion)}</h2>
+                                   <a href="${pagina}?id=${escapeHtml(zona.idZona)}" class="btn btn-success btn-zone">
+                                    <i class="fas fa-calendar-alt me-2"></i>Ver Horarios
+                                </a>
+                        </article>
+                        <br><br>
+                    </div>
+                `;
             });
+            
+            container.innerHTML = html;
         }
+
+        function obtenerPaginaPorZona(idZona) {
+            switch (idZona.toString()) {
+                case '2': return 'solicitarbbq.php';
+                case '1': return 'solicitarfutbol.php';
+                case '3': return 'solicitarsalon.php';
+                case '4': return 'solicitarvoley.php';
+                case '5': return 'solicitargym.php';
+                default: return '#';
+            }
+        }
+
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                .toString()
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+
+        document.addEventListener('DOMContentLoaded', cargarZonasComunes);
     </script>
     <br>
     <footer>
