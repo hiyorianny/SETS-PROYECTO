@@ -1,5 +1,5 @@
 <?php
-require __DIR__.'/../../Backend/auth/controller/guarda.php';
+require __DIR__ . '/../../Backend/auth/controller/guarda.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -137,7 +137,7 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
                     </svg>
                     <div class="div">
                         <h5>Persona</h5>
-                        <input type="text" class="input" id="user?.id_Registro" name="user?.id_Registro" required>
+                        <input type="text" class="input" id="persona" name="persona" required>
                     </div>
                 </div>
 
@@ -190,10 +190,12 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
                 }
 
 
+                // En tu script del formulario, asegúrate que la URL sea correcta
+
                 const formData = new FormData(form);
 
                 try {
-                    const response = await fetch('http://192.168.1.100:3000/api/anunciossubir', {
+                    const response = await fetch('http://192.168.1.100:3001/api/anunciossubir', {
                         method: 'POST',
                         body: formData
                     });
@@ -201,14 +203,15 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
                     const data = await response.json();
 
                     if (response.ok) {
-                        alert('Anuncio creado exitosamente');
-                        window.location.href = 'inicioprincipal.php'; // Redirigir después de éxito
+                        alert(data.message || 'Anuncio creado exitosamente');
+                        window.location.href = 'inicioprincipal.php';
                     } else {
-                        alert(data.message || 'Error al crear el anuncio');
+                        alert(data.error || 'Error al crear el anuncio');
+                        console.error('Error del servidor:', data);
                     }
                 } catch (error) {
-                    console.error('Error:', error);
-                    alert('Hubo un error al enviar el formulario');
+                    console.error('Error de red:', error);
+                    alert('Hubo un error al conectar con el servidor');
                 }
             });
 
