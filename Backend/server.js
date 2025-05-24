@@ -18,8 +18,6 @@ const solicitudParqueaderoRoutes = require('./routes/solicitudParqueaderoRoutes'
 const mysql = require('mysql');
 const multer = require('multer');
 
-// Configura multer para manejar formularios multipart
-const upload = multer();
 
 
 const db = mysql.createConnection({

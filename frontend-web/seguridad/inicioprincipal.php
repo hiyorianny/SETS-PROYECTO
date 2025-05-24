@@ -293,7 +293,30 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
 
                 return false;
             }
+            async function deleteAnnouncement(id) {
+                if (!confirm('¿Estás seguro de que deseas eliminar este anuncio?')) {
+                    return;
+                }
 
+                try {
+                    const response = await fetch(`http://192.168.1.100:3001/api/elanuncios/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Error al eliminar el anuncio');
+                    }
+
+
+                    loadAnnouncements();
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error al eliminar el anuncio: ' + error.message);
+                }
+            }
 
             document.addEventListener('DOMContentLoaded', loadAnnouncements);
         </script>
