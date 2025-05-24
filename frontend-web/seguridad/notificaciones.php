@@ -1,35 +1,5 @@
 <?php
-
-
-include_once "conexion.php";
-
-$sqlAnuncios = "SELECT * FROM anuncio";
-$stmtAnuncios = $base_de_datos->prepare($sqlAnuncios);
-
-$stmtAnuncios->execute();
-$anuncios = $stmtAnuncios->fetchAll(PDO::FETCH_ASSOC);
-
-
-$sqlParqueadero = "SELECT 	 id_solicitud, fecha_inicio, fecha_final,TipoVehiculo,parqueadero_visitante FROM solicitud_parqueadero ORDER BY fecha_inicio DESC, fecha_final DESC LIMIT 5";
-$stmtParqueadero = $base_de_datos->prepare($sqlParqueadero);
-$stmtParqueadero->execute();
-$parqueaderos = $stmtParqueadero->fetchAll(PDO::FETCH_ASSOC);
-
-
-$sqlZonaComun = "SELECT ID_zonaComun, fechainicio, fechafinal FROM solicitud_zona ORDER BY fechainicio DESC LIMIT 5";
-$stmtZonaComun = $base_de_datos->prepare($sqlZonaComun);
-$stmtZonaComun->execute();
-$zonasComunes = $stmtZonaComun->fetchAll(PDO::FETCH_ASSOC);
-
-
-$sqlMensajesChat = "SELECT * FROM mensajes_chat   WHERE id_destinatario = :id_usuario   ORDER BY fecha_envio DESC  LIMIT 5";
-$stmtMensajesChat = $base_de_datos->prepare($sqlMensajesChat);
-$stmtMensajesChat->bindParam(':id_usuario', $idRegistro);
-$stmtMensajesChat->execute();
-$mensajesChat = $stmtMensajesChat->fetchAll(PDO::FETCH_ASSOC);
-?>
-<?php
-require __DIR__.'/../../Backend/auth/controller/guarda.php';
+require __DIR__ . '/../../Backend/auth/controller/guarda.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -110,127 +80,294 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
     <br>
     <br>
     <br>
-    <div class="container">
+   <div class="container">
         <center>
             <div class="alert alert-success" role="alert" style="font-size: 34px;">
                 <b> NOTIFICACIONES</b>
             </div>
         </center>
-        <div class="email-list">
-
-            <div class="email-list">
-
-                <div class="email-list">
-                    <?php foreach ($anuncios as $anuncio): ?>
-                        <div class="email-item" data-id="anuncio_<?php echo $anuncio['idAnuncio']; ?>">
-                            <div class="email-sender">Anuncio: <?php echo htmlspecialchars($anuncio['titulo']); ?></div>
-                            <div class="email-subject">Publicado el: <?php echo htmlspecialchars($anuncio['fechaPublicacion']); ?></div>
-                            <div class="email-snippet">Descripción: <?php echo htmlspecialchars($anuncio['descripcion']); ?></div>
-                            <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
-                            <a href="inicioprincipal.php" class="btn btn-outline-success" style="font-size:15px;">
-                                <center>IR</center>
-                            </a>
-                        </div>
-                    <?php endforeach; ?>
-
-                    <?php foreach ($parqueaderos as $parqueadero): ?>
-                        <div class="email-item" data-id="parqueadero_<?php echo $parqueadero['id_solicitud']; ?>">
-                            <b>Solicitud de Parqueadero</b><br>
-                            <b>Tipo Vehiculo:</b> <?php echo htmlspecialchars($parqueadero['TipoVehiculo']); ?><br>
-                            <b>Fecha Inicio:</b> <?php echo htmlspecialchars($parqueadero['fecha_inicio']); ?><br>
-                            <b>Parqueadero:</b> <?php echo htmlspecialchars($parqueadero['parqueadero_visitante']); ?><br>
-                            <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
-                            <a href="./parqueaderocarro.php" class="btn btn-outline-success" style="font-size:15px;">
-                                <center>IR CARRO</center>
-                            </a>
-                            <a href="./paromoto.php" class="btn btn-outline-success" style="font-size:15px;">
-                                <center>IR MOTO</center>
-                            </a>
-                        </div>
-                    <?php endforeach; ?>
-
-                    <?php foreach ($mensajesChat as $mensaje): ?>
-                        <div class="email-item" data-id="<?php echo $mensaje['id_mensaje']; ?>">
-                            <b>Nuevo Mensaje</b><br>
-                            <b>De:</b> <?php echo htmlspecialchars($mensaje['id_remitente']); ?><br>
-                            <b>Fecha:</b> <?php echo htmlspecialchars($mensaje['fecha_envio']); ?><br>
-                            <b>Mensaje:</b> <?php echo htmlspecialchars($mensaje['contenido']); ?><br>
-                            <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
-                            <a href="inicioprincipal.php" class="btn btn-outline-success" style="font-size:15px;">
-                                <center>IR AL CHAT</center>
-                            </a>
-                        </div>
-                        <br>
-                    <?php endforeach; ?>
-
-
-                    <?php foreach ($zonasComunes as $zonaComun): ?>
-                        <div class="email-item" data-id="zona_<?php echo $zonaComun['ID_zonaComun']; ?>">
-                            <b>Solicitud de Zona Común</b><br>
-                            <b>ID_zonaComun:</b> <?php echo htmlspecialchars($zonaComun['ID_zonaComun']); ?><br>
-                            <b>Inicio:</b> <?php echo htmlspecialchars($zonaComun['fechainicio']); ?><br>
-                            <b>Final:</b> <?php echo htmlspecialchars($zonaComun['fechafinal']); ?><br>
-                            <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
-                            <a href="./zonas_comunes.php" class="btn btn-outline-success" style="font-size:15px;">
-                                <center>IR</center>
-                            </a>
-                        </div>
-                    <?php endforeach; ?>
+        <div class="email-list" id="notifications-container">
+            <div class="text-center mt-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando notificaciones...</span>
                 </div>
+                <p>Cargando notificaciones...</p>
             </div>
         </div>
+    </div>
 
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const apiBaseUrl = 'http://192.168.1.100:3001/api';
+        const usuario = "<?php echo htmlspecialchars($Usuario); ?>";
+        const idRegistro = "<?php echo $idRegistro; ?>";
+        let hiddenNotifications = JSON.parse(localStorage.getItem("hiddenNotifications_" + usuario)) || [];
+        let lastCheckTime = localStorage.getItem("lastCheckTime_" + usuario) || new Date(0).toISOString();
 
-                let usuario = "<?php echo htmlspecialchars($Usuario); ?>";
+        // Función para formatear fechas
+        function formatDate(dateString) {
+            if (!dateString) return 'Fecha no disponible';
+            const date = new Date(dateString);
+            return date.toLocaleString('es-ES');
+        }
 
+        // Función para escapar HTML
+        function escapeHtml(unsafe) {
+            if (!unsafe) return '';
+            return unsafe.toString()
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
 
-                let hiddenNotifications = JSON.parse(localStorage.getItem("hiddenNotifications_" + usuario)) || [];
+        // Función para mostrar notificación con SweetAlert2
+        function showNotificationAlert(title, message, icon = 'info') {
+            Swal.fire({
+                title: title,
+                text: message,
+                icon: icon,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 5000,
+                timerProgressBar: true
+            });
+        }
 
-                // Ocultar notificaciones descartadas
-                document.querySelectorAll(".email-item").forEach(item => {
-                    let notifId = item.getAttribute("data-id");
-                    if (hiddenNotifications.includes(notifId)) {
-                        item.style.display = "none"; // Ocultar
+        // Función para obtener datos de la API con manejo de errores
+        async function fetchApiData(endpoint) {
+            try {
+                const response = await fetch(`${apiBaseUrl}${endpoint}`);
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching data from', endpoint, error);
+
+                return [];
+            }
+        }
+
+        // Función para crear elementos de notificación
+        function createNotificationElement(item, type) {
+            const notifId = `${type}_${item.idAnuncio || item.id_solicitud || item.ID_zonaComun || item.id_mensaje}`;
+            
+            if (hiddenNotifications.includes(notifId)) return null;
+
+            const element = document.createElement('div');
+            element.className = 'email-item';
+            element.setAttribute('data-id', notifId);
+
+            let htmlContent = '';
+            let actionUrl = 'inicioprincipal.php';
+            let isNew = false;
+
+            // Verificar si es una notificación nueva
+            const itemDate = new Date(item.fechaPublicacion || item.fecha_inicio || item.fechainicio || item.fecha_envio);
+            const checkDate = new Date(lastCheckTime);
+            isNew = itemDate > checkDate;
+
+            switch (type) {
+                case 'anuncio':
+                    htmlContent = `
+                        <div class="email-sender ${isNew ? 'text-primary fw-bold' : ''}">Anuncio: ${escapeHtml(item.titulo)}</div>
+                        <div class="email-subject">Publicado el: ${formatDate(item.fechaPublicacion)}</div>
+                        <div class="email-snippet">Descripción: ${escapeHtml(item.descripcion)}</div>
+                        <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
+                        <a href="${actionUrl}" class="btn btn-outline-success" style="font-size:15px;">
+                            <center>IR</center>
+                        </a>
+                    `;
+                    break;
+
+                case 'parqueadero':
+                    actionUrl = item.TipoVehiculo === 'Carro' ? './parqueaderocarro.php' : './paromoto.php';
+                    htmlContent = `
+                        <b class="${isNew ? 'text-primary' : ''}">Solicitud de Parqueadero</b><br>
+                        <b>Tipo Vehiculo:</b> ${escapeHtml(item.TipoVehiculo)}<br>
+                        <b>Fecha Inicio:</b> ${formatDate(item.fecha_inicio)}<br>
+                        <b>Parqueadero:</b> ${escapeHtml(item.parqueadero_visitante)}<br>
+                        <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
+                        <a href="${actionUrl}" class="btn btn-outline-success" style="font-size:15px;">
+                            <center>IR</center>
+                        </a>
+                    `;
+                    break;
+
+                case 'zona':
+                    actionUrl = './zonas_comunes.php';
+                    htmlContent = `
+                        <b class="${isNew ? 'text-primary' : ''}">Solicitud de Zona Común</b><br>
+                        <b>ID:</b> ${escapeHtml(item.ID_zonaComun)}<br>
+                        <b>Inicio:</b> ${formatDate(item.fechainicio)}<br>
+                        <b>Final:</b> ${formatDate(item.fechafinal)}<br>
+                        <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
+                        <a href="${actionUrl}" class="btn btn-outline-success" style="font-size:15px;">
+                            <center>IR</center>
+                        </a>
+                    `;
+                    break;
+
+                case 'mensaje':
+                    actionUrl = 'inicioprincipal.php';
+                    htmlContent = `
+                        <b class="${isNew ? 'text-primary' : ''}">Nuevo Mensaje</b><br>
+                        <b>De:</b> ${escapeHtml(item.id_remitente)}<br>
+                        <b>Fecha:</b> ${formatDate(item.fecha_envio)}<br>
+                        <b>Mensaje:</b> ${escapeHtml(item.contenido)}<br>
+                        <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
+                        <a href="${actionUrl}" class="btn btn-outline-success" style="font-size:15px;">
+                            <center>IR AL CHAT</center>
+                        </a>
+                    `;
+                    break;
+            }
+
+            element.innerHTML = htmlContent;
+            
+            // Configurar evento para el botón de descartar
+            const removeBtn = element.querySelector('.remove-notif');
+            if (removeBtn) {
+                removeBtn.addEventListener('click', function() {
+                    hiddenNotifications.push(notifId);
+                    localStorage.setItem("hiddenNotifications_" + usuario, JSON.stringify(hiddenNotifications));
+                    element.style.display = 'none';
+                    showNotificationAlert('Notificación descartada', 'La notificación ha sido eliminada', 'success');
+                });
+            }
+
+            return element;
+        }
+
+        // Función principal para cargar notificaciones
+        async function loadNotifications() {
+            const container = document.getElementById('notifications-container');
+            
+            try {
+                // Mostrar spinner de carga
+                container.innerHTML = `
+                    <div class="text-center mt-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando notificaciones...</span>
+                        </div>
+                        <p>Cargando notificaciones...</p>
+                    </div>
+                `;
+
+                // Obtener datos de la API
+                const [anuncios, parqueaderos, zonas, mensajes] = await Promise.all([
+                    fetchApiData('/anuncios'),
+                    fetchApiData('/solicitudes-parqueadero?limit=5'),
+                    fetchApiData('/solicitudes-zonas?limit=5'),
+                    fetchApiData(`/mensajes-chat?id_destinatario=${idRegistro}&limit=5`)
+                ]);
+
+                // Limpiar contenedor
+                container.innerHTML = '';
+
+                // Procesar todas las notificaciones
+                const allNotifications = [
+                    ...anuncios.map(item => ({ item, type: 'anuncio' })),
+                    ...parqueaderos.map(item => ({ item, type: 'parqueadero' })),
+                    ...zonas.map(item => ({ item, type: 'zona' })),
+                    ...mensajes.map(item => ({ item, type: 'mensaje' }))
+                ];
+
+                // Ordenar por fecha (más recientes primero)
+                allNotifications.sort((a, b) => {
+                    const dateA = new Date(a.item.fechaPublicacion || a.item.fecha_inicio || a.item.fechainicio || a.item.fecha_envio);
+                    const dateB = new Date(b.item.fechaPublicacion || b.item.fecha_inicio || b.item.fechainicio || b.item.fecha_envio);
+                    return dateB - dateA;
+                });
+
+                if (allNotifications.length === 0) {
+                    container.innerHTML = '<div class="text-center py-5"><p>No hay notificaciones nuevas</p></div>';
+                    return;
+                }
+
+                // Mostrar notificaciones
+                allNotifications.forEach(({ item, type }) => {
+                    const element = createNotificationElement(item, type);
+                    if (element) {
+                        container.appendChild(element);
+                        
+                        // Mostrar alerta para notificaciones nuevas
+                        const itemDate = new Date(item.fechaPublicacion || item.fecha_inicio || item.fechainicio || item.fecha_envio);
+                        const checkDate = new Date(lastCheckTime);
+                        
+                        if (itemDate > checkDate) {
+                            let title = '';
+                            let message = '';
+                            
+                            switch (type) {
+                                case 'anuncio':
+                                    title = 'Nuevo anuncio';
+                                    message = item.titulo;
+                                    break;
+                                case 'parqueadero':
+                                    title = 'Nueva solicitud de parqueadero';
+                                    message = `Para ${item.TipoVehiculo} en ${item.parqueadero_visitante}`;
+                                    break;
+                                case 'zona':
+                                    title = 'Nueva solicitud de zona común';
+                                    message = `ID: ${item.ID_zonaComun}`;
+                                    break;
+                                case 'mensaje':
+                                    title = 'Nuevo mensaje';
+                                    message = `De: ${item.id_remitente}`;
+                                    break;
+                            }
+                            
+                            showNotificationAlert(title, message);
+                        }
                     }
                 });
 
-                document.querySelectorAll(".remove-notif").forEach(button => {
-                    button.addEventListener("click", function() {
-                        let parent = this.parentElement;
-                        let notifId = parent.getAttribute("data-id");
+                // Actualizar última hora de verificación
+                lastCheckTime = new Date().toISOString();
+                localStorage.setItem("lastCheckTime_" + usuario, lastCheckTime);
 
-                        // Agregar la notificación
-                        if (!hiddenNotifications.includes(notifId)) {
-                            hiddenNotifications.push(notifId);
-                        }
+            } catch (error) {
+                console.error('Error al cargar notificaciones:', error);
+                container.innerHTML = `
+                    <div class="alert alert-danger">
+                        Error al cargar notificaciones. Por favor recarga la página.
+                    </div>
+                `;
 
-                        // Guardar en localStorage con el nombre del usuario
-                        localStorage.setItem("hiddenNotifications_" + usuario, JSON.stringify(hiddenNotifications));
-
-
-                        parent.style.display = "none";
-                    });
-                });
-            });
-        </script>
-
-        </main>
-
-
-        <script>
-            function toggleExpand(element) {
-                element.classList.toggle('expanded');
             }
-        </script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-            <a href="inicioprincipal.php" class="btn btn-outline-success" style="font-size:30px;   background-color: #0e2c0a;">
-                <center>VOLVER</center>
-            </a>
-        </div>
+        }
 
+        // Inicializar
+        loadNotifications();
+        
+        // Actualizar periódicamente (cada 30 segundos)
+        setInterval(loadNotifications, 30000);
+    });
+    </script>
+
+    </main>
+
+
+    <script>
+        function toggleExpand(element) {
+            element.classList.toggle('expanded');
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <a href="inicioprincipal.php" class="btn btn-outline-success" style="font-size:30px;   background-color: #0e2c0a;">
+            <center>VOLVER</center>
+        </a>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 <br>
 <br>
