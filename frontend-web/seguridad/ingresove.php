@@ -142,7 +142,7 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
             <a href="parqueaderocarro.php" class="btn btn-success">Volver</a>
         </div>
         </div>
-        <!-- Modal para confirmar eliminación -->
+
         <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -154,7 +154,7 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
                         ¿Estás seguro de que deseas eliminar esta solicitud?
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" data-bs-dismiss="modal">Cancelar</button>
                         <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Eliminar</button>
                     </div>
                 </div>

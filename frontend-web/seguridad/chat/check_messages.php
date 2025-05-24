@@ -1,9 +1,11 @@
 <?php
-require '/../../../Backend/auth/chatmiddleware.php';
-include_once "./conexion.php";
+require '../../../Backend/auth/controller/guarda.php';
+include_once "conexion.php";
 
 $decoded = authenticate();
-$idUsuario = $decoded->id;
+$decoded->id ?? $decoded->id_Registro;
+
+
 
 // Consulta para mensajes no leídos
 $sql = "SELECT COUNT(*) as count FROM mensajes_chat 

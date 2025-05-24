@@ -1,91 +1,81 @@
 <?php
-require './conexion.php';
-require '../../../Backend/auth/chatmiddleware.php';
+require __DIR__.'/conexion.php';
+require __DIR__.'/../../../Backend/auth/controller/guarda.php';
 
-// Configuración de errores
+// Configuración
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Configuración de CORS
+// Headers
 header("Access-Control-Allow-Origin: http://localhost:3000");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE, PUT");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 header("Access-Control-Allow-Credentials: true");
 header('Content-Type: application/json');
 
-// Responder a OPTIONS
+// Manejar OPTIONS
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
 try {
-    // Autenticar al usuario
-    $decoded = authenticate();
-    $response = ['status' => 'error', 'message' => 'Acción no válida'];
+    // Obtener usuario autenticado
+    $currentUserId = $_SESSION['user_id'] ?? null;
+    $currentUserRole = $_SESSION['user_role'] ?? null;
 
-    // Verificar método HTTP
+    if (!$currentUserId) {
+        throw new Exception('Usuario no autenticado', 401);
+    }
+
+    // Solo aceptar POST
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         throw new Exception('Método no permitido', 405);
     }
 
     // Obtener datos de entrada
-    $input = file_get_contents('php://input');
-    if (empty($input)) {
-        throw new Exception('Datos de solicitud vacíos');
-    }
-
-    $data = json_decode($input, true);
+    $input = json_decode(file_get_contents('php://input'), true);
     if (json_last_error() !== JSON_ERROR_NONE) {
         throw new Exception('Error al decodificar JSON: ' . json_last_error_msg());
     }
 
-    if (!isset($data['action'])) {
+    if (!isset($input['action'])) {
         throw new Exception('Acción no especificada');
     }
 
     // Procesar acciones
-    switch ($data['action']) {
+    switch ($input['action']) {
         case 'send':
-            $content = trim($data['content']);
+            $content = trim($input['content'] ?? '');
             if (empty($content)) {
                 throw new Exception('El mensaje no puede estar vacío');
             }
 
-            if (!isset($data['chat_type'])) {
-                throw new Exception('Tipo de chat no especificado');
-            }
-
-            $chatType = $data['chat_type'];
+            $chatType = $input['chat_type'] ?? '';
             if (!in_array($chatType, ['privado', 'grupal'])) {
                 throw new Exception('Tipo de chat no válido');
             }
 
-            $senderId = $decoded->id;
             $receiverId = null;
             $groupChat = null;
 
             if ($chatType === 'privado') {
-                if (!isset($data['receiver_id'])) {
+                $receiverId = $input['receiver_id'] ?? null;
+                if (empty($receiverId)) {
                     throw new Exception('ID de destinatario no proporcionado');
                 }
 
-                $receiverId = $data['receiver_id'];
-                if (empty($receiverId)) {
-                    throw new Exception('ID de destinatario no puede estar vacío');
-                }
-
                 // Verificar destinatario
-                $stmtCheck = $base_de_datos->prepare("SELECT id_Registro FROM registro WHERE id_Registro = ?");
-                $stmtCheck->execute([$receiverId]);
-                if ($stmtCheck->rowCount() === 0) {
+                $stmt = $base_de_datos->prepare("SELECT id_Registro FROM registro WHERE id_Registro = ?");
+                $stmt->execute([$receiverId]);
+                if ($stmt->rowCount() === 0) {
                     throw new Exception('El usuario destinatario no existe');
                 }
             } else {
-                if (!isset($data['group_chat'])) {
+                $groupChat = $input['group_chat'] ?? null;
+                if (empty($groupChat)) {
                     throw new Exception('ID de grupo no proporcionado');
                 }
-                $groupChat = $data['group_chat'];
             }
 
             // Insertar mensaje
@@ -93,7 +83,7 @@ try {
                 (id_remitente, id_destinatario, contenido, tipo_chat, grupo_chat, fecha_envio) 
                 VALUES (?, ?, ?, ?, ?, NOW())");
 
-            if (!$stmt->execute([$senderId, $receiverId, $content, $chatType, $groupChat])) {
+            if (!$stmt->execute([$currentUserId, $receiverId, $content, $chatType, $groupChat])) {
                 throw new Exception('Error al insertar mensaje');
             }
 
@@ -105,21 +95,16 @@ try {
             break;
 
         case 'get_users':
-            $currentUserId = $decoded->id;
-            $currentUserRole = $decoded->idRol;
-
             // Consulta mejorada para obtener usuarios
             $query = "SELECT r.id_Registro, r.PrimerNombre, r.PrimerApellido, r.Usuario, rol.Roldescripcion 
                       FROM registro r 
                       JOIN rol ON r.idRol = rol.id 
                       WHERE r.id_Registro != ? AND r.idRol != 4444"; // Excluir dueños
 
-            // Filtros por rol
             $params = [$currentUserId];
 
-            if ($currentUserRole == 1111) { // Admin
-                // Puede hablar con todos
-            } elseif ($currentUserRole == 2222) { // Guarda
+            // Filtros por rol
+            if ($currentUserRole == 2222) { // Guarda
                 $query .= " AND r.idRol IN (1111, 3333)"; // Admin y residentes
             } elseif ($currentUserRole == 3333) { // Residente
                 $query .= " AND r.idRol IN (1111, 2222)"; // Admin y guardas
@@ -129,94 +114,46 @@ try {
             $stmt->execute($params);
             $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Grupos disponibles
-            $groups = [
-                ['id_Registro' => 'comunal', 'PrimerNombre' => 'Chat Comunal', 'Roldescripcion' => 'Grupo']
-            ];
-
             $response = [
                 'status' => 'success',
                 'users' => $users,
-                'groups' => $groups,
+                'groups' => [
+                    ['id_Registro' => 'comunal', 'PrimerNombre' => 'Chat Comunal', 'Roldescripcion' => 'Grupo']
+                ],
                 'current_user_id' => $currentUserId
-            ];
-            break;
-        case 'delete_message':
-            if (!isset($data['message_id'])) {
-                throw new Exception('ID de mensaje no proporcionado');
-            }
-
-            $messageId = $data['message_id'];
-            $currentUserId = $decoded->id;
-
-            // Obtener información del mensaje
-            $stmtCheck = $base_de_datos->prepare("SELECT id_remitente, id_destinatario, tipo_chat FROM mensajes_chat WHERE id_mensaje = ?");
-            $stmtCheck->execute([$messageId]);
-
-            if ($stmtCheck->rowCount() === 0) {
-                throw new Exception('El mensaje no existe');
-            }
-
-            $messageData = $stmtCheck->fetch(PDO::FETCH_ASSOC);
-
-            // Determinar qué campo actualizar
-            $updateField = '';
-            if ($messageData['id_remitente'] == $currentUserId) {
-                $updateField = 'eliminado_por_remitente';
-            } else if ($messageData['id_destinatario'] == $currentUserId || $messageData['tipo_chat'] == 'grupal') {
-                $updateField = 'eliminado_por_destinatario';
-            } else if ($currentUserRole == 1111) { // Admin puede eliminar cualquier mensaje
-                $updateField = 'eliminado_por_remitente'; // O ambos campos según necesidad
-            } else {
-                throw new Exception('No tienes permiso para eliminar este mensaje');
-            }
-
-            // Actualizar el campo correspondiente
-            $stmt = $base_de_datos->prepare("UPDATE mensajes_chat SET $updateField = TRUE WHERE id_mensaje = ?");
-
-            if (!$stmt->execute([$messageId])) {
-                throw new Exception('Error al eliminar el mensaje');
-            }
-
-            $response = [
-                'status' => 'success',
-                'message' => 'Mensaje eliminado'
             ];
             break;
 
         case 'get_messages':
-            $currentUserId = $decoded->id;
-
-            if (!isset($data['chat_type']) || !isset($data['target_id'])) {
+            if (!isset($input['chat_type']) || !isset($input['target_id'])) {
                 throw new Exception('Parámetros incompletos');
             }
 
-            $chatType = $data['chat_type'];
-            $targetId = $data['target_id'];
+            $chatType = $input['chat_type'];
+            $targetId = $input['target_id'];
 
             if (!in_array($chatType, ['privado', 'grupal'])) {
                 throw new Exception('Tipo de chat no válido');
             }
 
-            // Consulta mejorada para obtener mensajes
             $query = "SELECT m.*, r.PrimerNombre, r.PrimerApellido, r.Usuario, rol.Roldescripcion 
-                              FROM mensajes_chat m
-                              JOIN registro r ON m.id_remitente = r.id_Registro
-                              JOIN rol ON r.idRol = rol.id
-                              WHERE ";
-
+                      FROM mensajes_chat m
+                      JOIN registro r ON m.id_remitente = r.id_Registro
+                      JOIN rol ON r.idRol = rol.id
+                      WHERE ";
+            
             $params = [];
 
             if ($chatType === 'privado') {
                 $query .= "((m.id_remitente = ? AND m.id_destinatario = ?) OR 
-                                   (m.id_remitente = ? AND m.id_destinatario = ?))
-                                   AND m.tipo_chat = 'privado'
-                                   AND (m.eliminado_por_remitente = FALSE OR m.id_remitente != ?)
-                                   AND (m.eliminado_por_destinatario = FALSE OR m.id_destinatario != ?)";
+                           (m.id_remitente = ? AND m.id_destinatario = ?))
+                           AND m.tipo_chat = 'privado'
+                           AND (m.eliminado_por_remitente = FALSE OR m.id_remitente != ?)
+                           AND (m.eliminado_por_destinatario = FALSE OR m.id_destinatario != ?)";
                 $params = [$currentUserId, $targetId, $targetId, $currentUserId, $currentUserId, $currentUserId];
             } else {
                 $query .= "m.grupo_chat = ? AND m.tipo_chat = 'grupal'
-                                  AND (m.eliminado_por_remitente = FALSE OR m.id_remitente != ?)";
+                          AND (m.eliminado_por_remitente = FALSE OR m.id_remitente != ?)";
                 $params = [$targetId, $currentUserId];
             }
 
@@ -233,24 +170,64 @@ try {
             ];
             break;
 
+        case 'delete_message':
+            if (!isset($input['message_id'])) {
+                throw new Exception('ID de mensaje no proporcionado');
+            }
+
+            $messageId = $input['message_id'];
+
+            $stmt = $base_de_datos->prepare("SELECT id_remitente, id_destinatario, tipo_chat FROM mensajes_chat WHERE id_mensaje = ?");
+            $stmt->execute([$messageId]);
+            
+            if ($stmt->rowCount() === 0) {
+                throw new Exception('El mensaje no existe');
+            }
+
+            $messageData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            $updateField = '';
+            if ($messageData['id_remitente'] == $currentUserId) {
+                $updateField = 'eliminado_por_remitente';
+            } elseif ($messageData['id_destinatario'] == $currentUserId || $messageData['tipo_chat'] == 'grupal') {
+                $updateField = 'eliminado_por_destinatario';
+            } elseif ($currentUserRole == 1111) {
+                $updateField = 'eliminado_por_remitente';
+            } else {
+                throw new Exception('No tienes permiso para eliminar este mensaje');
+            }
+
+            $stmt = $base_de_datos->prepare("UPDATE mensajes_chat SET $updateField = TRUE WHERE id_mensaje = ?");
+            if (!$stmt->execute([$messageId])) {
+                throw new Exception('Error al eliminar el mensaje');
+            }
+
+            $response = [
+                'status' => 'success',
+                'message' => 'Mensaje eliminado'
+            ];
+            break;
+
         default:
             throw new Exception('Acción no reconocida');
     }
+
 } catch (PDOException $e) {
     $response = [
         'status' => 'error',
         'message' => 'Error de base de datos',
         'error_details' => $e->getMessage()
     ];
+    http_response_code(500);
 } catch (Exception $e) {
     $response = [
         'status' => 'error',
         'message' => $e->getMessage(),
         'error_code' => $e->getCode()
     ];
+    http_response_code($e->getCode() ?: 400);
 }
 
-// Enviar respuesta
 ob_clean();
 echo json_encode($response);
 exit();
