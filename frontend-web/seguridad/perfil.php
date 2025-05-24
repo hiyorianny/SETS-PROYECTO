@@ -190,7 +190,7 @@ if (!$userData) {
             <br>
             <br>
             <a href="editarperfil.php" class="btn btn-success">Actualizar Datos</a>
-            <a href="../../MODEL/backend/logout.php" class="btn btn-danger">Cerrar sesión</a>
+            <a href="../../Backend/auth/logout.php" class="btn btn-danger">Cerrar sesión</a>
 
             <a href="inicioprincipal.php" class="btn btn-danger">Volver</a>
 

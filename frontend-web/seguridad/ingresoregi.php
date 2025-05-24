@@ -50,7 +50,7 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
                                                 <center><a href="Perfil.php">Editar Datos</a></center>
                                             </li>
                                             <li>
-                                                <center> <a href="../../servidor/auth/logout.php">Cerrar sesión</a></center>
+                                                <center> <a href="../../Backend/auth/logout.php">Cerrar sesión</a></center>
                                             </li>
                                         </ul>
                                 </center>

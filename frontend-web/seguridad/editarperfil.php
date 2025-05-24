@@ -170,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         </li>
 
                                         <li>
-                                            <center> <a href="../../servidor/auth/logout.php">Cerrar Sesión</a></center>
+                                            <center> <a href="../../Backend/auth/logout.php">Cerrar Sesión</a></center>
                                         </li>
                                     </ul>
                             </center>

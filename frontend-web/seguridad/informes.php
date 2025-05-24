@@ -7,7 +7,7 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SETS - INICIO GUARDA</title>
+    <title>SETS -  Informes </title>
     <link rel="shortcut icon" href="img/c.png" type="image/x-icon" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="./css/principal.css?v=<?php echo (rand()); ?>">
@@ -46,54 +46,13 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
                                 </center>
                             </div>
                             <br>
-                            <center>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <img src="img/usuario.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
-
-                                        <b style="font-size: 20px;"> Perfil</b>
-                                    </a>
-                                    <ul class="dropdown-menu" role="menu">
-                                        <li>
-                                            <center><a href="Perfil.php"><b>Perfil</b></a></center>
-                                        </li>
-
-                                        <li>
-                                            <center> <a href="../../Backend/auth/logout.php"><b>Cerrar Sesión</b></a></center>
-                                        </li>
-                                    </ul>
-                            </center>
-                            </li>
                             <br>
-                            <center>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <img src="img/hablando.png" alt="Logo" width="30" height="44" class="d-inline-block align-text-top">
-                                        <b style="font-size: 20px;">CHAT</b>
-
-                                    </a>
-                                    <ul class="dropdown-menu dropdown-menu-chat dropdown-menu-end" id="chatDropdownMenu" role="menu">
-                                        <li>
-                                            <div class="chat-search-container p-2">
-                                                <input type="text" class="form-control form-control-sm chat-search-input"
-                                                    placeholder="Buscar contacto..." oninput="filterChatContacts()">
-                                            </div>
-                                        </li>
-                                        <li class="dropdown-header">Contactos</li>
-                                    </ul>
-                                </li>
+        
                             </center>
                             <div class="offcanvas-header">
                                 <img src="img/notificacion.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
                                 <center>
                                     <a href="notificaciones.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Notificaciones</b></a>
-                                </center>
-                            </div>
-
-                            <div class="offcanvas-header">
-                                <img src="img/reporte-de-negocios.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
-                                <center>
-                                    <a href="./informes.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Informes</b></a>
                                 </center>
                             </div>
 
@@ -114,212 +73,8 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
     </header>
     <br>
     <br><br>
-    <main>
-        <div id="chatContainer" class="chat-container">
-            <div class="chat-header">
-                <span id="chatHeader">Chat</span>
-                <button class="close-btn" onclick="closeChat()">×</button>
-            </div>
-            <div class="chat-messages" id="chatMessages">
-            </div>
-            <div class="chat-input">
-                <input type="text" id="chatInput" style="font-size: 14px;" placeholder="Escribe tu mensaje...">
-                <button onclick="sendMessage()">Enviar</button>
-            </div>
-        </div>
-
-        <br><br>
-        <br><br>
-        <br><br> <br>
-        <main>
-            <div class="container text-center">
-                <div class="row">
-                    <br>
-                    <div class="col-12 col-sm-6  ">
-                        <div class="icon">
-                            <a href="torres.php" class="link-button">
-                                <img src="img/casa.png" alt="Torres" class="medium-img">
-                                <button class="add-announcement">Torres</button>
-                            </a>
-                        </div>
-                    </div>
-                    <br>
-                    <div class="col-12 col-sm-6 ">
-                        <div class="icon">
-                            <a href="parqueaderocarro.php" class="link-button">
-                                <img src="img/coche.png" alt="Parqueadero" class="medium-img">
-                                <button class="add-announcement">Parqueadero</button>
-                            </a>
-                        </div>
-                    </div>
-                    <br>
-                    <div class="col-12 col-sm-6 ">
-                        <div class="icon">
-                            <a href="zonas_comunes.php" class="link-button">
-                                <img src="img/campo.png" alt="Zonas Comunes" class="medium-img">
-                                <button class="add-announcement">Zonas Comunes</button>
-                            </a>
-                        </div>
-                    </div>
-                    <br>
-                    <div class="col-12 col-sm-6 ">
-                        <div class="icon">
-                            <a href="manualconvivencia.php" class="link-button">
-                                <img src="img/instrucciones.png" alt="Manual de convivencia" class="medium-img">
-                                <center><button class="add-announcement">Manual de convivencia</button></center>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-        </div>
-        </div>
-        </div>
-        </div>
-        </div>
-        <br>
-        <br><br>
-        <main>
-            <div class="container">
-                <section class="announcements">
-                    <center>
-                        <h2>Anuncios</h2>
-                    </center>
-                    <div class="search-container">
-                        <form onsubmit="return searchAnnouncements(event)">
-                            <input type="text" id="search-input" placeholder="Buscar Anuncio">
-                            <img src="img/lupa.png" alt="Buscar" class="search-icon">
-                        </form>
-                    </div>
-
-                    <div id="announcements">
-
-                    </div>
-                </section>
-
-                <div class="icon">
-                    <a href="añadiranuncio.php" class="link-button">
-                        <button class="add-announcement">Añadir Anuncio</button>
-                    </a>
-                </div>
-            </div>
-        </main>
-
-        <script>
-            const DEFAULT_ANNOUNCEMENT_IMAGE = 'img/alerta.png';
-
-            async function loadAnnouncements() {
-                try {
-                    const response = await fetch('http://192.168.1.100:3001/api/anuncios');
-                    const anuncios = await response.json();
-
-                    const announcementsContainer = document.getElementById('announcements');
-
-                    if (anuncios.length === 0) {
-                        announcementsContainer.innerHTML = "<p>No se encontraron anuncios.</p>";
-                        return;
-                    }
-
-                    let html = '';
-                    anuncios.forEach(anuncio => {
-
-                        const imagenAnuncio = anuncio.img_anuncio || DEFAULT_ANNOUNCEMENT_IMAGE;
-
-                        html += `
-                <div class="announcement" id="announcement-${anuncio.idAnuncio}">
-                    <img src="${imagenAnuncio}" alt="Imagen del anuncio" style="width:90%; max-width:90px;"><br>
-                    <p><b>Anuncio:</b> ${anuncio.titulo}<br>
-                        <b>Descripcion:</b> ${anuncio.descripcion}<br>
-                        <b>Fecha de Publicación: </b>${anuncio.fechaPublicacion}<br>
-                        <b>Hora de Publicación:</b> ${anuncio.horaPublicacion}<br>
-                    </p>
-                    <button class="delete-button" onclick="deleteAnnouncement(${anuncio.idAnuncio})">Eliminar</button>
-                </div>
-            `;
-                    });
-
-                    announcementsContainer.innerHTML = html;
-                } catch (error) {
-                    console.error('Error al cargar anuncios:', error);
-                    document.getElementById('announcements').innerHTML = "<p>Error al cargar los anuncios.</p>";
-                }
-            }
-
-            async function searchAnnouncements(event) {
-                event.preventDefault();
-                const query = document.getElementById('search-input').value.toLowerCase();
-
-                try {
-                    const response = await fetch('http://192.168.1.100:3001/api/anuncios');
-                    const anuncios = await response.json();
-
-                    const filtered = query ?
-                        anuncios.filter(a =>
-                            a.titulo.toLowerCase().includes(query) ||
-                            a.descripcion.toLowerCase().includes(query)) :
-                        anuncios;
-
-                    const announcementsContainer = document.getElementById('announcements');
-
-                    if (filtered.length === 0) {
-                        announcementsContainer.innerHTML = "<p>No se encontraron anuncios.</p>";
-                        return false;
-                    }
-
-                    let html = '';
-                    filtered.forEach(anuncio => {
-
-                        const imagenAnuncio = anuncio.img_anuncio || DEFAULT_ANNOUNCEMENT_IMAGE;
-
-                        html += `
-                <div class="announcement" id="announcement-${anuncio.idAnuncio}">
-                    <img src="${imagenAnuncio}" alt="Imagen del anuncio" style="width:90%; max-width:90px;"><br>
-                    <p><b>Anuncio:</b> ${anuncio.titulo}<br>
-                        <b>Descripcion:</b> ${anuncio.descripcion}<br>
-                        <b>Fecha de Publicación: </b>${anuncio.fechaPublicacion}<br>
-                        <b>Hora de Publicación:</b> ${anuncio.horaPublicacion}<br>
-                    </p>
-                    <button class="delete-button" onclick="deleteAnnouncement(${anuncio.idAnuncio})">Eliminar</button>
-                </div>
-            `;
-                    });
-
-                    announcementsContainer.innerHTML = html;
-                } catch (error) {
-                    console.error('Error en la búsqueda:', error);
-                    document.getElementById('announcements').innerHTML = "<p>Error al buscar anuncios.</p>";
-                }
-
-                return false;
-            }
-            async function deleteAnnouncement(id) {
-                if (!confirm('¿Estás seguro de que deseas eliminar este anuncio?')) {
-                    return;
-                }
-
-                try {
-                    const response = await fetch(`http://192.168.1.100:3001/api/elanuncios/${id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Error al eliminar el anuncio');
-                    }
-
-
-                    loadAnnouncements();
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('Error al eliminar el anuncio: ' + error.message);
-                }
-            }
-
-            document.addEventListener('DOMContentLoaded', loadAnnouncements);
-        </script>
+  
+       
         <script>
             const searchEventInput = document.getElementById('searchEventInput');
             const events = document.querySelectorAll('.event');
