@@ -1,25 +1,7 @@
 <?php
 require '../../Backend/auth/controller/guarda.php';
-session_start();
-header("Access-Control-Allow-Origin: http://localhost:3000");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Credentials: true");
-$decoded = authenticate();
-
-$idRegistro = $decoded->id;
-$Usuario = $decoded->Usuario;
-$idRol = $decoded->idRol;
-
-
-if ($idRol != 2222) {
-    header("Location: http://localhost/sets/error.php");
-    exit();
-}
 
 include_once "conexion.php";
-
-
 if (isset($_FILES['imagenPerfil']) && $_FILES['imagenPerfil']['error'] === UPLOAD_ERR_OK) {
     $fileTmpPath = $_FILES['imagenPerfil']['tmp_name'];
     $fileName = basename($_FILES['imagenPerfil']['name']);
@@ -67,21 +49,22 @@ if (isset($_FILES['imagenPerfil']) && $_FILES['imagenPerfil']['error'] === UPLOA
     }
 }
 
-
-
-$sql = "SELECT r.id_Registro, r.PrimerNombre, r.SegundoNombre, r.PrimerApellido, r.Clave , r.apartamento , r.tipo_propietario,  r.SegundoApellido, r.Correo, r.Usuario, r.numeroDocumento,
-                rd.Roldescripcion, r.imagenPerfil, td.descripcionDoc AS tipodoc, r.telefonoUno, r.telefonoDos
+$sql = "SELECT r.id_Registro, r.PrimerNombre, r.SegundoNombre, r.PrimerApellido, 
+               r.SegundoApellido, r.Correo, r.Usuario, r.numeroDocumento,
+               rd.Roldescripcion, r.imagenPerfil, td.descripcionDoc AS tipodoc, 
+               r.telefonoUno, r.telefonoDos, r.apartamento, r.tipo_propietario
         FROM registro r
         JOIN rol rd ON r.idRol = rd.id
         JOIN tipodoc td ON r.Id_tipoDocumento = td.idtDoc
-        WHERE r.Usuario = ?";
+        WHERE r.id_Registro = ?";
 
 $stmt = $base_de_datos->prepare($sql);
-$stmt->execute([$Usuario]);
+$stmt->execute([$idRegistro]);
 $userData = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$userData) {
-    die("Error: No se encontraron datos del perfil.");
+    error_log("No se encontró perfil para ID: $idRegistro, Usuario: $Usuario");
+    die("Error: No se encontraron datos del perfil. Por favor contacte al administrador.");
 }
 ?>
 

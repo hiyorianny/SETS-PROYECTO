@@ -1,22 +1,9 @@
 <?php
-require '../../servidor/auth/authMiddleware.php';
-session_start();
-header("Access-Control-Allow-Origin: http://localhost:3000");  
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Credentials: true");  
-$decoded = authenticate();
 
-$idRegistro = $decoded->id;
-$Usuario = $decoded->Usuario; 
-$idRol = $decoded->idRol;
-
-if ($idRol != 2222) { 
-    header("Location: http://localhost/sets/error.php");
-    exit();
-}
+require './controller/guarda.php';
 
 include_once "conexion.php";
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_FILES['imagenPerfil']) && $_FILES['imagenPerfil']['error'] === UPLOAD_ERR_OK) {
