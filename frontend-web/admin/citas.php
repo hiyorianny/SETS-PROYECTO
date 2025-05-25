@@ -1,55 +1,5 @@
 <?php
-require '../../MODEL/backend/authMiddleware.php';
-session_start();
-header("Access-Control-Allow-Origin: http://localhost:3000");  
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Credentials: true");  
-$decoded = authenticate();
-
-$idRegistro = $decoded->id;
-$Usuario = $decoded->Usuario; 
-$idRol = $decoded->idRol;
-
-
-if ($idRol != 1111) { 
-    header("Location: http://localhost/sets/error.php");
-    exit();
-}
-
-include_once "conexion.php";
-
-// Para respuesta
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['responder'])) {
-    $idcita  = $_POST['idcita'];
-    $respuesta = $_POST['respuesta'];
-
-    // Ya al tener una respuesta y actualizar
-    $sql = "UPDATE cita SET respuesta = :respuesta, estado = 'respondida' WHERE idcita  = :idcita";
-    $stmt = $base_de_datos->prepare($sql);
-
-    if ($stmt->execute(['respuesta' => $respuesta, 'idcita' => $idcita])) {
-    } else {
-        echo "Error al enviar la respuesta.";
-    }
-}
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete'])) {
-    $idcita  = $_POST['delete_id'];
-
-    // Borrar una cita
-    $sql = "DELETE FROM cita WHERE idcita  = :idcita";
-    $stmt = $base_de_datos->prepare($sql);
-
-    if ($stmt->execute(['idcita' => $idcita])) {
-    } else {
-        echo "Error al eliminar la cita.";
-    }
-}
-
-// Tener las citas
-$sql = "SELECT * FROM cita";
-$stmt = $base_de_datos->query($sql);
-$citas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+require __DIR__ . '/../../Backend/auth/controller/admin.php';
 ?>
 
 <!DOCTYPE html>
@@ -152,8 +102,7 @@ $citas = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <button onclick="sendMessage()">Enviar</button>
             </div>
         </div>
-
-    </main>
+        </main>
     </header>
     <br><br><br><br>
     <div class="container">
@@ -177,35 +126,8 @@ $citas = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <th>Proceso</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <?php foreach ($citas as $cita): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($cita['tipocita']); ?></td>
-                                <td><?php echo htmlspecialchars($cita['fechacita']); ?></td>
-                                <td><?php echo htmlspecialchars($cita['horacita']); ?></td>
-                                <td><?php echo htmlspecialchars($cita['estado']); ?></td>
-                                <td><?php echo htmlspecialchars($cita['respuesta']); ?></td>
-                                <td>
-
-                                    <form action="" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta cita?');">
-                                        <input type="hidden" name="delete_id" value="<?php echo $cita['idcita']; ?>">
-                                        <button class="btn btn-danger mt-3" type="submit" name="delete">Eliminar</button>
-                                        <link rel="stylesheet" href="administrar.css">
-                                    </form>
-                                </td>
-                                <td>
-                                    <?php if ($cita['estado'] == 'pendiente'): ?>
-                                        <form action="" method="post">
-                                            <input type="hidden" name="idcita" value="<?php echo $cita['idcita']; ?>">
-                                            <textarea name="respuesta" required placeholder="Escribe tu respuesta aquí"></textarea>
-                                            <button class="btn btn-secondary" type="submit" name="responder">Enviar Respuesta</button>
-                                        </form>
-                                    <?php else: ?>
-                                        <span>Respondida</span>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
+                    <tbody id="citasTableBody">
+                        <!-- Las citas se cargarán aquí mediante JavaScript -->
                     </tbody>
                 </table>
             </div>
@@ -219,31 +141,119 @@ $citas = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <a class="btn btn-success" href="inicioprincipal.php">Volver</a>
         </div>
         <br>
-
-  
     </div>
+
     <script>
-        document.querySelector('.admin-img').addEventListener('click', function() {
-            document.querySelector('.dropdown-menu').classList.toggle('show');
-        });
 
-        document.querySelector('.chat-button').addEventListener('click', function() {
-            document.querySelector('.chat-menu').classList.toggle('show');
-        });
-
-        function filterChat() {
-            const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-            const chatItems = document.querySelectorAll('.chat-item');
-            chatItems.forEach(item => {
-                if (item.textContent.toLowerCase().includes(searchInput)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
+        async function loadCitas() {
+            try {
+                const response = await fetch('http://192.168.1.100:3001/api/citas');
+                if (!response.ok) {
+                    throw new Error('Error al cargar las citas');
                 }
+                const citas = await response.json();
+                renderCitas(citas);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar las citas');
+            }
+        }
+
+
+        function renderCitas(citas) {
+            const tableBody = document.getElementById('citasTableBody');
+            tableBody.innerHTML = '';
+
+            citas.forEach(cita => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${escapeHtml(cita.tipocita)}</td>
+                    <td>${escapeHtml(cita.fechacita)}</td>
+                    <td>${escapeHtml(cita.horacita)}</td>
+                    <td>${escapeHtml(cita.estado)}</td>
+                    <td>${escapeHtml(cita.respuesta || '')}</td>
+                    <td>
+                        <button class="btn btn-danger mt-3" onclick="deleteCita(${cita.idcita})">Eliminar</button>
+                    </td>
+                    <td>
+                        ${cita.estado === 'pendiente' ? 
+                            `<form onsubmit="responderCita(event, ${cita.idcita})">
+                                <textarea name="respuesta" required placeholder="Escribe tu respuesta aquí"></textarea>
+                                <button class="btn btn-success" type="submit">Enviar Respuesta</button>
+                            </form>` : 
+                            '<span>Respondida</span>'}
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
             });
         }
-    </script>
-    <script>
+
+        // Función para responder a una cita
+        async function responderCita(event, idcita) {
+            event.preventDefault();
+            const respuesta = event.target.respuesta.value;
+            
+            try {
+                const response = await fetch('http://192.168.1.100:3001/api/citas/responder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ idcita, respuesta })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Error al responder la cita');
+                }
+                
+                alert('Respuesta enviada con éxito');
+                loadCitas(); // Recargar las citas
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al responder la cita');
+            }
+        }
+
+
+        async function deleteCita(idcita) {
+            if (!confirm('¿Estás seguro de que deseas eliminar esta cita?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://192.168.1.100:3001/api/citas/${idcita}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Error al eliminar la cita');
+                }
+                
+                alert('Cita eliminada con éxito');
+                loadCitas(); // Recargar las citas
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al eliminar la cita');
+            }
+        }
+
+        // Función para escapar HTML (seguridad)
+        function escapeHtml(unsafe) {
+            if (unsafe == null) return '';
+            return unsafe.toString()
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Cargar citas al cargar la página
+        document.addEventListener('DOMContentLoaded', loadCitas);
+
+        // Funciones del chat (mantenidas igual)
         function openChat(chatName) {
             const chatContainer = document.getElementById('chatContainer');
             const chatHeader = document.getElementById('chatHeader');
@@ -268,31 +278,18 @@ $citas = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
         }
-
-        function filterChat() {
-            const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-            const chatItems = document.querySelectorAll('.chat-item');
-            chatItems.forEach(item => {
-                if (item.textContent.toLowerCase().includes(searchInput)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
     </script>
-     <br> <br>  <br>   <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>
-        <footer> 
-  <div class="footer-content">
-    <p>&copy; 2025 SETS. Todos los derechos reservados.</p>
-    <ul>
-      <li><a href="#">Términos y Condiciones</a></li>
-      <li><a href="#">Política de Privacidad</a></li>
-      <li><a href="#">Contacto</a></li>
-    </ul>
-  </div>
-</footer>
+    <br> <br>  <br>   <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>
+    <footer> 
+        <div class="footer-content">
+            <p>&copy; 2025 SETS. Todos los derechos reservados.</p>
+            <ul>
+                <li><a href="#">Términos y Condiciones</a></li>
+                <li><a href="#">Política de Privacidad</a></li>
+                <li><a href="#">Contacto</a></li>
+            </ul>
+        </div>
+    </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
-
 </html>
