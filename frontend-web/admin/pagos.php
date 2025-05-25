@@ -1,42 +1,5 @@
 <?php
-require '../../MODEL/backend/authMiddleware.php';
-session_start();
-header("Access-Control-Allow-Origin: http://localhost:3000");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Credentials: true");
-$decoded = authenticate();
-
-$idRegistro = $decoded->id;
-$Usuario = $decoded->Usuario;
-$idRol = $decoded->idRol;
-
-
-if ($idRol != 1111) {
-    header("Location: http://localhost/sets/error.php");
-    exit();
-}
-
-include_once "conexion.php";
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete'])) {
-    $idPagos = $_POST['delete_idPagos'];
-
-    // Borrar un pago
-    $sql = "DELETE FROM pagos WHERE idPagos = :idPagos";
-    $stmt = $base_de_datos->prepare($sql);
-
-    if ($stmt->execute(['idPagos' => $idPagos])) {
-        echo "<script>
-                alert('Pago eliminado con éxito.');
-                window.location.href = 'pagos.php'; // Redirige a la página principal
-              </script>";
-    } else {
-        echo "Error al eliminar el pago.";
-    }
-}
-$sql = "SELECT * FROM pagos";
-$stmt = $base_de_datos->query($sql);
-$pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+require __DIR__ . '/../../Backend/auth/controller/admin.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -48,6 +11,8 @@ $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="css/citasFormulario.css?v=<?php echo (rand()); ?>">
     <link rel="shortcut icon" href="img/c.png" type="image/x-icon" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 </head>
 
 <body>
@@ -70,20 +35,26 @@ $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                            <li class="nav-item">
-                                <center><a class="nav-link active" aria-current="page" href="#" style="font-size: 20px;"><b>Inicio</b></a></center>
-                            </li>
-                            <center>
+                    <div class="offcanvas-header">
+                                <img src="img/pagina-de-inicio.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                <center>
+                                    <a href="./inicioprincipal.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Inicio</b></a>
+                                </center>
+                            </div>
+                               <center>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <img src="img/usuario.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
+
                                         <b style="font-size: 20px;"> Perfil</b>
                                     </a>
                                     <ul class="dropdown-menu" role="menu">
                                         <li>
-                                            <center><a href="Perfil.php">Editar Datos</a></center>
+                                            <center><a href="Perfil.php"><b>Perfil</b></a></center>
                                         </li>
+
                                         <li>
-                                            <center> <a href="../../MODEL/backend/logout.php">Cerrar Sesión</a></center>
+                                            <center> <a href="../../Backend/auth/logout.php"><b>Cerrar Sesión</b></a></center>
                                         </li>
                                     </ul>
                             </center>
@@ -99,38 +70,21 @@ $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                         </ul>
 
-                        <form class="d-flex mt-3" role="search">
-                            <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-                            <button class="btn btn-outline-success" type="submit">Buscar</button>
-                        </form>
+        
                     </div>
                 </div>
             </div>
         </nav>
     </header>
     <br><br>
-    <main>
-        <div id="chatContainer" class="chat-container">
-            <div class="chat-header">
-                <span id="chatHeader">Chat</span>
-                <button class="close-btn" onclick="closeChat()">×</button>
-            </div>
-            <div class="chat-messages" id="chatMessages">
-            </div>
-            <div class="chat-input">
-                <input type="text" id="chatInput" style="font-size: 14px;" placeholder="Escribe tu mensaje...">
-                <button onclick="sendMessage()">Enviar</button>
-            </div>
-        </div>
 
-    </main>
     <main>
         <br> <br> <br>
         <div class="alert alert-success" role="alert" style="text-align: center; font-size :30px;">Insertar Pagos</div>
         <div class="container">
             <div class="row">
                 <div class="col-sm-12 col-md-3 col-lg-4 mt-5">
-                    <form action="../../CONTROLLER/money.php" method="post">
+                    <form id="pagoForm">
                         <fieldset>
                             <center>
                                 <legend><b>Insertar Pago</b></legend>
@@ -198,35 +152,8 @@ $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <th scope="col">Acciones</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <?php foreach ($pagos as $pago): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($pago['idPagos']); ?></td>
-                                    <td><?php echo htmlspecialchars($pago['pagoPor']); ?></td>
-                                    <td><?php echo htmlspecialchars($pago['cantidad']); ?></td>
-                                    <td><?php echo htmlspecialchars($pago['mediopago']); ?></td>
-                                    <td><?php echo htmlspecialchars($pago['apart']); ?></td>
-                                    <td><?php echo htmlspecialchars($pago['fechaPago']); ?></td>
-                                    <td><?php echo htmlspecialchars($pago['referenciaPago']); ?></td>
-                                    <td><?php echo htmlspecialchars($pago['estado']); ?></td>
-                                    <td>
-                                        <form action="../../CONTROLLER/money.php" method="post" style="display: inline;">
-                                            <input type="hidden" name="idPagos" value="<?php echo $pago['idPagos']; ?>">
-                                            <select name="nuevoEstado" class="form-select" onchange="this.form.submit()">
-                                                <option value="Pendiente" <?php echo ($pago['estado'] == 'Pendiente') ? 'selected' : ''; ?>>Pendiente</option>
-                                                <option value="Pagado" <?php echo ($pago['estado'] == 'Pagado') ? 'selected' : ''; ?>>Pagado</option>
-                                                <option value="Vencido" <?php echo ($pago['estado'] == 'Vencido') ? 'selected' : ''; ?>>Vencido</option>
-                                            </select>
-                                        </form>
-                                    </td>
-                                    <td>
-                                        <form action="" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este pago?');">
-                                            <input type="hidden" name="delete_idPagos" value="<?php echo $pago['idPagos']; ?>">
-                                            <button class="btn btn-danger" type="submit" name="delete">Eliminar</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
+                        <tbody id="pagosTableBody">
+            
                         </tbody>
                     </table>
                 </div>
@@ -235,202 +162,303 @@ $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="container mt-5">
             <a href="inicioprincipal.php" class="btn btn-success">Volver</a>
         </div>
+        
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-        <script type="text/javascript" src="JAVA/main.js"></script>
         <script>
-            document.querySelector('.admin-img').addEventListener('click', function() {
-                document.querySelector('.dropdown-menu').classList.toggle('show');
-            });
-            document.querySelector('.chat-button').addEventListener('click', function() {
-                document.querySelector('.chat-menu').classList.toggle('show');
-            });
 
-            function filterChat() {
-                const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-                const chatItems = document.querySelectorAll('.chat-item');
-                chatItems.forEach(item => {
-                    if (item.textContent.toLowerCase().includes(searchInput)) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
-            }
-        </script>
-        <script>
-            function openChat(chatName) {
-                const chatContainer = document.getElementById('chatContainer');
-                const chatHeader = document.getElementById('chatHeader');
-                chatHeader.textContent = chatName;
-                chatContainer.classList.add('show');
-            }
+            const { jsPDF } = window.jspdf;
+            let pagosData = [];
+            
 
-            function closeChat() {
-                const chatContainer = document.getElementById('chatContainer');
-                chatContainer.classList.remove('show');
-            }
-
-            function sendMessage() {
-                const messageInput = document.getElementById('chatInput');
-                const messageText = messageInput.value.trim();
-                if (messageText) {
-                    const chatMessages = document.getElementById('chatMessages');
-                    const messageElement = document.createElement('p');
-                    messageElement.textContent = messageText;
-                    chatMessages.appendChild(messageElement);
-                    messageInput.value = '';
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }
-            }
-
-            function filterChat() {
-                const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-                const chatItems = document.querySelectorAll('.chat-item');
-                chatItems.forEach(item => {
-                    if (item.textContent.toLowerCase().includes(searchInput)) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
-            }
-        </script>
-        <script>
-            const searchInput = document.getElementById('searchInput');
-            const announcements = document.querySelectorAll('.announcement');
-
-
-            searchInput.addEventListener('input', function() {
-                const filter = searchInput.value.toLowerCase();
-
-
-                announcements.forEach(function(announcement) {
-                    const text = announcement.textContent.toLowerCase();
-                    if (text.includes(filter)) {
-                        announcement.style.display = 'block';
-                    } else {
-                        announcement.style.display = 'none';
-                    }
-                });
-            });
-        </script>
-        <script>
-            document.querySelector('.admin-img').addEventListener('click', function() {
-                document.querySelector('.dropdown-menu').classList.toggle('show');
-            });
-
-            document.querySelector('.chat-button').addEventListener('click', function() {
-                document.querySelector('.chat-menu').classList.toggle('show');
-            });
-
-            function filterChat() {
-                const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-                const chatItems = document.querySelectorAll('.chat-item');
-                chatItems.forEach(item => {
-                    if (item.textContent.toLowerCase().includes(searchInput)) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
-            }
-        </script>
-        <script>
-            function openChat(chatName) {
-                const chatContainer = document.getElementById('chatContainer');
-                const chatHeader = document.getElementById('chatHeader');
-                chatHeader.textContent = chatName;
-                chatContainer.classList.add('show');
-            }
-
-            function closeChat() {
-                const chatContainer = document.getElementById('chatContainer');
-                chatContainer.classList.remove('show');
-            }
-
-            function sendMessage() {
-                const messageInput = document.getElementById('chatInput');
-                const messageText = messageInput.value.trim();
-                if (messageText) {
-                    const chatMessages = document.getElementById('chatMessages');
-                    const messageElement = document.createElement('p');
-                    messageElement.textContent = messageText;
-                    chatMessages.appendChild(messageElement);
-                    messageInput.value = '';
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }
-            }
-
-            function filterChat() {
-                const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-                const chatItems = document.querySelectorAll('.chat-item');
-                chatItems.forEach(item => {
-                    if (item.textContent.toLowerCase().includes(searchInput)) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
-            }
-        </script>
-        <script>
             document.addEventListener('DOMContentLoaded', function() {
-                const form = document.querySelector('form');
-                const fechaPagoInput = document.getElementById('fechaPago');
+                cargarPagos();
+                configurarFormulario();
+                configurarValidaciones();
+            });
+            
+     
+            function cargarPagos() {
+                fetch('http://192.168.1.100:3001/api/pagos')
+                    .then(response => response.json())
+                    .then(data => {
+                        pagosData = data;
+                        actualizarTablaPagos(data);
+                    })
+                    .catch(error => {
+                        console.error('Error al cargar pagos:', error);
+                        mostrarAlerta('Error al cargar los pagos', 'danger');
+                    });
+            }
+            
 
-                // Establecer fecha mínima como hoy
+            function actualizarTablaPagos(pagos) {
+                const tableBody = document.getElementById('pagosTableBody');
+                tableBody.innerHTML = '';
+                
+                pagos.forEach(pago => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${pago.idPagos}</td>
+                        <td>${pago.pagoPor}</td>
+                        <td>${pago.cantidad}</td>
+                        <td>${pago.mediopago}</td>
+                        <td>${pago.apart}</td>
+                        <td>${pago.fechaPago}</td>
+                        <td>${pago.referenciaPago || '-'}</td>
+                        <td>${pago.estado}</td>
+                        <td>
+                            <select class="form-select estado-select" data-id="${pago.idPagos}">
+                                <option value="Pendiente" ${pago.estado === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                                <option value="Pagado" ${pago.estado === 'Pagado' ? 'selected' : ''}>Pagado</option>
+                                <option value="Vencido" ${pago.estado === 'Vencido' ? 'selected' : ''}>Vencido</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button class="btn btn-danger delete-btn" data-id="${pago.idPagos}">Eliminar</button>
+                            <button class="btn btn-success pdf-btn" data-id="${pago.idPagos}">PDF</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                
+               
+                document.querySelectorAll('.estado-select').forEach(select => {
+                    select.addEventListener('change', function() {
+                        const idPago = this.getAttribute('data-id');
+                        const nuevoEstado = this.value;
+                        actualizarEstadoPago(idPago, nuevoEstado);
+                    });
+                });
+                
+               
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idPago = this.getAttribute('data-id');
+                        eliminarPago(idPago);
+                    });
+                });
+                
+            
+                document.querySelectorAll('.pdf-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idPago = this.getAttribute('data-id');
+                        const pago = pagosData.find(p => p.idPagos == idPago);
+                        generarPDF(pago);
+                    });
+                });
+            }
+            
+
+            function configurarFormulario() {
+                const form = document.getElementById('pagoForm');
+                
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = {
+                        pagoPor: document.getElementById('pagoPor').value,
+                        cantidad: parseFloat(document.getElementById('cantidad').value),
+                        mediopago: document.getElementById('mediopago').value,
+                        apart: document.getElementById('apart').value,
+                        fechaPago: document.getElementById('fechaPago').value,
+                        estado: document.getElementById('estado').value,
+                        referenciaPago: document.getElementById('referenciaPago').value || null
+                    };
+                    
+          
+                    if (formData.cantidad <= 0) {
+                        mostrarAlerta('La cantidad debe ser mayor a cero', 'danger');
+                        return;
+                    }
+                    
+                  
+                    const hoy = new Date();
+                    hoy.setHours(0, 0, 0, 0);
+                    const fechaPago = new Date(formData.fechaPago);
+                    
+                    if (fechaPago < hoy) {
+                        mostrarAlerta('No puedes registrar pagos con fecha en el pasado', 'danger');
+                        return;
+                    }
+                    
+               
+                    fetch('http://192.168.1.100:3001/api/pagos', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            throw new Error(data.error);
+                        }
+                        mostrarAlerta('Pago creado exitosamente', 'success');
+                        form.reset();
+                        cargarPagos();
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        mostrarAlerta('Error al crear el pago: ' + error.message, 'danger');
+                    });
+                });
+            }
+            
+          
+            function actualizarEstadoPago(idPago, nuevoEstado) {
+                fetch(`http://192.168.1.100:3001/api/pagos/${idPago}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ estado: nuevoEstado })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    mostrarAlerta('Estado actualizado correctamente', 'success');
+                    cargarPagos();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    mostrarAlerta('Error al actualizar el estado: ' + error.message, 'danger');
+                    cargarPagos(); 
+                });
+            }
+            
+ 
+            function eliminarPago(idPago) {
+                if (!confirm('¿Estás seguro de que deseas eliminar este pago?')) {
+                    return;
+                }
+                
+                fetch(`http://192.168.1.100:3001/api/pagos/${idPago}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    mostrarAlerta('Pago eliminado correctamente', 'success');
+                    cargarPagos();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    mostrarAlerta('Error al eliminar el pago: ' + error.message, 'danger');
+                });
+            }
+            
+            function generarPDF(pago) {
+                const doc = new jsPDF();
+                
+
+                doc.addImage('img/c.png', 'PNG', 10, 10, 30, 30);
+                
+   
+                doc.setFontSize(20);
+                doc.text('COMPROBANTE DE PAGO', 105, 20, { align: 'center' });
+                
+       
+                doc.setFontSize(12);
+                doc.text(`ID Pago: ${pago.idPagos}`, 14, 50);
+                doc.text(`Concepto: ${pago.pagoPor}`, 14, 60);
+                doc.text(`Cantidad: $${pago.cantidad.toFixed(2)}`, 14, 70);
+                doc.text(`Medio de Pago: ${pago.mediopago}`, 14, 80);
+                doc.text(`Apartamento: ${pago.apart}`, 14, 90);
+                doc.text(`Fecha de Pago: ${pago.fechaPago}`, 14, 100);
+                if (pago.referenciaPago) {
+                    doc.text(`Referencia: ${pago.referenciaPago}`, 14, 110);
+                }
+                doc.text(`Estado: ${pago.estado}`, 14, 120);
+                
+                
+                doc.text('_________________________', 50, 150);
+                doc.text('Firma del Administrador', 60, 160);
+                
+       
+                doc.save(`Pago_${pago.idPagos}_${pago.apart}.pdf`);
+            }
+            
+          
+            function mostrarAlerta(mensaje, tipo) {
+                const alerta = document.createElement('div');
+                alerta.className = `alert alert-${tipo} fixed-top text-center`;
+                alerta.style.marginTop = '80px';
+                alerta.style.zIndex = '1000';
+                alerta.textContent = mensaje;
+                
+                document.body.appendChild(alerta);
+                
+                setTimeout(() => {
+                    alerta.remove();
+                }, 3000);
+            }
+            
+
+            function configurarValidaciones() {
+                const fechaPagoInput = document.getElementById('fechaPago');
+                const cantidadInput = document.getElementById('cantidad');
+                
+     
                 const today = new Date();
                 const dd = String(today.getDate()).padStart(2, '0');
-                const mm = String(today.getMonth() + 1).padStart(2, '0'); 
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
                 const yyyy = today.getFullYear();
                 const fechaHoy = yyyy + '-' + mm + '-' + dd;
                 fechaPagoInput.setAttribute('min', fechaHoy);
+                
 
-                // Validación al enviar el formulario
-                form.addEventListener('submit', function(e) {
-                    const fechaSeleccionada = new Date(fechaPagoInput.value);
-                    const hoy = new Date();
-                    hoy.setHours(0, 0, 0, 0); // Resetear horas para comparar solo fechas
-
-                    if (fechaSeleccionada < hoy) {
-                        alert('No puedes registrar pagos con fecha en el pasado');
-                        e.preventDefault();
-                        return false;
-                    }
-
-                    // Validar que la cantidad sea positiva
-                    const cantidadInput = document.getElementById('cantidad');
-                    if (parseFloat(cantidadInput.value) <= 0) {
-                        alert('La cantidad debe ser mayor a cero');
-                        e.preventDefault();
-                        return false;
-                    }
-
-                    return true;
-                });
-
-                // Validación en tiempo real para la fecha
                 fechaPagoInput.addEventListener('change', function() {
                     const fechaSeleccionada = new Date(this.value);
                     const hoy = new Date();
                     hoy.setHours(0, 0, 0, 0);
-
+                    
                     if (fechaSeleccionada < hoy) {
-                        alert('No puedes seleccionar una fecha en el pasado');
+                        mostrarAlerta('No puedes seleccionar una fecha en el pasado', 'danger');
                         this.value = fechaHoy;
                     }
                 });
-
-                // Validación en tiempo real para la cantidad
-                document.getElementById('cantidad').addEventListener('change', function() {
+                
+  
+                cantidadInput.addEventListener('change', function() {
                     if (parseFloat(this.value) <= 0) {
-                        alert('La cantidad debe ser mayor a cero');
+                        mostrarAlerta('La cantidad debe ser mayor a cero', 'danger');
                         this.value = '';
                     }
                 });
-            });
+            }
+            
+ 
+            function openChat(chatName) {
+                const chatContainer = document.getElementById('chatContainer');
+                const chatHeader = document.getElementById('chatHeader');
+                chatHeader.textContent = chatName;
+                chatContainer.classList.add('show');
+            }
+            
+            function closeChat() {
+                const chatContainer = document.getElementById('chatContainer');
+                chatContainer.classList.remove('show');
+            }
+            
+            function sendMessage() {
+                const messageInput = document.getElementById('chatInput');
+                const messageText = messageInput.value.trim();
+                if (messageText) {
+                    const chatMessages = document.getElementById('chatMessages');
+                    const messageElement = document.createElement('p');
+                    messageElement.textContent = messageText;
+                    chatMessages.appendChild(messageElement);
+                    messageInput.value = '';
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            }
         </script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        
         <br>
         <br>
         <footer>
@@ -443,8 +471,5 @@ $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </ul>
             </div>
         </footer>
-
-</body>
-
-
+    </body>
 </html>
