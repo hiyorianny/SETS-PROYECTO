@@ -1,87 +1,70 @@
 <?php
-require '../../MODEL/backend/authMiddleware.php';
-session_start();
-header("Access-Control-Allow-Origin: http://localhost:3000");  
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Credentials: true");  
-$decoded = authenticate();
-
-$idRegistro = $decoded->id;
-$Usuario = $decoded->Usuario; 
-$idRol = $decoded->idRol;
-
-
-if ($idRol != 3333) { 
-    header("Location: http://localhost/sets/error.php");
-    exit();
-}
+require '../../Backend/auth/controller/residente.php';
 
 include_once "conexion.php";
+if (isset($_FILES['imagenPerfil']) && $_FILES['imagenPerfil']['error'] === UPLOAD_ERR_OK) {
+    $fileTmpPath = $_FILES['imagenPerfil']['tmp_name'];
+    $fileName = basename($_FILES['imagenPerfil']['name']);
+    $fileSize = $_FILES['imagenPerfil']['size'];
+    $fileType = $_FILES['imagenPerfil']['type'];
+    $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
 
-    if (isset($_FILES['imagenPerfil']) && $_FILES['imagenPerfil']['error'] === UPLOAD_ERR_OK) {
-        $fileTmpPath = $_FILES['imagenPerfil']['tmp_name'];
-        $fileName = basename($_FILES['imagenPerfil']['name']);
-        $fileSize = $_FILES['imagenPerfil']['size'];
-        $fileType = $_FILES['imagenPerfil']['type'];
-        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-
-       
-        $check = getimagesize($fileTmpPath);
-        if ($check === false) {
-            echo "El archivo no es una imagen.";
-            exit;
-        }
-
-        
-        if ($fileSize > 2000000) {
-            echo "El archivo es demasiado grande.";
-            exit;
-        }
-
-
-        $allowedTypes = ['jpg', 'jpeg', 'png', 'gif'];
-        if (!in_array($fileExtension, $allowedTypes)) {
-            echo "Solo se permiten archivos JPG, JPEG, PNG y GIF.";
-            exit;
-        }
-
-     
-        $targetDir = "uploads/";
-        if (!is_dir($targetDir)) {
-            mkdir($targetDir, 0755, true);
-        }
-        $targetFilePath = $targetDir . $fileName;
-        if (move_uploaded_file($fileTmpPath, $targetFilePath)) {
-           
-            $sql = "UPDATE registro SET imagenPerfil = ? WHERE Usuario = ?";
-            $stmt = $base_de_datos->prepare($sql);
-            if ($stmt->execute([$targetFilePath, $Usuario])) {
-                echo "La imagen se ha subido correctamente.";
-            } else {
-                echo "Hubo un error al actualizar la base de datos.";
-            }
-        } else {
-            echo "Hubo un error al subir la imagen.";
-        }
+    $check = getimagesize($fileTmpPath);
+    if ($check === false) {
+        echo "El archivo no es una imagen.";
+        exit;
     }
 
 
+    if ($fileSize > 2000000) {
+        echo "El archivo es demasiado grande.";
+        exit;
+    }
 
-$sql = "SELECT r.id_Registro, r.PrimerNombre, r.SegundoNombre, r.PrimerApellido, r.Clave , r.apartamento , r.tipo_propietario,  r.SegundoApellido, r.Correo, r.Usuario, r.numeroDocumento,
-                rd.Roldescripcion, r.imagenPerfil, td.descripcionDoc AS tipodoc, r.telefonoUno, r.telefonoDos
+
+    $allowedTypes = ['jpg', 'jpeg', 'png', 'gif'];
+    if (!in_array($fileExtension, $allowedTypes)) {
+        echo "Solo se permiten archivos JPG, JPEG, PNG y GIF.";
+        exit;
+    }
+
+
+    $targetDir = "uploads/";
+    if (!is_dir($targetDir)) {
+        mkdir($targetDir, 0755, true);
+    }
+    $targetFilePath = $targetDir . $fileName;
+    if (move_uploaded_file($fileTmpPath, $targetFilePath)) {
+
+        $sql = "UPDATE registro SET imagenPerfil = ? WHERE Usuario = ?";
+        $stmt = $base_de_datos->prepare($sql);
+        if ($stmt->execute([$targetFilePath, $Usuario])) {
+            echo "La imagen se ha subido correctamente.";
+        } else {
+            echo "Hubo un error al actualizar la base de datos.";
+        }
+    } else {
+        echo "Hubo un error al subir la imagen.";
+    }
+}
+
+$sql = "SELECT r.id_Registro, r.PrimerNombre, r.SegundoNombre, r.PrimerApellido, 
+               r.SegundoApellido, r.Correo, r.Usuario, r.numeroDocumento,
+               rd.Roldescripcion, r.imagenPerfil, td.descripcionDoc AS tipodoc, 
+               r.telefonoUno, r.telefonoDos, r.apartamento, r.tipo_propietario
         FROM registro r
         JOIN rol rd ON r.idRol = rd.id
         JOIN tipodoc td ON r.Id_tipoDocumento = td.idtDoc
-        WHERE r.Usuario = ?";
+        WHERE r.id_Registro = ?";
 
 $stmt = $base_de_datos->prepare($sql);
-$stmt->execute([$Usuario]);
+$stmt->execute([$idRegistro]);
 $userData = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$userData) {
-    die("Error: No se encontraron datos del perfil.");
+    error_log("No se encontró perfil para ID: $idRegistro, Usuario: $Usuario");
+    die("Error: No se encontraron datos del perfil. Por favor contacte al administrador.");
 }
 ?>
 
@@ -121,20 +104,26 @@ if (!$userData) {
                     </div>
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                            <li class="nav-item">
-                                <center><a class="nav-link active" aria-current="page" href="#" style="font-size: 20px;"><b>Inicio</b></a></center>
-                            </li>
-                            <center>
+                         <div class="offcanvas-header">
+                                <img src="img/pagina-de-inicio.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                <center>
+                                    <a href="./inicioprincipal.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Inicio</b></a>
+                                </center>
+                            </div>
+                               <center>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <img src="img/usuario.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
+
                                         <b style="font-size: 20px;"> Perfil</b>
                                     </a>
                                     <ul class="dropdown-menu" role="menu">
                                         <li>
-                                            <center><a href="Perfil.php">Editar datos</a></center>
+                                            <center><a href="Perfil.php"><b>Perfil</b></a></center>
                                         </li>
+
                                         <li>
-                                            <center> <a href="../../MODEL/backend/logout.php">Cerrar sesión</a></center>
+                                            <center> <a href="../../Backend/auth/logout.php"><b>Cerrar Sesión</b></a></center>
                                         </li>
                                     </ul>
                             </center>
@@ -149,30 +138,14 @@ if (!$userData) {
                             </div>
                             
                         </ul>
-                        <form class="d-flex mt-3" role="search">
-                            <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-                            <button class="btn btn-outline-success" type="submit">Buscar</button>
-                        </form>
+                
                     </div>
                 </div>
             </div>
         </nav>
     </header>
     <br><br>
-    <main>
-        <section class="chat-container" id="chatContainer">
-            <header class="chat-header">
-                <span id="chatHeader">Chat</span>
-                <button class="close-btn" onclick="closeChat()">×</button>
-            </header>
-            <div class="chat-messages" id="chatMessages">
-            </div>
-            <div class="chat-input">
-                <input type="text" id="chatInput" placeholder="Escribe tu mensaje...">
-                <button onclick="sendMessage()">Enviar</button>
-            </div>
-        </section>
-    </main>
+
     <br>
     <br>
     <br>
