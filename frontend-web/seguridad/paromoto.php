@@ -171,7 +171,7 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
             }
         </script>
         <script>
-            // Función para cargar los parqueaderos desde la API
+          
             async function cargarParqueaderos() {
                 try {
                     const response = await fetch('http://192.168.1.100:3001/api/parqueaderos');
@@ -210,7 +210,7 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
                         </div>
                     `;
 
-                        // Agregar nueva fila cada 5 elementos
+
                         if ((index + 1) % 5 === 0) {
                             html += `</div><div class="row">`;
                         }
@@ -218,7 +218,7 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
 
                     container.innerHTML = html;
 
-                    // Configurar el buscador
+
                     document.getElementById('searchInput').addEventListener('input', function() {
                         const query = this.value.toLowerCase();
                         const cards = document.querySelectorAll('.product-card');
@@ -240,7 +240,7 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
                 }
             }
 
-            // Cargar los parqueaderos cuando la página esté lista
+        
             document.addEventListener('DOMContentLoaded', cargarParqueaderos);
         </script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
