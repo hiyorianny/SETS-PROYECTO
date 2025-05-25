@@ -1,36 +1,5 @@
 <?php
-require '../../MODEL/backend/authMiddleware.php';
-session_start();
-header("Access-Control-Allow-Origin: http://localhost:3000");  
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Credentials: true");  
-$decoded = authenticate();
-
-$idRegistro = $decoded->id;
-$Usuario = $decoded->Usuario; 
-$idRol = $decoded->idRol;
-
-
-if ($idRol != 3333) { 
-    header("Location: http://localhost/sets/error.php");
-    exit();
-}
-
-include_once "conexion.php";
-
-
-
-
-$query = "SELECT idZona, descripcion, url_videos , 	costo_alquiler FROM zona_comun";
-try {
-    $statement = $base_de_datos->prepare($query);
-    $statement->execute();
-    $zonas_comunes = $statement->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    echo "Error al ejecutar la consulta: " . $e->getMessage();
-    exit();
-}
+require __DIR__ . '/../../Backend/auth/controller/residente.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -64,20 +33,26 @@ try {
                     </div>
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                            <li class="nav-item">
-                                <center><a class="nav-link active" aria-current="page" href="#" style="font-size: 20px;"><b>Inicio</b></a></center>
-                            </li>
-                            <center>
+                            <div class="offcanvas-header">
+                                <img src="img/pagina-de-inicio.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                <center>
+                                    <a href="./inicioprincipal.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Inicio</b></a>
+                                </center>
+                            </div>
+                               <center>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <img src="img/usuario.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
+
                                         <b style="font-size: 20px;"> Perfil</b>
                                     </a>
                                     <ul class="dropdown-menu" role="menu">
                                         <li>
-                                            <center><a href="Perfil.php">Editar datos</a></center>
+                                            <center><a href="Perfil.php"><b>Perfil</b></a></center>
                                         </li>
+
                                         <li>
-                                            <center> <a href="../../MODEL/backend/logout.php">Cerrar sessión</a></center>
+                                            <center> <a href="../../Backend/auth/logout.php"><b>Cerrar Sesión</b></a></center>
                                         </li>
                                     </ul>
                             </center>
@@ -92,90 +67,29 @@ try {
                             </div>
                            
                         </ul>
-                        <form class="d-flex mt-3" role="search">
-                            <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-                            <button class="btn btn-outline-success" type="submit">Buscar</button>
-                        </form>
                     </div>
                 </div>
             </div>
         </nav>
     </header>
     <br><br>
-    <main>
-        <section class="chat-container" id="chatContainer">
-            <header class="chat-header">
-                <span id="chatHeader">Chat</span>
-                <button class="close-btn" onclick="closeChat()">×</button>
-            </header>
-            <div class="chat-messages" id="chatMessages">
-            </div>
-            <div class="chat-input">
-                <input type="text" id="chatInput" placeholder="Escribe tu mensaje...">
-                <button onclick="sendMessage()">Enviar</button>
-            </div>
-        </section>
-    </main>
-    <main>
+
+      <main>
         <br>
         <br>
         <section class="zones-section container mt-5">
             <h1 class="title text-center mb-5"><b>Zonas Comunes</b></h1>
-            <div class="row">
-                <?php if (!empty($zonas_comunes)): ?>
-                    <?php foreach ($zonas_comunes as $zona): ?>
-                        <div class="col-12 col-md-6 ">
-                            <article class="zone">
-                                <button class="zone-type-btn">
-                                    <h3><?= htmlspecialchars($zona['idZona']); ?></h3>
-                                </button>
-                                <div class="video-wrapper">
-                                    <video src="<?= htmlspecialchars($zona['url_videos']); ?>" autoplay loop muted></video>
-                                </div>
-                                <h2 class="zone-description"><?= htmlspecialchars($zona['descripcion']); ?></h2>
-                                <h6>Costo de Alquiler</h6>
-                                <h2 class="zone-description"><?= htmlspecialchars($zona['costo_alquiler']); ?></h2>
-                                <?php
-                                $pagina = '';
-                                switch ($zona['idZona']) {
-                                    case '2':
-                                        $pagina = 'solicitarbbq.php';
-                                        break;
-                                    case '1':
-                                        $pagina = 'solicitarfutbol.php';
-                                        break;
-                                    case '3':
-                                        $pagina = 'solicitarsalon.php';
-                                        break;
-                                    case '4':
-                                        $pagina = 'solicitarvoley.php';
-                                        break;
-                                    case '5':
-                                        $pagina = 'solicitargym.php';
-                                        break;
-                                    default:
-                                        $pagina = '#';
-                                        break;
-                                }
-                                ?>
-                                <a href="<?= htmlspecialchars($pagina); ?>?id=<?= htmlspecialchars($zona['idZona']); ?>" class="btn btn-outline-success">
-                                    Ver Horario Disponible
-                                </a><br>
-                                <a class="btn btn-success" href="agendasaloncomunal.php">
-                                    <center>
-                                        <h3>Solicitar</h3>
-                                    </center>
-                                </a>
-                            </article>
-                            <br>
-                            <br>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+            <div class="row" id="zonasContainer">
+
+                <div class="col-12 text-center">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">Cargando zonas comunes...</span>
+                    </div>
+                    <p>Cargando zonas comunes...</p>
+                </div>
             </div>
         </section>
         <a href="inicioprincipal.php" class="btn btn-outline-success" style="font-size: 30px;">Volver</a>
-
     </main>
     </section>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
@@ -202,42 +116,113 @@ try {
         }
     </script>
     <script>
-        function openChat(chatName) {
-            const chatContainer = document.getElementById('chatContainer');
-            const chatHeader = document.getElementById('chatHeader');
-            chatHeader.textContent = chatName;
-            chatContainer.classList.add('show');
-        }
+       document.addEventListener('DOMContentLoaded', function() {
+    cargarZonasComunes();
+});
 
-        function closeChat() {
-            const chatContainer = document.getElementById('chatContainer');
-            chatContainer.classList.remove('show');
-        }
+async function cargarZonasComunes() {
+    try {
 
-        function sendMessage() {
-            const messageInput = document.getElementById('chatInput');
-            const messageText = messageInput.value.trim();
-            if (messageText) {
-                const chatMessages = document.getElementById('chatMessages');
-                const messageElement = document.createElement('p');
-                messageElement.textContent = messageText;
-                chatMessages.appendChild(messageElement);
-                messageInput.value = '';
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+        const container = document.getElementById('zonasContainer');
+        
+
+        const response = await fetch('http://192.168.1.100:3001/api/zonas-comunes', {
+            headers: {
+                'Content-Type': 'application/json',
+
             }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
         }
+        
+        const zonas = await response.json();
+        mostrarZonas(zonas);
+    } catch (error) {
+        console.error('Error al cargar las zonas comunes:', error);
+        mostrarError();
+    }
+}
 
-        function filterChat() {
-            const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-            const chatItems = document.querySelectorAll('.chat-item');
-            chatItems.forEach(item => {
-                if (item.textContent.toLowerCase().includes(searchInput)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
+function mostrarZonas(zonas) {
+    const container = document.getElementById('zonasContainer');
+    
+    if (!zonas || zonas.length === 0) {
+        container.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No hay zonas comunes disponibles en este momento.
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    
+    zonas.forEach(zona => {
+        const pagina = obtenerPaginaSolicitud(zona.idZona);
+        
+        html += `
+            <div class="col-12 col-md-6">
+                <article class="zone">
+                    <button class="zone-type-btn">
+                        <h3>${escapeHtml(zona.idZona)}</h3>
+                    </button>
+                    <div class="video-wrapper">
+                        <video src="${escapeHtml(zona.url_videos)}" autoplay loop muted></video>
+                    </div>
+                    <h2 class="zone-description">${escapeHtml(zona.descripcion)}</h2>
+                    <h6>Costo de Alquiler</h6>
+                    <h2 class="zone-description">${escapeHtml(zona.costo_alquiler)}</h2>
+                    <a href="${pagina}?id=${escapeHtml(zona.idZona)}" class="btn btn-outline-success">
+                        Ver Horario Disponible
+                    </a><br>
+                    <a class="btn btn-success" href="agendasaloncomunal.php">
+                        <center><h3>Solicitar</h3></center>
+                    </a>
+                </article>
+                <br><br>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function mostrarError() {
+    const container = document.getElementById('zonasContainer');
+    container.innerHTML = `
+        <div class="col-12">
+            <div class="alert alert-danger">
+                Error al cargar las zonas comunes. Por favor, inténtalo de nuevo más tarde.
+                <button onclick="cargarZonasComunes()" class="btn btn-sm btn-warning mt-2">Reintentar</button>
+            </div>
+        </div>
+    `;
+}
+
+function obtenerPaginaSolicitud(idZona) {
+    const paginas = {
+        '1': 'solicitarfutbol.php',
+        '2': 'solicitarbbq.php',
+        '3': 'solicitarsalon.php',
+        '4': 'solicitarvoley.php',
+        '5': 'solicitargym.php'
+    };
+    return paginas[idZona] || '#';
+}
+
+function escapeHtml(unsafe) {
+    if (!unsafe) return '';
+    return unsafe.toString()
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
     </script>
      <br>
         <footer> 

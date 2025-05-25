@@ -77,15 +77,31 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                 </div>
             </nav>
     </header>
-     <main>
+    <main>
         <div class="container mt-5 pt-4">
-            
-<br>
+            <!-- Sección de estado de parqueaderos -->
+            <div class="card shadow mb-5">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0"><i class="bi bi-bicycle"></i> Estado de Parqueaderos de Moto Visitantes</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="estadoParqueaderosContainer">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-success" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <p class="mt-2">Cargando disponibilidad...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario de solicitud -->
             <div class="row">
                 <div class="col-lg-5">
                     <div class="card shadow mb-4">
                         <div class="card-header bg-success text-white">
-                            <h3 class="mb-0"><i class="bi bi-car-front"></i> Nueva Solicitud</h3>
+                            <h3 class="mb-0"><i class="bi bi-bicycle"></i> Nueva Solicitud</h3>
                         </div>
                         <div class="card-body">
                             <form id="solicitudForm" class="needs-validation" novalidate>
@@ -94,7 +110,7 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                                         <label for="id_apartamento" class="form-label">Apartamento</label>
                                         <input type="text" class="form-control" id="id_apartamento" required>
                                     </div>
-
+                                    
                                     <div class="col-md-6">
                                         <label for="parqueadero_visitante" class="form-label">Parqueadero</label>
                                         <select class="form-select" id="parqueadero_visitante" required>
@@ -114,7 +130,7 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                                             Por favor seleccione un parqueadero
                                         </div>
                                     </div>
-
+                                    
                                     <div class="col-12">
                                         <label for="nombre_visitante" class="form-label">Nombre del Visitante</label>
                                         <input type="text" class="form-control" id="nombre_visitante" required>
@@ -122,14 +138,14 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                                             Por favor ingrese el nombre del visitante
                                         </div>
                                     </div>
-
+                                    
                                     <div class="col-md-6">
                                         <label for="tipoVehiculo" class="form-label">Tipo de Vehículo</label>
-                                        <select class="form-select" id="tipoVehiculo" required>
+                                        <select class="form-select" id="tipoVehiculo" required disabled>
                                             <option value="moto" selected>Moto</option>
                                         </select>
                                     </div>
-
+                                    
                                     <div class="col-md-6">
                                         <label for="placaVehiculo" class="form-label">Placa</label>
                                         <input type="text" class="form-control" id="placaVehiculo" required>
@@ -137,32 +153,32 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                                             Por favor ingrese la placa del vehículo
                                         </div>
                                     </div>
-
+                                    
                                     <div class="col-md-6">
                                         <label for="marca" class="form-label">Marca</label>
                                         <input type="text" class="form-control" id="marca" required>
                                     </div>
-
+                                    
                                     <div class="col-md-6">
                                         <label for="modelo" class="form-label">Modelo</label>
                                         <input type="text" class="form-control" id="modelo" required>
                                     </div>
-
+                                    
                                     <div class="col-md-6">
                                         <label for="colorVehiculo" class="form-label">Color</label>
                                         <input type="text" class="form-control" id="colorVehiculo" required>
                                     </div>
-
+                                    
                                     <div class="col-md-6">
                                         <label for="fecha_inicio" class="form-label">Fecha y Hora de Inicio</label>
                                         <input type="datetime-local" class="form-control" id="fecha_inicio" required>
                                     </div>
-
+                                    
                                     <div class="col-md-6">
                                         <label for="fecha_final" class="form-label">Fecha y Hora Final</label>
                                         <input type="datetime-local" class="form-control" id="fecha_final" required>
                                     </div>
-
+                                    
                                     <div class="col-12 mt-4">
                                         <button type="submit" class="btn btn-success w-100 py-2">
                                             <i class="bi bi-send-check"></i> Enviar Solicitud
@@ -173,8 +189,8 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                         </div>
                     </div>
                 </div>
-
-   
+                
+                <!-- Historial de solicitudes -->
                 <div class="col-lg-7">
                     <div class="card shadow">
                         <div class="card-header bg-success text-white">
@@ -208,28 +224,10 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                         </div>
                     </div>
                 </div>
-
-
-
-                <div class="card shadow mb-5">
-                <div class="card-header bg-success text-white">
-                    <h3 class="mb-0"><i class="bi bi-p-square"></i> Estado de Parqueaderos de Moto Visitantes</h3>
-                </div>
-                <div class="card-body">
-                    <div class="row" id="estadoParqueaderosContainer">
-                        <div class="text-center py-5">
-                            <div class="spinner-border text-success" role="status">
-                                <span class="visually-hidden">Cargando...</span>
-                            </div>
-                            <p class="mt-2">Cargando disponibilidad...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
             </div>
         </div>
 
-
+        <!-- Modal de confirmación -->
         <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -253,59 +251,7 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
     <div class="container mt-5">
         <a href="./paromoto.php" class="btn btn-success">Volver</a>
     </div>
-    </div>
-    </div>
-    <br>
-    </div>
-    <br>
-    </div>
-    <script>
-        document.getElementById('searchInput').addEventListener('input', function() {
-            const query = this.value.toLowerCase();
-            const cards = document.querySelectorAll('.product-card');
 
-            cards.forEach(card => {
-                const number = card.getAttribute('data-number').toLowerCase();
-                if (number.includes(query)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-    </script>
-    <script>
-        document.querySelector('.admin-img').addEventListener('click', function() {
-            document.querySelector('.dropdown-menu').classList.toggle('show');
-        });
-
-        document.querySelector('.chat-button').addEventListener('click', function() {
-            document.querySelector('.chat-menu').classList.toggle('show');
-        });
-
-        function filterChat() {
-            const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-            const chatItems = document.querySelectorAll('.chat-item');
-            chatItems.forEach(item => {
-                if (item.textContent.toLowerCase().includes(searchInput)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
-
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.getElementById(tabId).classList.add('active');
-            document.querySelector(`.tab-btn[onclick="showTab('${tabId}')"]`).classList.add('active');
-        }
-    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -317,12 +263,12 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
         document.addEventListener('DOMContentLoaded', function() {
             confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
             document.getElementById('confirmActionBtn').addEventListener('click', confirmAction);
-
+            
             const form = document.getElementById('solicitudForm');
             form.addEventListener('submit', handleSubmit);
-
+            
             loadInitialData();
-
+            
             setupDateValidation();
         });
 
@@ -339,9 +285,9 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
 
         async function loadParkingStatus() {
             try {
-                const response = await fetch(`${API_BASE_URL}/solicitudes-parqueadero/estado`);
+                const response = await fetch(`${API_BASE_URL}/solicitudes-parqueadero/estado?tipoVehiculo=moto`);
                 if (!response.ok) throw new Error('Error al cargar estado');
-
+                
                 const data = await response.json();
                 displayParkingStatus(data);
             } catch (error) {
@@ -356,15 +302,15 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
 
         function displayParkingStatus(parqueaderos) {
             const container = document.getElementById('estadoParqueaderosContainer');
-
+            
             if (!parqueaderos || parqueaderos.length === 0) {
                 container.innerHTML = '<div class="alert alert-warning">No hay información de parqueaderos</div>';
                 return;
             }
-
+            
             // Filtrar solo parqueaderos con estado diferente a NULL
             const parqueaderosFiltrados = parqueaderos.filter(p => p.estado !== null);
-
+            
             container.innerHTML = parqueaderosFiltrados.map(p => {
                 // Manejo seguro de valores NULL
                 const estado = p.estado || 'disponible';
@@ -372,10 +318,10 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                 const visitante = p.visitante || 'N/A';
                 const placa = p.placa || 'N/A';
                 const horario = p.horario || 'N/A';
-
+                
                 const statusClass = getStatusClass(estado);
                 const statusText = getStatusText(estado);
-
+                
                 const details = estado !== 'disponible' ? `
                     <div class="mt-2">
                         <small class="d-block"><strong>Visitante:</strong> ${visitante}</small>
@@ -383,7 +329,7 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                         <small class="d-block"><strong>Horario:</strong> ${horario}</small>
                     </div>
                 ` : '<div class="mt-2"><small>Disponible para reserva</small></div>';
-
+                
                 return `
                     <div class="col-md-4 mb-3">
                         <div class="card h-100 border-${statusClass} animate__animated animate__fadeIn">
@@ -399,37 +345,29 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
         }
 
         function getStatusClass(status) {
-            switch ((status || '').toLowerCase()) {
-                case 'ocupado':
-                    return 'danger';
-                case 'reservado':
-                    return 'warning';
-                case 'disponible':
-                    return 'success';
-                default:
-                    return 'secondary';
+            switch((status || '').toLowerCase()) {
+                case 'ocupado': return 'danger';
+                case 'reservado': return 'warning';
+                case 'disponible': return 'success';
+                default: return 'secondary';
             }
         }
 
         function getStatusText(status) {
-            switch ((status || '').toLowerCase()) {
-                case 'ocupado':
-                    return 'Ocupado';
-                case 'reservado':
-                    return 'Reservado';
-                case 'disponible':
-                    return 'Disponible';
-                default:
-                    return status || 'Desconocido';
+            switch((status || '').toLowerCase()) {
+                case 'ocupado': return 'Ocupado';
+                case 'reservado': return 'Reservado';
+                case 'disponible': return 'Disponible';
+                default: return status || 'Desconocido';
             }
         }
 
         async function loadRequests() {
             try {
-                // Filtrar solo solicitudes de carros
+                // Filtrar solo solicitudes de motos
                 const response = await fetch(`${API_BASE_URL}/solicitudes-parqueadero?tipoVehiculo=moto`);
                 if (!response.ok) throw new Error('Error al cargar solicitudes');
-
+                
                 solicitudes = await response.json();
                 displayRequests();
             } catch (error) {
@@ -446,7 +384,7 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
 
         function displayRequests() {
             const tbody = document.getElementById('solicitudesTableBody');
-
+            
             if (!solicitudes || solicitudes.length === 0) {
                 tbody.innerHTML = `
                     <tr>
@@ -457,21 +395,21 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                 `;
                 return;
             }
-
-
-            const solicitudesCarros = solicitudes.filter(s => s.tipoVehiculo === 'moto');
-
-            tbody.innerHTML = solicitudesCarros.map(solicitud => {
-                const statusClass = solicitud.estado === 'aprobado' ? 'success' :
-                    solicitud.estado === 'rechazado' ? 'danger' : 'warning';
-
+            
+            // Filtrar solo solicitudes de motos (por si acaso)
+            const solicitudesMotos = solicitudes.filter(s => s.tipoVehiculo === 'moto');
+            
+            tbody.innerHTML = solicitudesMotos.map(solicitud => {
+                const statusClass = solicitud.estado === 'aprobado' ? 'success' : 
+                                  solicitud.estado === 'rechazado' ? 'danger' : 'warning';
+                
                 // Manejo seguro de valores NULL
                 const parqueadero = solicitud.parqueadero_visitante || 'N/A';
                 const visitante = solicitud.nombre_visitante || 'N/A';
                 const tipoVehiculo = solicitud.tipoVehiculo || 'N/A';
                 const placa = solicitud.placaVehiculo || 'Sin placa';
                 const estado = solicitud.estado || 'pendiente';
-
+                
                 return `
                     <tr class="animate__animated animate__fadeIn">
                         <td>${parqueadero}</td>
@@ -503,7 +441,6 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
             }).join('');
         }
 
-
         function formatDate(dateString) {
             if (!dateString) return 'N/A';
             const date = new Date(dateString);
@@ -519,12 +456,12 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
         function setupDateValidation() {
             const fechaInicio = document.getElementById('fecha_inicio');
             const fechaFinal = document.getElementById('fecha_final');
-
+            
             // Establecer fecha mínima como la fecha/hora actual
             const now = new Date();
             const nowISO = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
             fechaInicio.min = nowISO;
-
+            
             fechaInicio.addEventListener('change', function() {
                 // Validar que la fecha de inicio no sea en el pasado
                 const fechaInicioValue = new Date(fechaInicio.value);
@@ -538,20 +475,20 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                     fechaInicio.value = '';
                     return;
                 }
-
+                
                 // Establecer fecha mínima para fecha final (1 hora después de la fecha de inicio)
                 if (fechaInicio.value) {
                     const minFechaFinal = new Date(fechaInicio.value);
                     minFechaFinal.setHours(minFechaFinal.getHours() + 1);
                     fechaFinal.min = minFechaFinal.toISOString().slice(0, 16);
-
+                    
                     if (fechaFinal.value && new Date(fechaFinal.value) <= minFechaFinal) {
                         fechaFinal.value = '';
                         fechaFinal.setCustomValidity('La fecha final debe ser al menos 1 hora después de la fecha de inicio');
                     }
                 }
             });
-
+            
             fechaFinal.addEventListener('change', function() {
                 if (fechaInicio.value && new Date(fechaFinal.value) <= new Date(fechaInicio.value)) {
                     Swal.fire({
@@ -564,13 +501,13 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                     fechaFinal.setCustomValidity('La fecha final debe ser posterior a la de inicio');
                 } else {
                     fechaFinal.setCustomValidity('');
-
+                    
                     // Validar que la reserva no exceda 24 horas
                     if (fechaInicio.value && fechaFinal.value) {
                         const inicio = new Date(fechaInicio.value);
                         const fin = new Date(fechaFinal.value);
                         const diffHours = (fin - inicio) / (1000 * 60 * 60);
-
+                        
                         if (diffHours > 24) {
                             Swal.fire({
                                 icon: 'error',
@@ -585,17 +522,16 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
             });
         }
 
-
         async function handleSubmit(event) {
             event.preventDefault();
             event.stopPropagation();
-
+            
             const form = event.target;
             if (!form.checkValidity()) {
                 form.classList.add('was-validated');
                 return;
             }
-
+            
             try {
                 const formData = {
                     id_apartamento: document.getElementById('id_apartamento').value,
@@ -603,14 +539,14 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                     nombre_visitante: document.getElementById('nombre_visitante').value,
                     placaVehiculo: document.getElementById('placaVehiculo').value,
                     colorVehiculo: document.getElementById('colorVehiculo').value,
-                    tipoVehiculo: document.getElementById('tipoVehiculo').value,
+                    tipoVehiculo: 'moto', // Forzamos a que siempre sea moto
                     modelo: document.getElementById('modelo').value,
                     marca: document.getElementById('marca').value,
                     fecha_inicio: document.getElementById('fecha_inicio').value,
                     fecha_final: document.getElementById('fecha_final').value,
                     estado: 'pendiente'
                 };
-
+                
                 const response = await fetch(`${API_BASE_URL}/solicitudes-parqueadero`, {
                     method: 'POST',
                     headers: {
@@ -618,12 +554,12 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                     },
                     body: JSON.stringify(formData)
                 });
-
+                
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.message || 'Error al enviar solicitud');
                 }
-
+                
                 await Swal.fire({
                     icon: 'success',
                     title: 'Solicitud enviada',
@@ -631,16 +567,16 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                     timer: 2000,
                     showConfirmButton: false
                 });
-
+                
                 form.reset();
                 form.classList.remove('was-validated');
-
+                
                 // Recargar datos
                 await Promise.all([
                     loadParkingStatus(),
                     loadRequests()
                 ]);
-
+                
             } catch (error) {
                 showError('Error al enviar solicitud', error);
             }
@@ -651,29 +587,29 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
             const modal = document.getElementById('confirmModal');
             const modalBody = document.getElementById('modalBody');
             const confirmBtn = document.getElementById('confirmActionBtn');
-
+            
             if (action === 'eliminar') {
                 modalBody.textContent = '¿Está seguro de que desea cancelar esta solicitud?';
                 confirmBtn.textContent = 'Cancelar solicitud';
                 confirmBtn.className = 'btn btn-danger';
             }
-
+            
             confirmModal.show();
         }
 
         async function confirmAction() {
             if (!currentActionId) return;
-
+            
             try {
                 const response = await fetch(`${API_BASE_URL}/solicitudes-parqueadero/${currentActionId}`, {
                     method: 'DELETE'
                 });
-
+                
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.message || 'Error al eliminar solicitud');
                 }
-
+                
                 await Swal.fire({
                     icon: 'success',
                     title: 'Solicitud cancelada',
@@ -681,13 +617,13 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                     timer: 2000,
                     showConfirmButton: false
                 });
-
+                
                 confirmModal.hide();
                 await Promise.all([
                     loadParkingStatus(),
                     loadRequests()
                 ]);
-
+                
             } catch (error) {
                 showError('Error al procesar la acción', error);
             } finally {
@@ -704,7 +640,6 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
             });
         }
     </script>
-    </main>
     <style>
         .parking-card {
             transition: all 0.3s ease;
@@ -742,5 +677,4 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
         </div>
     </footer>
 </body>
-
 </html>
