@@ -1,46 +1,5 @@
 <?php
-require '../../MODEL/backend/authMiddleware.php';
-session_start();
-header("Access-Control-Allow-Origin: http://localhost:3000");  
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Credentials: true");  
-$decoded = authenticate();
-
-$idRegistro = $decoded->id;
-$Usuario = $decoded->Usuario; 
-$idRol = $decoded->idRol;
-
-
-if ($idRol != 3333) { 
-    header("Location: http://localhost/sets/error.php");
-    exit();
-}
-
-
-
-
-
-include_once "conexion.php";
-if (!$base_de_datos) {
-    die('Error en la conexión a la base de datos: ' . print_r($base_de_datos->errorInfo(), true));
-}
-$sql = "SELECT idcita, tipocita, fechacita, horacita, respuesta FROM cita";
-$stmt = $base_de_datos->query($sql);
-if (!$stmt) {
-    die('Error en la consulta: ' . print_r($base_de_datos->errorInfo(), true));
-}
-$citas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-$eventos = [];
-foreach ($citas as $row) {
-    $eventos[] = [
-        'id' => $row['idcita'],
-        'title' => $row['tipocita'],
-        'start' => $row['fechacita'] . 'T' . $row['horacita'],
-        'respuesta' => $row['respuesta'] 
-    ];
-}
-
+require __DIR__ . '/../../Backend/auth/controller/residente.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">

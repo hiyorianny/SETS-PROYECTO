@@ -79,10 +79,10 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
     </header>
     <main>
         <div class="container mt-5 pt-4">
-            <!-- Sección de estado de parqueaderos -->
+
             <div class="card shadow mb-5">
                 <div class="card-header bg-success text-white">
-                    <h3 class="mb-0"><i class="bi bi-bicycle"></i> Estado de Parqueaderos de Moto Visitantes</h3>
+                    <h3 class="mb-0"><i class="">🏍️</i> Estado de Parqueaderos de Moto Visitantes</h3>
                 </div>
                 <div class="card-body">
                     <div class="row" id="estadoParqueaderosContainer">
@@ -96,12 +96,11 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                 </div>
             </div>
 
-            <!-- Formulario de solicitud -->
             <div class="row">
                 <div class="col-lg-5">
                     <div class="card shadow mb-4">
                         <div class="card-header bg-success text-white">
-                            <h3 class="mb-0"><i class="bi bi-bicycle"></i> Nueva Solicitud</h3>
+                            <h3 class="mb-0"><i class="">🏍️</i> Nueva Solicitud</h3>
                         </div>
                         <div class="card-body">
                             <form id="solicitudForm" class="needs-validation" novalidate>
@@ -190,11 +189,11 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                     </div>
                 </div>
                 
-                <!-- Historial de solicitudes -->
+
                 <div class="col-lg-7">
                     <div class="card shadow">
                         <div class="card-header bg-success text-white">
-                            <h3 class="mb-0"><i class="bi bi-clock-history"></i> Historial de Solicitudes</h3>
+                            <h3 class="mb-0"><i class="bi bi-clock-history">🏍️</i> Historial de Solicitudes</h3>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -227,7 +226,6 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
             </div>
         </div>
 
-        <!-- Modal de confirmación -->
         <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">

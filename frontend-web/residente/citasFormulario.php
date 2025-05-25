@@ -1,40 +1,5 @@
 <?php
-require '../../MODEL/backend/authMiddleware.php';
-session_start();
-header("Access-Control-Allow-Origin: http://localhost:3000");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Credentials: true");
-$decoded = authenticate();
-
-$idRegistro = $decoded->id;
-$Usuario = $decoded->Usuario;
-$idRol = $decoded->idRol;
-
-
-if ($idRol != 3333) {
-    header("Location: http://localhost/sets/error.php");
-    exit();
-}
-
-include_once "conexion.php";
-
-
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete'])) {
-    $idcita = $_POST['delete_idcita'];
-
-    // Borrar una cita
-    $sql = "DELETE FROM cita WHERE idcita = :idcita";
-    $stmt = $base_de_datos->prepare($sql);
-
-    if ($stmt->execute(['idcita' => $idcita])) {
-    } else {
-        echo "Error al eliminar la cita.";
-    }
-}
-$sql = "SELECT * FROM cita";
-$stmt = $base_de_datos->query($sql);
-$citas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+require __DIR__ . '/../../Backend/auth/controller/residente.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -95,10 +60,6 @@ $citas = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </div>
 
                         </ul>
-                        <form class="d-flex mt-3" role="search">
-                            <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-                            <button class="btn btn-outline-success" type="submit">Buscar</button>
-                        </form>
                     </div>
                 </div>
             </div>
