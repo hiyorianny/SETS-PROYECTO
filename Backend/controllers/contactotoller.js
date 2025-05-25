@@ -19,7 +19,7 @@ class ContactoController {
         try {
             const { nombre, correo, telefono, comentario } = req.body;
             
-            // Validación básica
+
             if (!nombre || !correo || !comentario) {
                 return res.status(400).json({ error: 'Faltan campos obligatorios' });
             }

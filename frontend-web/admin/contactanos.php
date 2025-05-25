@@ -1,54 +1,5 @@
 <?php
-
-require '../../MODEL/backend/authMiddleware.php';
-session_start();
-header("Access-Control-Allow-Origin: http://localhost:3000");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Credentials: true");
-$decoded = authenticate();
-
-$idRegistro = $decoded->id;
-$Usuario = $decoded->Usuario;
-$idRol = $decoded->idRol;
-
-
-if ($idRol != 1111) {
-    header("Location: http://localhost/sets/error.php");
-    exit();
-}
-
-
-
-include_once "conexion.php";
-
-if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-    try {
-
-        $input = json_decode(file_get_contents('php://input'), true);
-        $idContacto = $input['idContacto'] ?? null;
-        
-        if (!$idContacto) {
-            throw new Exception("ID de contacto no proporcionado");
-        }
-        
-
-        $stmt = $base_de_datos->prepare("DELETE FROM contactarnos WHERE idcontactarnos = ?");
-        $stmt->execute([$idContacto]);
-        
-        if ($stmt->rowCount() > 0) {
-            echo json_encode(['success' => true, 'message' => 'Contacto eliminado correctamente']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'No se encontró el contacto']);
-        }
-        
-        exit();
-    } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode(['success' => false, 'message' => 'Error al eliminar: ' . $e->getMessage()]);
-        exit();
-    }
-}
+require __DIR__ . '/../../Backend/auth/controller/admin.php';
 ?>
 
 <!DOCTYPE html>
@@ -84,20 +35,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
                             </div>
                             <div class="offcanvas-body">
                                 <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                                    <li class="nav-item">
-                                        <center><a class="nav-link active" aria-current="page" href="#" style="font-size: 20px;"><b>Inicio</b></a></center>
-                                    </li>
+                                    <div class="offcanvas-header">
+                                        <img src="img/pagina-de-inicio.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                        <center>
+                                            <a href="./inicioprincipal.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Inicio</b></a>
+                                        </center>
+                                    </div>
                                     <center>
                                         <li class="nav-item dropdown">
                                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <img src="img/usuario.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
+
                                                 <b style="font-size: 20px;"> Perfil</b>
                                             </a>
                                             <ul class="dropdown-menu" role="menu">
                                                 <li>
-                                                    <center><a href="Perfil.php">Editar Datos</a></center>
+                                                    <center><a href="Perfil.php"><b>Perfil</b></a></center>
                                                 </li>
+
                                                 <li>
-                                                    <center> <a href="../../MODEL/backend/logout.php">Cerrar Sesión</a></center>
+                                                    <center> <a href="../../Backend/auth/logout.php"><b>Cerrar Sesión</b></a></center>
                                                 </li>
                                             </ul>
                                     </center>
@@ -110,155 +67,240 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
                                             <a href="notificaciones.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;">Notificaciones</a>
                                         </center>
                                     </div>
-                                 
-                                </ul>
 
-                                <form class="d-flex mt-3" role="search">
-                                    <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-                                    <button class="btn btn-outline-success" type="submit">Buscar</button>
-                                </form>
+                                </ul>
                             </div>
                         </div>
                     </div>
                 </nav>
         </header>
         <br><br>
-
+        <br><br>
+        <br><br>
         <main>
-        <div id="chatContainer" class="chat-container">
-            <div class="chat-header">
-                <span id="chatHeader">Chat</span>
-                <button class="close-btn" onclick="closeChat()">×</button>
+            <div class="alert alert-success" role="alert">
+                <h1>Contactarnos! </h1>
+                <center>
+                    <h4>Responder Dudas e Inquietudes</h4>
+                </center>
             </div>
-            <div class="chat-messages" id="chatMessages">
-            </div>
-            <div class="chat-input">
-                <input type="text" id="chatInput" style="font-size: 14px;" placeholder="Escribe tu mensaje...">
-                <button onclick="sendMessage()">Enviar</button>
-            </div>
-        </div>
-
-    </main>
-        <br><br>
-        <br><br>
-        <div class="alert alert-success" role="alert">
-            <h1>Contactarnos! </h1>
             <center>
-                <h4>Responder Dudas e Inquietudes</h4>
+                <div class="barra">
+                    <div class="sombra"></div>
+                    <input type="text" placeholder="Buscar contacto..." id="searchInput" class="form-control">
+                </div>
             </center>
-        </div>
-        <center>
-            <div class="barra">
-                <div class="sombra"></div>
-                <input type="text" placeholder="Buscar contacto..." id="searchInput">
-                <ion-icon name="search-outline"></ion-icon>
+
+            <div class="container mt-4">
+                <div class="row justify-content-center">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered" id="contactTable">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Id_Contactarnos</th>
+                                        <th>Nombre</th>
+                                        <th>Correo</th>
+                                        <th>Teléfono</th>
+                                        <th>Comentario</th>
+                                        <th>Fecha</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaContactos">
+                                    <tr>
+                                        <td colspan="7" class="text-center">
+                                            <div class="spinner-border text-success" role="status">
+                                                <span class="visually-hidden">Cargando...</span>
+                                            </div>
+                                            <p>Cargando datos de contactos...</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </center>
-        <main>
-            <section>
-                <br>
-                <table class="user-table table table-striped" id="contactTable">
-                    <thead>
-                        <tr>
-                            <th class="cc">Id_Contactarnos</th>
-                            <th class="cc">Nombre</th>
-                            <th class="cc">Correo</th>
-                            <th class="cc">Telefono</th>
-                            <th class="cc">Comentario</th>
-                            <th class="cc">Fecha</th>
-                            <th class="cc">Acciones</th>
-                            
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <?php
-                    try {
-                        include_once "conexion.php";
-
-                        $stmt = $base_de_datos->query("
-                            SELECT c.idcontactarnos, c.nombre, c.correo, c.telefono, c.comentario, c.fecha
-                            FROM contactarnos c;
-                        ");
-
-                        $i = 1;
-                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                            $idcontactarnos = $row['idcontactarnos'];
-                            $nombre = $row['nombre'];
-                            $correo = $row['correo'];
-                            $telefono = $row['telefono'];
-                            $comentario = $row['comentario'];
-                            $fecha = $row['fecha'];
-                            
-
-                            echo "<tr>
-                                <td>$idcontactarnos</td>
-                                <td>$nombre</td>
-                                <td>$correo</td>
-                                <td>$telefono</td>
-                                <td>$comentario</td>
-                                <td>$fecha</td>
-                                <td>
-                                    <button class='btn btn-danger btn-sm delete-btn' data-id='$idcontactarnos'>
-                                        Eliminar
-                                    </button>
-                                </td>
-                            </tr>";
-                            $i++;
-                        }
-                    } catch (PDOException $e) {
-                        echo "<tr><td colspan='7'>Error: " . $e->getMessage() . "</td></tr>";
-                    }
-                    ?>
-                </tbody>
-                </table>
-            </section>
         </main>
         <center>
             <a href="inicioprincipal.php" class="btn btn-success btn-lg">
                 <center>Volver </center>
             </a>
         </center>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-          
-                document.querySelectorAll('.delete-btn').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const idContacto = this.getAttribute('data-id');
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+        <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
-                        if (confirm('¿Estás seguro de que deseas eliminar este contacto?')) {
-                            fetch(window.location.href, {
-                                    method: 'DELETE',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'Authorization': 'Bearer <?php echo $_COOKIE['token'] ?? ''; ?>'
-                                    },
-                                    body: JSON.stringify({
-                                        idContacto: idContacto
-                                    }),
-                                    credentials: 'include'
-                                })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        alert(data.message);
-                                        location.reload(); 
-                                    } else {
-                                        alert('Error: ' + data.message);
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                    alert('Ocurrió un error al eliminar el contacto');
-                                });
+        <script>
+            async function cargarContactos() {
+                try {
+                    const response = await fetch('http://192.168.1.100:3001/api/contactarnos');
+                    if (!response.ok) {
+                        throw new Error('Error al obtener los datos');
+                    }
+                    const contactos = await response.json();
+
+                    const tabla = document.getElementById('tablaContactos');
+                    tabla.innerHTML = '';
+
+                    if (contactos.length === 0) {
+                        tabla.innerHTML = '<tr><td colspan="7" class="text-center">No hay contactos registrados</td></tr>';
+                        return;
+                    }
+
+                    contactos.forEach(contacto => {
+                        const fila = document.createElement('tr');
+                        fila.innerHTML = `
+                        <td>${contacto.idcontactarnos}</td>
+                        <td>${contacto.nombre}</td>
+                        <td>${contacto.correo}</td>
+                        <td>${contacto.telefono || '-'}</td>
+                        <td>${contacto.comentario}</td>
+                        <td>${new Date(contacto.fecha).toLocaleString()}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="eliminarContacto(${contacto.idcontactarnos})">
+                                Eliminar
+                            </button>
+                        </td>
+                    `;
+                        tabla.appendChild(fila);
+                    });
+                } catch (error) {
+                    console.error('Error:', error);
+                    document.getElementById('tablaContactos').innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center text-danger">
+                            Error al cargar los datos: ${error.message}
+                            <button onclick="cargarContactos()" class="btn btn-sm btn-warning">Reintentar</button>
+                        </td>
+                    </tr>
+                `;
+                }
+            }
+
+
+            async function eliminarContacto(id) {
+                if (!confirm('¿Estás seguro de que deseas eliminar este contacto?')) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`http://192.168.1.100:3001/api/contactarnos/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer <?php echo $_COOKIE['token'] ?? ''; ?>'
                         }
                     });
-                });
+
+                    if (!response.ok) {
+                        throw new Error('Error al eliminar el contacto');
+                    }
+
+                    const result = await response.json();
+                    if (result.success) {
+                        alert('Contacto eliminado exitosamente');
+                        cargarContactos();
+                    } else {
+                        throw new Error(result.message || 'Error al eliminar el contacto');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert(`Error al eliminar el contacto: ${error.message}`);
+                }
+            }
+
+
+            function buscarContactos() {
+                const input = document.getElementById('searchInput');
+                const filter = input.value.toUpperCase();
+                const table = document.getElementById('contactTable');
+                const tr = table.getElementsByTagName('tr');
+
+                for (let i = 1; i < tr.length; i++) {
+                    let match = false;
+                    const td = tr[i].getElementsByTagName('td');
+
+                    for (let j = 0; j < td.length - 1; j++) {
+                        if (td[j]) {
+                            const txtValue = td[j].textContent || td[j].innerText;
+                            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                                match = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    tr[i].style.display = match ? '' : 'none';
+                }
+            }
+
+
+            document.addEventListener('DOMContentLoaded', function() {
+                cargarContactos();
+                document.getElementById('searchInput').addEventListener('keyup', buscarContactos);
             });
         </script>
         <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
         <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
         <script type="text/javascript" src="JAVA/main.js"></script>
         <script>
+            document.querySelector('.admin-img').addEventListener('click', function() {
+                document.querySelector('.dropdown-menu').classList.toggle('show');
+            });
+            document.querySelector('.chat-button').addEventListener('click', function() {
+                document.querySelector('.chat-menu').classList.toggle('show');
+            });
+
+            function filterChat() {
+                const searchInput = document.querySelector('.search-bar').value.toLowerCase();
+                const chatItems = document.querySelectorAll('.chat-item');
+                chatItems.forEach(item => {
+                    if (item.textContent.toLowerCase().includes(searchInput)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            }
+        </script>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const searchInput = document.getElementById("searchInput");
+                const table = document.getElementById("contactTable");
+                const rows = table.getElementsByTagName("tr");
+
+                searchInput.addEventListener("input", function() {
+                    const searchText = searchInput.value.toLowerCase();
+
+                    for (let i = 1; i < rows.length; i++) {
+                        const row = rows[i];
+                        const cells = row.getElementsByTagName("td");
+                        let match = false;
+
+
+                        for (let j = 0; j < cells.length; j++) {
+                            const cellText = cells[j].textContent.toLowerCase();
+                            if (cellText.includes(searchText)) {
+                                match = true;
+                                break;
+                            }
+                        }
+
+
+                        if (match) {
+                            row.style.display = "";
+                        } else {
+                            row.style.display = "none";
+                        }
+                    }
+                });
+            });
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+       <script>
             document.querySelector('.admin-img').addEventListener('click', function() {
                 document.querySelector('.dropdown-menu').classList.toggle('show');
             });
@@ -349,7 +391,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
                 });
             });
         </script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 </body>
 <br>
