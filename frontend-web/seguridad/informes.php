@@ -1,5 +1,23 @@
 <?php
 require __DIR__ . '/../../Backend/auth/controller/guarda.php';
+
+function getApiData($endpoint) {
+    $apiUrl = 'http://192.168.1.100:3001'.$endpoint;
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $apiUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec($ch);
+    curl_close($ch);
+    return json_decode($response, true);
+}
+
+
+$anunciosData = getApiData('/api/anuncios');
+$zonasComunesData = getApiData('/api/zonas-comunes');
+$solicitudesZonasData = getApiData('/api/solicitudes-zonas');
+$parqueaderosData = getApiData('/api/solicitudes-parqueadero');
+$estadoParqueaderosData = getApiData('/api/solicitudes-parqueadero/estado');
+$ingresosData = getApiData('/api/ingresos');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -7,10 +25,48 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SETS -  Informes </title>
+    <title>SETS - Informes</title>
     <link rel="shortcut icon" href="img/c.png" type="image/x-icon" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="./css/principal.css?v=<?php echo (rand()); ?>">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            width: 100%;
+            margin: 20px auto;
+            height: 300px;
+        }
+        .chart-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .chart-box {
+            width: 48%;
+            margin-bottom: 30px;
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+           
+        }
+        h1 {
+            text-align: center;
+            color: #0e2c0a;
+            margin: 30px 0;
+        }
+        h2 {
+            text-align: center;
+            color: #0e2c0a;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 768px) {
+            .chart-box {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -36,8 +92,7 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
                                 <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
                                 <button class="btn btn-outline-success" type="submit">Buscar</button>
                             </form>
-                            <br>
-                            <br>
+                            <br><br>
 
                             <div class="offcanvas-header">
                                 <img src="img/pagina-de-inicio.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
@@ -45,10 +100,8 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
                                     <a href="./inicioprincipal.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Inicio</b></a>
                                 </center>
                             </div>
-                            <br>
-                            <br>
+                            <br><br>
         
-                            </center>
                             <div class="offcanvas-header">
                                 <img src="img/notificacion.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
                                 <center>
@@ -62,450 +115,314 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
                                     <a href="./ayuda.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Ayuda</b></a>
                                 </center>
                             </div>
-                            <center>
-
                         </ul>
-
                     </div>
                 </div>
             </div>
         </nav>
     </header>
-    <br>
-    <br><br>
-  
-       
-        <script>
-            const searchEventInput = document.getElementById('searchEventInput');
-            const events = document.querySelectorAll('.event');
+    
+ <main class="container" style="margin-top: 100px;">
+    <h1>Reportes e Informes</h1>
+    
+    <div class="chart-row">
+        <div class="chart-box">
+            <h2>Anuncios Publicados (Últimos 6 meses)</h2>
+            <div class="chart-container">
+                <canvas id="anunciosChart"></canvas>
+            </div>
+        </div>
+          <div class="chart-box">
+            <h2>Solicitudes de Parqueaderos</h2>
+            <div class="chart-container">
+                <canvas id="solicitudesParqueaderoChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <center>
+    <div class="chart-row">
+    
+        
+        <div class="chart-box">
+            <h2>Estado Actual de Parqueaderos</h2>
+            <div class="chart-container">
+                <canvas id="estadoParqueaderosChart"></canvas>
+            </div>
+        </div>
+    </div>
+    </center>
+<a href="./inicioprincipal.php" type="button" class="btn btn-success">Volver</a>
+    <script>
+        // Datos desde PHP
+        const rawAnunciosData = <?php echo json_encode($anunciosData); ?>;
+        const rawZonasComunesData = <?php echo json_encode($zonasComunesData); ?>;
+        const rawSolicitudesZonasData = <?php echo json_encode($solicitudesZonasData); ?>;
+        const rawParqueaderosData = <?php echo json_encode($parqueaderosData); ?>;
+        const rawEstadoParqueaderosData = <?php echo json_encode($estadoParqueaderosData); ?>;
+        const rawIngresosData = <?php echo json_encode($ingresosData); ?>;
 
-            searchEventInput.addEventListener('input', function() {
-                const filter = searchEventInput.value.toLowerCase();
+        console.log('Datos de anuncios:', rawAnunciosData);
+        console.log('Datos de zonas comunes:', rawZonasComunesData);
+        console.log('Datos de solicitudes de zonas:', rawSolicitudesZonasData);
+        console.log('Datos de parqueaderos:', rawParqueaderosData);
+        console.log('Estado de parqueaderos:', rawEstadoParqueaderosData);
 
-                events.forEach(function(event) {
-                    const text = event.textContent.toLowerCase();
-                    if (text.includes(filter)) {
-                        event.style.display = 'block';
-                    } else {
-                        event.style.display = 'none';
-                    }
-                });
-            });
-        </script>
-        <script>
-            const searchInput = document.getElementById('searchInput');
-            const announcements = document.querySelectorAll('.announcement');
-            searchInput.addEventListener('input', function() {
-                const filter = searchInput.value.toLowerCase();
-                announcements.forEach(function(announcement) {
-                    const text = announcement.textContent.toLowerCase();
-                    if (text.includes(filter)) {
-                        announcement.style.display = 'block';
-                    } else {
-                        announcement.style.display = 'none';
-                    }
-                });
-            });
-        </script>
-        <script>
-            document.querySelector('.admin-img').addEventListener('click', function() {
-                document.querySelector('.dropdown-menu').classList.toggle('show');
-            });
-            document.querySelector('.chat-button').addEventListener('click', function() {
-                document.querySelector('.chat-menu').classList.toggle('show');
-            });
+        // Procesamiento de datos para Anuncios
+        function processAnunciosData(data) {
+            if (!data || data.length === 0) {
+                return {
+                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+                    data: [0, 0, 0, 0, 0, 0]
+                };
+            }
 
-            function filterChat() {
-                const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-                const chatItems = document.querySelectorAll('.chat-item');
-                chatItems.forEach(item => {
-                    if (item.textContent.toLowerCase().includes(searchInput)) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
+            const last6Months = Array(6).fill(0);
+            const monthNames = [];
+            
+            const currentDate = new Date();
+            for (let i = 5; i >= 0; i--) {
+                const date = new Date();
+                date.setMonth(currentDate.getMonth() - i);
+                const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                monthNames.push(new Intl.DateTimeFormat('es-ES', { month: 'short' }).format(date));
+                
+                data.forEach(anuncio => {
+                    if (anuncio.fechaPublicacion) {
+                        const anuncioDate = new Date(anuncio.fechaPublicacion);
+                        const anuncioMonth = `${anuncioDate.getFullYear()}-${String(anuncioDate.getMonth() + 1).padStart(2, '0')}`;
+                        if (anuncioMonth === monthKey) {
+                            last6Months[5 - i]++;
+                        }
                     }
                 });
             }
-        </script>
-        <script>
-            let currentChat = {
-                type: null,
-                targetId: null,
-                name: null
+            
+            return {
+                labels: monthNames.map(name => name.charAt(0).toUpperCase() + name.slice(1)),
+                data: last6Months
             };
-            let currentUserId = null;
+        }
 
-            // Función para obtener cookies
-            function getCookie(name) {
-                const value = `; ${document.cookie}`;
-                const parts = value.split(`; ${name}=`);
-                if (parts.length === 2) return parts.pop().split(';').shift();
-            }
+        // Procesamiento de datos para Solicitudes por Zona
+       function processSolicitudesPorZona(zonasComunes, solicitudes) {
+    // Verificar que tenemos datos
+    if (!zonasComunes || zonasComunes.length === 0) {
+        console.error('No hay datos de zonas comunes');
+        return {
+            labels: ['Sin datos de zonas'],
+            data: [0],
+            colors: ['rgba(200, 200, 200, 0.7)']
+        };
+    }
 
-            // Función para cerrar el chat
-            function closeChat() {
-                document.getElementById('chatContainer').style.display = 'none';
-                currentChat = {
-                    type: null,
-                    targetId: null,
-                    name: null
+    if (!solicitudes || solicitudes.length === 0) {
+        console.error('No hay datos de solicitudes');
+        return {
+            labels: zonasComunes.map(z => z.descripcion),
+            data: zonasComunes.map(() => 0),
+            colors: zonasComunes.map((_, i) => 
+                `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.7)`
+            )
+        };
+    }
+
+    // Contar solicitudes por zona
+    const solicitudesPorZona = {};
+    solicitudes.forEach(solicitud => {
+        const zonaId = solicitud.ID_zonaComun;
+        solicitudesPorZona[zonaId] = (solicitudesPorZona[zonaId] || 0) + 1;
+    });
+
+    // Preparar datos para el gráfico
+    const labels = [];
+    const data = [];
+    const colors = [];
+    
+    zonasComunes.forEach(zona => {
+        labels.push(zona.descripcion);
+        data.push(solicitudesPorZona[zona.idZona] || 0);
+        colors.push(getColorForZona(zona.idZona));
+    });
+
+    console.log('Datos procesados para gráfico:', { labels, data, colors });
+    
+    return {
+        labels: labels,
+        data: data,
+        colors: colors
+    };
+}
+
+// Función auxiliar para generar colores consistentes
+function getColorForZona(zonaId) {
+    const colores = [
+        'rgba(255, 99, 132, 0.7)',
+        'rgba(54, 162, 235, 0.7)',
+        'rgba(255, 206, 86, 0.7)',
+        'rgba(75, 192, 192, 0.7)',
+        'rgba(153, 102, 255, 0.7)'
+    ];
+    return colores[zonaId % colores.length];
+}
+
+        // Procesamiento de datos para Solicitudes de Parqueaderos
+        function processSolicitudesParqueaderoData(data) {
+            if (!data || data.length === 0) {
+                return {
+                    labels: ['Pendientes', 'Aprobadas', 'Rechazadas'],
+                    data: [0, 0, 0],
+                    colors: [
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(255, 99, 132, 0.7)'
+                    ]
                 };
             }
 
-            // Función para enviar mensajes
-            async function sendMessage() {
-                if (!currentChat.type || !currentChat.targetId) {
-                    alert('No hay un chat seleccionado');
-                    return;
+            const estados = {
+                pendiente: { count: 0, color: 'rgb(255, 186, 11)' },
+                aprobado: { count: 0, color: 'rgba(15, 77, 23, 0.7)' },
+                rechazado: { count: 0, color: 'rgb(102, 8, 8)' }
+            };
+            
+            data.forEach(item => {
+                if (item.estado && estados[item.estado.toLowerCase()]) {
+                    estados[item.estado.toLowerCase()].count++;
                 }
-
-                const chatInput = document.getElementById('chatInput');
-                const message = chatInput.value.trim();
-
-                if (!message) {
-                    alert('El mendaje enviado correctamente ');
-                    return;
-                }
-
-                try {
-                    // Mostrar mensaje temporalmente
-                    const tempMessage = {
-                        id_mensaje: 'temp-' + Date.now(),
-                        id_remitente: currentUserId,
-                        PrimerNombre: 'Tú',
-                        PrimerApellido: '',
-                        Roldescripcion: '',
-                        contenido: message,
-                        fecha_envio: new Date().toISOString()
-                    };
-
-                    displayMessages([tempMessage], currentUserId);
-                    chatInput.value = '';
-
-                    // Enviar mensaje al servidor
-                    const response = await fetch('./chat/chat.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + getCookie('token')
-                        },
-                        body: JSON.stringify({
-                            action: 'send',
-                            content: message,
-                            chat_type: currentChat.type,
-                            receiver_id: currentChat.type === 'privado' ? currentChat.targetId : null,
-                            group_chat: currentChat.type === 'grupal' ? currentChat.targetId : null
-                        })
-                    });
-
-                    const data = await response.json();
-
-                    if (!response.ok || data.status !== 'success') {
-                        throw new Error(data.message || 'Error al enviar mensaje');
-                    }
-
-                    // Reemplazar mensaje temporal con el real del servidor
-                    const tempElement = document.querySelector(`[data-message-id="temp-${tempMessage.id_mensaje.split('-')[1]}"]`);
-                    if (tempElement) {
-                        tempElement.dataset.messageId = data.message_id;
-                    }
-
-                } catch (error) {
-                    console.error('Error al enviar mensaje:', error);
-                    alert('Error al enviar mensaje: ' + error.message);
-                }
-            }
-
-            // Función para eliminar un mensaje
-            async function deleteMessage(event, messageId) {
-                event.stopPropagation();
-
-                if (!confirm('¿Estás seguro de que quieres eliminar este mensaje?')) {
-                    return;
-                }
-
-                try {
-                    const response = await fetch('./chat/chat.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + getCookie('token')
-                        },
-                        body: JSON.stringify({
-                            action: 'delete_message',
-                            message_id: messageId
-                        })
-                    });
-
-                    const data = await response.json();
-
-                    if (!response.ok || data.status !== 'success') {
-                        throw new Error(data.message || 'Error al eliminar mensaje');
-                    }
-
-                    // Eliminar el mensaje del DOM
-                    const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
-                    if (messageElement) {
-                        messageElement.remove();
-                    }
-
-                } catch (error) {
-                    console.error('Error al eliminar mensaje:', error);
-                    alert('Error al eliminar mensaje: ' + error.message);
-                }
-            }
-            // Función para cargar usuarios disponibles
-            async function loadChatUsers() {
-                try {
-                    console.log("Cargando usuarios del chat...");
-                    const response = await fetch('./chat/chat.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + getCookie('token')
-                        },
-                        body: JSON.stringify({
-                            action: 'get_users'
-                        })
-                    });
-
-                    console.log("Respuesta del servidor:", response);
-
-                    if (!response.ok) {
-                        throw new Error(`Error HTTP: ${response.status}`);
-                    }
-
-                    const data = await response.json();
-                    console.log("Datos recibidos:", data);
-
-                    if (!data || !data.users) {
-                        throw new Error('Datos de usuarios no recibidos correctamente');
-                    }
-
-                    updateChatMenu(data.users, data.groups || [], data.current_user_id);
-                } catch (error) {
-                    console.error('Error al cargar usuarios:', error);
-                    alert('Error al cargar los contactos: ' + error.message);
-                }
-            }
-
-            // Función para actualizar el menú de chat
-            function updateChatMenu(users, groups, currentUserId) {
-                const chatMenu = document.getElementById('chatDropdownMenu');
-
-                if (!chatMenu) {
-                    console.error('Menú de chat no encontrado en el DOM');
-                    return;
-                }
-
-                // Limpiar solo los elementos de contactos (conservar el buscador)
-                const contactItems = chatMenu.querySelectorAll('li:not(:first-child)');
-                contactItems.forEach(item => item.remove());
-
-                if (users.length === 0) {
-                    const noUsersItem = document.createElement('li');
-                    noUsersItem.className = 'dropdown-item';
-                    noUsersItem.textContent = 'No hay contactos disponibles';
-                    chatMenu.appendChild(noUsersItem);
-                    return;
-                }
-
-                // Función para escapar HTML
-                const escapeHtml = (unsafe) => {
-                    return unsafe?.toString()
-                        .replace(/&/g, "&amp;")
-                        .replace(/</g, "&lt;")
-                        .replace(/>/g, "&gt;")
-                        .replace(/"/g, "&quot;")
-                        .replace(/'/g, "&#039;") || '';
-                };
-
-                // Agregar usuarios
-                users.forEach(user => {
-                    if (user.id_Registro != currentUserId) {
-                        const li = document.createElement('li');
-                        li.className = 'chat-contact-item dropdown-item';
-
-                        li.innerHTML = `
-                <a href="#" class="chat-item d-flex align-items-center p-2"
-                   onclick="openChat('${escapeHtml(user.PrimerNombre)} ${escapeHtml(user.PrimerApellido)}', 
-                           ${user.id_Registro}, false)">
-                    <img src="./img/usuario.png"  
-                         class="rounded-circle me-2" width="30" height="30">
-                    <div>
-                        <div class="fw-bold">${escapeHtml(user.PrimerNombre)} ${escapeHtml(user.PrimerApellido)}</div>
-                        <small class="text-muted">${escapeHtml(user.Roldescripcion)}</small>
-                    </div>
-                </a>
-            `;
-                        chatMenu.appendChild(li);
-                    }
-                });
-
-                // Agregar grupos si existen
-                if (groups && groups.length > 0) {
-                    const groupHeader = document.createElement('li');
-                    groupHeader.className = 'dropdown-header';
-                    groupHeader.textContent = 'Grupos';
-                    chatMenu.appendChild(groupHeader);
-
-                    groups.forEach(group => {
-                        const li = document.createElement('li');
-                        li.className = 'chat-contact-item dropdown-item';
-                        li.innerHTML = `
-                <a href="#" class="chat-item d-flex align-items-center p-2"
-                   onclick="openChat('${escapeHtml(group.PrimerNombre)}', 
-                           '${escapeHtml(group.id_Registro)}', true)">
-                    <img src="img/c.png" alt="${escapeHtml(group.PrimerNombre)}" 
-                         class="rounded-circle me-2" width="30" height="30">
-                    <div>
-                        <div class="fw-bold">${escapeHtml(group.PrimerNombre)}</div>
-                        <small class="text-muted">Grupo</small>
-                    </div>
-                </a>
-            `;
-                        chatMenu.appendChild(li);
-                    });
-                }
-            }
-
-            // Función para abrir un chat
-            function openChat(chatName, targetId = null, isGroup = false) {
-                currentChat = {
-                    type: isGroup ? 'grupal' : 'privado',
-                    targetId: targetId,
-                    name: chatName
-                };
-
-                const chatContainer = document.getElementById('chatContainer');
-                const chatHeader = document.getElementById('chatHeader');
-
-                chatHeader.textContent = chatName;
-                chatContainer.style.display = 'flex';
-                document.getElementById('chatMessages').innerHTML = '';
-
-                fetchMessages();
-
-                const chatInput = document.getElementById('chatInput');
-                chatInput.focus();
-                chatInput.onkeypress = function(e) {
-                    if (e.key === 'Enter') {
-                        sendMessage();
-                    }
-                };
-            }
-
-            // Función para obtener mensajes
-            async function fetchMessages() {
-                if (!currentChat.type || !currentChat.targetId) return;
-
-                try {
-                    const response = await fetch('./chat/chat.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + getCookie('token')
-                        },
-                        body: JSON.stringify({
-                            action: 'get_messages',
-                            chat_type: currentChat.type,
-                            target_id: currentChat.targetId
-                        })
-                    });
-
-                    const data = await response.json();
-
-                    if (!response.ok || data.status !== 'success') {
-                        throw new Error(data.message || 'Error al obtener mensajes');
-                    }
-
-                    displayMessages(data.messages, data.current_user_id);
-                } catch (error) {
-                    console.error('Error:', error);
-                }
-            }
-
-            // Función para mostrar mensajes
-            function displayMessages(messages, currentUserId) {
-                const chatMessages = document.getElementById('chatMessages');
-
-                // Conservar mensajes temporales
-                const tempMessages = Array.from(chatMessages.querySelectorAll('.message.pending'))
-                    .map(el => el.outerHTML);
-
-                chatMessages.innerHTML = '';
-
-                // Mostrar mensajes del servidor
-                messages.forEach(message => {
-                    const isCurrentUser = message.id_remitente == currentUserId;
-                    const messageElement = document.createElement('div');
-                    messageElement.className = isCurrentUser ? 'message sent' : 'message received';
-                    messageElement.dataset.messageId = message.id_mensaje;
-
-                    const messageTime = new Date(message.fecha_envio).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-
-                    messageElement.innerHTML = `
-            <div class="message-header">
-                <span class="sender-name">${message.PrimerNombre} ${message.PrimerApellido} (${message.Roldescripcion})</span>
-                <span class="message-time">${messageTime}</span>
-                ${isCurrentUser ? '<button class="delete-message-btn" onclick="deleteMessage(event, ' + message.id_mensaje + ')">×</button>' : ''}
-            </div>
-            <div class="message-content">${message.contenido}</div>
-        `;
-                    chatMessages.appendChild(messageElement);
-                });
-
-                // Restaurar mensajes temporales
-                tempMessages.forEach(html => {
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = html;
-                    chatMessages.appendChild(tempDiv.firstChild);
-                });
-
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-
-            document.addEventListener('DOMContentLoaded', function() {
-                loadChatUsers();
-
-                // Configurar evento para el botón de enviar
-                document.querySelector('.chat-input button').addEventListener('click', sendMessage);
-
-                // Configurar evento para la tecla Enter
-                document.getElementById('chatInput').addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        sendMessage();
-                    }
-                });
-
-                // Actualizar mensajes periódicamente
-                setInterval(() => {
-                    if (document.getElementById('chatContainer').style.display === 'flex') {
-                        fetchMessages();
-                    }
-                }, 3000);
             });
-        </script>
-        <br>
-        <br>
-        <br>
-        <footer>
-            <div class="footer-content">
-                <li>&copy; 2025 SETS. Todos los derechos reservados.</li>
-                <ul>
-                    <li><a href="#">Términos y Condiciones</a></li>
-                    <li><a href="#">Política de Privacidad</a></li>
-                    <li><a href="#">Contacto</a></li>
-                </ul>
-            </div>
-        </footer>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    </main>
-    </main>
-    </header>
-</body>
+            
+            return {
+                labels: Object.keys(estados).map(e => e.charAt(0).toUpperCase() + e.slice(1)),
+                data: Object.values(estados).map(e => e.count),
+                colors: Object.values(estados).map(e => e.color)
+            };
+        }
 
+        // Procesamiento de datos para Estado de Parqueaderos
+        function processEstadoParqueaderosData(data) {
+            if (!data || data.length === 0) {
+                return {
+                    labels: ['Disponibles', 'Ocupados', 'Reservados'],
+                    data: [0, 0, 0],
+                    colors: [
+                        'rgba(13, 37, 15, 0.7)',
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(255, 206, 86, 0.7)'
+                    ]
+                };
+            }
+
+            const estados = {
+                disponible: { count: 0, color: 'rgba(13, 39, 20, 0.7)' },
+                ocupado: { count: 0, color: 'rgba(255, 99, 132, 0.7)' },
+                reservado: { count: 0, color: 'rgba(255, 206, 86, 0.7)' }
+            };
+            
+            data.forEach(item => {
+                if (item.estado && estados[item.estado.toLowerCase()]) {
+                    estados[item.estado.toLowerCase()].count++;
+                }
+            });
+            
+            return {
+                labels: Object.keys(estados).map(e => e.charAt(0).toUpperCase() + e.slice(1)),
+                data: Object.values(estados).map(e => e.count),
+                colors: Object.values(estados).map(e => e.color)
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                // 1. Gráfico de Anuncios
+                const anunciosProcessed = processAnunciosData(rawAnunciosData);
+                new Chart(document.getElementById('anunciosChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: anunciosProcessed.labels,
+                        datasets: [{
+                            label: 'Anuncios',
+                            data: anunciosProcessed.data,
+                            backgroundColor: 'rgba(54, 235, 54, 0.7)',
+                            borderColor: 'rgb(12, 34, 20)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        }
+                    }
+                });
+
+                const parqueaderosProcessed = processSolicitudesParqueaderoData(rawParqueaderosData);
+                new Chart(document.getElementById('solicitudesParqueaderoChart'), {
+                    type: 'pie',
+                    data: {
+                        labels: parqueaderosProcessed.labels,
+                        datasets: [{
+                            data: parqueaderosProcessed.data,
+                            backgroundColor: parqueaderosProcessed.colors,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+
+                // 4. Gráfico de Estado de Parqueaderos
+                const estadoProcessed = processEstadoParqueaderosData(rawEstadoParqueaderosData);
+                new Chart(document.getElementById('estadoParqueaderosChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: estadoProcessed.labels,
+                        datasets: [{
+                            label: 'Parqueaderos',
+                            data: estadoProcessed.data,
+                            backgroundColor: estadoProcessed.colors,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error al crear gráficos:', error);
+            }
+        });
+    </script>
+</main>
+
+    <footer>
+        <div class="footer-content">
+            <li>&copy; 2025 SETS. Todos los derechos reservados.</li>
+            <ul>
+                <li><a href="#">Términos y Condiciones</a></li>
+                <li><a href="#">Política de Privacidad</a></li>
+                <li><a href="#">Contacto</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
