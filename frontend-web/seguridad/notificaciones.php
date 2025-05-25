@@ -313,7 +313,7 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
                                     break;
                                 case 'parqueadero':
                                     title = 'Nueva solicitud de parqueadero';
-                                    message = `Para ${item.TipoVehiculo} en ${item.parqueadero_visitante}`;
+                                    message = `Para  ${item.parqueadero_visitante}`;
                                     break;
                                 case 'zona':
                                     title = 'Nueva solicitud de zona común';

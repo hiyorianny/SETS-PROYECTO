@@ -60,6 +60,26 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                                     </ul>
                             </center>
                             </li>
+                            <br>
+                            <center>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <img src="img/hablando.png" alt="Logo" width="30" height="44" class="d-inline-block align-text-top">
+                                        <b style="font-size: 20px;">CHAT</b>
+
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-chat dropdown-menu-end" id="chatDropdownMenu" role="menu">
+                                        <li>
+                                            <div class="chat-search-container p-2">
+                                                <input type="text" class="form-control form-control-sm chat-search-input"
+                                                    placeholder="Buscar contacto..." oninput="filterChatContacts()">
+                                            </div>
+                                        </li>
+                                        <li class="dropdown-header">Contactos</li>
+                                    </ul>
+                                </li>
+                            </center>
+                            
                             <div class="offcanvas-header">
                                 <img src="img/notificacion.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
 
@@ -68,37 +88,21 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                                     <a href="notificaciones.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;">Notificaciones</a>
                                 </center>
                             </div>
-                            <center>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <img src="img/hablando.png" alt="Logo" width="30" height="44" class="d-inline-block align-text-top">
-                                        <b style="font-size: 20px;"> CHAT</b>
+                           <div class="offcanvas-header">
+                                <img src="img/reporte-de-negocios.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                <center>
+                                    <a href="./informes.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Informes</b></a>
+                                </center>
+                            </div>
 
-                                    </a>
-                                    <ul class="dropdown-menu dropdown-menu-chat dropdown-menu-end" id="chatDropdownMenu" role="menu">
-
-
-                                        <li>
-                                            <div class="chat-search-container p-2">
-                                                <input type="text" class="form-control form-control-sm chat-search-input"
-                                                    placeholder="Buscar contacto..." oninput="filterChatContacts()">
-                                            </div>
-                                        </li>
-
-
-                                        <li class="dropdown-header">Contactos</li>
-
-
-
-
-                                    </ul>
-                                </li>
-                            </center>
+                            <div class="offcanvas-header">
+                                <img src="img/ayudar (1).png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                <center>
+                                    <a href="./ayuda.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Ayuda</b></a>
+                                </center>
+                            </div>
                         </ul>
-                        <form class="d-flex mt-3" role="search">
-                            <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-                            <button class="btn btn-outline-success" type="submit">Buscar</button>
-                        </form>
+                     
                     </div>
                 </div>
             </div>
@@ -171,6 +175,7 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
         </div>
         <br>
         <br><br>
+          <br><br>
         <main>
             <div class="container">
                 <section class="announcements">
@@ -178,103 +183,141 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                         <h2>Anuncios</h2>
                     </center>
                     <div class="search-container">
-                        <form onsubmit="return searchAnnouncements();">
+                        <form onsubmit="return searchAnnouncements(event)">
                             <input type="text" id="search-input" placeholder="Buscar Anuncio">
                             <img src="img/lupa.png" alt="Buscar" class="search-icon">
                         </form>
                     </div>
+
                     <div id="announcements">
-                        <?php
-                        $sql = "SELECT * FROM anuncio";
-                        $result = $base_de_datos->query($sql);
-                        if ($result->rowCount() > 0) {
-                            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                        ?>
-                                <div class="announcement" id="announcement-<?= htmlspecialchars($row['titulo']); ?>">
-                                    <img src="<?= htmlspecialchars($row['img_anuncio']); ?>" alt="Imagen" style="width:90%; max-width:90px;"><br>
-                                    <p><b>Anuncio:</b> <?= htmlspecialchars($row["titulo"]); ?><br>
-                                        <b>Descripcion:</b> <?= htmlspecialchars($row["descripcion"]); ?><br>
-                                        <b>Fecha de Publicación: </b><?= htmlspecialchars($row["fechaPublicacion"]); ?><br>
-                                        <b>Hora de Publicación:</b> <?= htmlspecialchars($row["horaPublicacion"]); ?><br>
-                                    </p>
-                                    <button class="delete-button" onclick="deleteAnnouncement('<?= htmlspecialchars($row['titulo']); ?>')">Eliminar</button>
-                                </div>
-                        <?php
-                            }
-                        } else {
-                            echo "<p>No se encontraron anuncios.</p>";
-                        }
-                        ?>
+
                     </div>
                 </section>
-                <script>
-                    function deleteAnnouncement(titulo) {
-                        if (confirm("¿Está seguro de que desea eliminar este anuncio?")) {
 
-                            fetch('../../CONTROLLER/anunciosguarda.php', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/x-www-form-urlencoded'
-                                    },
-                                    body: new URLSearchParams({
-                                        'titulo': titulo,
-                                        'accion': 'eliminar'
-                                    })
-                                })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.status === 'success') {
-
-                                        document.getElementById('announcement-' + titulo).remove();
-                                        alert(data.message);
-                                    } else {
-                                        alert(data.message);
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error al eliminar el anuncio:', error);
-                                    alert("Hubo un error al eliminar el anuncio.");
-                                });
-                        }
-                    }
-                </script>
                 <div class="icon">
                     <a href="añadiranuncio.php" class="link-button">
                         <button class="add-announcement">Añadir Anuncio</button>
                     </a>
                 </div>
             </div>
+        </main>
+               
+               
+         
             <script>
-                function searchAnnouncements() {
-                    var query = document.getElementById('search-input').value;
-                    var xhr = new XMLHttpRequest();
-                    xhr.open('GET', './buscador.php?query=' + encodeURIComponent(query), true);
-                    xhr.onload = function() {
-                        if (xhr.status === 200) {
-                            document.getElementById('announcements').innerHTML = xhr.responseText;
-                        } else {
-                            console.error('Error en la búsqueda:', xhr.statusText);
-                        }
-                    };
-                    xhr.send();
-                    return false;
+            const DEFAULT_ANNOUNCEMENT_IMAGE = 'img/alerta.png';
+
+            async function loadAnnouncements() {
+                try {
+                    const response = await fetch('http://192.168.1.100:3001/api/anuncios');
+                    const anuncios = await response.json();
+
+                    const announcementsContainer = document.getElementById('announcements');
+
+                    if (anuncios.length === 0) {
+                        announcementsContainer.innerHTML = "<p>No se encontraron anuncios.</p>";
+                        return;
+                    }
+
+                    let html = '';
+                    anuncios.forEach(anuncio => {
+
+                        const imagenAnuncio = anuncio.img_anuncio || DEFAULT_ANNOUNCEMENT_IMAGE;
+
+                        html += `
+                <div class="announcement" id="announcement-${anuncio.idAnuncio}">
+                    <img src="${imagenAnuncio}" alt="Imagen del anuncio" style="width:90%; max-width:90px;"><br>
+                    <p><b>Anuncio:</b> ${anuncio.titulo}<br>
+                        <b>Descripcion:</b> ${anuncio.descripcion}<br>
+                        <b>Fecha de Publicación: </b>${anuncio.fechaPublicacion}<br>
+                        <b>Hora de Publicación:</b> ${anuncio.horaPublicacion}<br>
+                    </p>
+                    <button class="delete-button" onclick="deleteAnnouncement(${anuncio.idAnuncio})">Eliminar</button>
+                </div>
+            `;
+                    });
+
+                    announcementsContainer.innerHTML = html;
+                } catch (error) {
+                    console.error('Error al cargar anuncios:', error);
+                    document.getElementById('announcements').innerHTML = "<p>Error al cargar los anuncios.</p>";
                 }
-            </script>
-            <script>
-                const searchEventInput = document.getElementById('searchEventInput');
-                const events = document.querySelectorAll('.event');
-                searchEventInput.addEventListener('input', function() {
-                    const filter = searchEventInput.value.toLowerCase();
-                    events.forEach(function(event) {
-                        const text = event.textContent.toLowerCase();
-                        if (text.includes(filter)) {
-                            event.style.display = 'block';
-                        } else {
-                            event.style.display = 'none';
+            }
+
+            async function searchAnnouncements(event) {
+                event.preventDefault();
+                const query = document.getElementById('search-input').value.toLowerCase();
+
+                try {
+                    const response = await fetch('http://192.168.1.100:3001/api/anuncios');
+                    const anuncios = await response.json();
+
+                    const filtered = query ?
+                        anuncios.filter(a =>
+                            a.titulo.toLowerCase().includes(query) ||
+                            a.descripcion.toLowerCase().includes(query)) :
+                        anuncios;
+
+                    const announcementsContainer = document.getElementById('announcements');
+
+                    if (filtered.length === 0) {
+                        announcementsContainer.innerHTML = "<p>No se encontraron anuncios.</p>";
+                        return false;
+                    }
+
+                    let html = '';
+                    filtered.forEach(anuncio => {
+
+                        const imagenAnuncio = anuncio.img_anuncio || DEFAULT_ANNOUNCEMENT_IMAGE;
+
+                        html += `
+                <div class="announcement" id="announcement-${anuncio.idAnuncio}">
+                    <img src="${imagenAnuncio}" alt="Imagen del anuncio" style="width:90%; max-width:90px;"><br>
+                    <p><b>Anuncio:</b> ${anuncio.titulo}<br>
+                        <b>Descripcion:</b> ${anuncio.descripcion}<br>
+                        <b>Fecha de Publicación: </b>${anuncio.fechaPublicacion}<br>
+                        <b>Hora de Publicación:</b> ${anuncio.horaPublicacion}<br>
+                    </p>
+                    <button class="delete-button" onclick="deleteAnnouncement(${anuncio.idAnuncio})">Eliminar</button>
+                </div>
+            `;
+                    });
+
+                    announcementsContainer.innerHTML = html;
+                } catch (error) {
+                    console.error('Error en la búsqueda:', error);
+                    document.getElementById('announcements').innerHTML = "<p>Error al buscar anuncios.</p>";
+                }
+
+                return false;
+            }
+            async function deleteAnnouncement(id) {
+                if (!confirm('¿Estás seguro de que deseas eliminar este anuncio?')) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`http://192.168.1.100:3001/api/elanuncios/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
                         }
                     });
-                });
-            </script>
+
+                    if (!response.ok) {
+                        throw new Error('Error al eliminar el anuncio');
+                    }
+
+
+                    loadAnnouncements();
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error al eliminar el anuncio: ' + error.message);
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', loadAnnouncements);
+        </script>
             <script>
                 const searchInput = document.getElementById('searchInput');
                 const announcements = document.querySelectorAll('.announcement');

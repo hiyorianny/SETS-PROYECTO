@@ -589,3 +589,160 @@ button, input {
     display: inline-block;
     margin-right: 5px;
   }
+
+
+  /* Notificaciones */
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #dc3545;
+  color: rgb(39, 7, 7);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+
+@media (max-width: 768px) {
+  .chat-container {
+    width: 90%;
+    height: 70vh;
+    right: 5%;
+    bottom: 10px;
+  }
+
+  .medium-img {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.announcement {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, .3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Estilos para el contenedor de mensajes */
+.chat-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Estilo base para todos los mensajes */
+.message {
+    max-width: 80%;
+    padding: 10px 15px;
+    border-radius: 18px;
+    position: relative;
+    word-wrap: break-word;
+}
+
+/* Mensajes enviados por el usuario actual */
+.message.sent {
+    align-self: flex-end;
+    background-color: #0e2c0a;
+    color: white;
+    border-bottom-right-radius: 5px;
+}
+
+/* Mensajes recibidos de otros usuarios */
+.message.received {
+    align-self: flex-start;
+    background-color: #f1f1f1;
+    color: #333;
+    border-bottom-left-radius: 5px;
+}
+
+/* Contenido del mensaje */
+.message-content {
+    position: relative;
+}
+
+/* Texto del mensaje */
+.message-text {
+    margin: 5px 0;
+    line-height: 1.4;
+}
+
+/* Remitente del mensaje (solo para mensajes recibidos) */
+.message-sender {
+    font-weight: bold;
+    font-size: 0.8em;
+    color: #555;
+    margin-bottom: 3px;
+}
+
+/* Hora del mensaje */
+.message-time {
+    font-size: 0.7em;
+    text-align: right;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 3px;
+}
+
+.message.received .message-time {
+    color: rgba(0, 0, 0, 0.5);
+}
+
+/* Botón para eliminar mensaje */
+.delete-message-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    display: none;
+}
+
+.message:hover .delete-message-btn {
+    display: block;
+}
+
+/* Mensajes temporales (pendientes de confirmación del servidor) */
+.message.pending {
+    opacity: 0.7;
+}
