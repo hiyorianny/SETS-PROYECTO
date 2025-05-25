@@ -389,14 +389,14 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
             };
             let currentUserId = null;
 
-            // Función para obtener cookies
+
             function getCookie(name) {
                 const value = `; ${document.cookie}`;
                 const parts = value.split(`; ${name}=`);
                 if (parts.length === 2) return parts.pop().split(';').shift();
             }
 
-            // Función para cerrar el chat
+
             function closeChat() {
                 document.getElementById('chatContainer').style.display = 'none';
                 currentChat = {
@@ -406,7 +406,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                 };
             }
 
-            // Función para enviar mensajes
+
             async function sendMessage() {
                 if (!currentChat.type || !currentChat.targetId) {
                     alert('No hay un chat seleccionado');
@@ -422,7 +422,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                 }
 
                 try {
-                    // Mostrar mensaje temporalmente
+  
                     const tempMessage = {
                         id_mensaje: 'temp-' + Date.now(),
                         id_remitente: currentUserId,
@@ -436,7 +436,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                     displayMessages([tempMessage], currentUserId);
                     chatInput.value = '';
 
-                    // Enviar mensaje al servidor
+   
                     const response = await fetch('./chat/chat.php', {
                         method: 'POST',
                         headers: {
@@ -458,7 +458,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                         throw new Error(data.message || 'Error al enviar mensaje');
                     }
 
-                    // Reemplazar mensaje temporal con el real del servidor
+
                     const tempElement = document.querySelector(`[data-message-id="temp-${tempMessage.id_mensaje.split('-')[1]}"]`);
                     if (tempElement) {
                         tempElement.dataset.messageId = data.message_id;
@@ -470,7 +470,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                 }
             }
 
-            // Función para eliminar un mensaje
+
             async function deleteMessage(event, messageId) {
                 event.stopPropagation();
 
@@ -497,7 +497,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                         throw new Error(data.message || 'Error al eliminar mensaje');
                     }
 
-                    // Eliminar el mensaje del DOM
+
                     const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
                     if (messageElement) {
                         messageElement.remove();
@@ -508,7 +508,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                     alert('Error al eliminar mensaje: ' + error.message);
                 }
             }
-            // Función para cargar usuarios disponibles
+
             async function loadChatUsers() {
                 try {
                     console.log("Cargando usuarios del chat...");
@@ -543,7 +543,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                 }
             }
 
-            // Función para actualizar el menú de chat
+ 
             function updateChatMenu(users, groups, currentUserId) {
                 const chatMenu = document.getElementById('chatDropdownMenu');
 
@@ -552,7 +552,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                     return;
                 }
 
-                // Limpiar solo los elementos de contactos (conservar el buscador)
+
                 const contactItems = chatMenu.querySelectorAll('li:not(:first-child)');
                 contactItems.forEach(item => item.remove());
 
@@ -564,7 +564,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                     return;
                 }
 
-                // Función para escapar HTML
+
                 const escapeHtml = (unsafe) => {
                     return unsafe?.toString()
                         .replace(/&/g, "&amp;")
@@ -574,7 +574,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                         .replace(/'/g, "&#039;") || '';
                 };
 
-                // Agregar usuarios
+
                 users.forEach(user => {
                     if (user.id_Registro != currentUserId) {
                         const li = document.createElement('li');
@@ -596,7 +596,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                     }
                 });
 
-                // Agregar grupos si existen
+
                 if (groups && groups.length > 0) {
                     const groupHeader = document.createElement('li');
                     groupHeader.className = 'dropdown-header';
@@ -623,7 +623,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                 }
             }
 
-            // Función para abrir un chat
+
             function openChat(chatName, targetId = null, isGroup = false) {
                 currentChat = {
                     type: isGroup ? 'grupal' : 'privado',
@@ -649,7 +649,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                 };
             }
 
-            // Función para obtener mensajes
+
             async function fetchMessages() {
                 if (!currentChat.type || !currentChat.targetId) return;
 
@@ -679,17 +679,17 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                 }
             }
 
-            // Función para mostrar mensajes
+     
             function displayMessages(messages, currentUserId) {
                 const chatMessages = document.getElementById('chatMessages');
 
-                // Conservar mensajes temporales
+
                 const tempMessages = Array.from(chatMessages.querySelectorAll('.message.pending'))
                     .map(el => el.outerHTML);
 
                 chatMessages.innerHTML = '';
 
-                // Mostrar mensajes del servidor
+
                 messages.forEach(message => {
                     const isCurrentUser = message.id_remitente == currentUserId;
                     const messageElement = document.createElement('div');
@@ -712,7 +712,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                     chatMessages.appendChild(messageElement);
                 });
 
-                // Restaurar mensajes temporales
+                
                 tempMessages.forEach(html => {
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = html;
@@ -725,17 +725,16 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
             document.addEventListener('DOMContentLoaded', function() {
                 loadChatUsers();
 
-                // Configurar evento para el botón de enviar
                 document.querySelector('.chat-input button').addEventListener('click', sendMessage);
 
-                // Configurar evento para la tecla Enter
+    
                 document.getElementById('chatInput').addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') {
                         sendMessage();
                     }
                 });
 
-                // Actualizar mensajes periódicamente
+       
                 setInterval(() => {
                     if (document.getElementById('chatContainer').style.display === 'flex') {
                         fetchMessages();

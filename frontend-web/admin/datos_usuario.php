@@ -163,7 +163,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                 searchInput.addEventListener("input", function() {
                     const searchText = searchInput.value.toLowerCase();
 
-                    // Recorrer todas las filas de la tabla (excepto la primera, que es el encabezado)
+                 
                     for (let i = 1; i < rows.length; i++) {
                         const row = rows[i];
                         const cells = row.getElementsByTagName("td");
@@ -231,7 +231,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
         <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
         <script>
-            // Función para cargar los usuarios desde la API
+
             async function cargarUsuarios() {
                 try {
                     const response = await fetch('http://192.168.1.100:3001/api/usuarios');
@@ -288,7 +288,6 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                 }
             }
 
-            // Función para eliminar un usuario
             async function eliminarUsuario(id) {
                 if (!confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
                     return;
@@ -320,7 +319,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                 }
             }
 
-            // Función para buscar usuarios
+     
             function buscarUsuarios() {
                 const input = document.getElementById('searchInput');
                 const filter = input.value.toUpperCase();
@@ -331,7 +330,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                     let match = false;
                     const td = tr[i].getElementsByTagName('td');
 
-                    for (let j = 0; j < td.length - 1; j++) { // Excluir la columna de acciones
+                    for (let j = 0; j < td.length - 1; j++) { 
                         if (td[j]) {
                             const txtValue = td[j].textContent || td[j].innerText;
                             if (txtValue.toUpperCase().indexOf(filter) > -1) {
@@ -345,7 +344,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                 }
             }
 
-            // Event listeners
+
             document.addEventListener('DOMContentLoaded', function() {
                 cargarUsuarios();
                 document.getElementById('searchInput').addEventListener('keyup', buscarUsuarios);
