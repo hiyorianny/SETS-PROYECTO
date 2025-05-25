@@ -75,9 +75,9 @@ try {
         $Clave = password_hash($Clave, PASSWORD_BCRYPT);
 
         $imagenesPorRol = [
-            1111 => "../../frontend-web/seguridad/img/ajustes.png", 
+            1111 => "../../frontend-web/admin/img/ajustes.png", 
             2222 => "../../frontend-web/seguridad/img/guarda.png", 
-            3333 => "../../frontend-web/seguridad/img/resi.png" 
+            3333 => "../../frontend-web/residente/img/resi.png" 
         ];
 
         $imagenPerfil = $imagenesPorRol[$idRol] ?? $imagenPerfilPredeterminada;
