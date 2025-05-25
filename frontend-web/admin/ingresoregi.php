@@ -1,43 +1,7 @@
 <?php
-require '../../MODEL/backend/authMiddleware.php';
-session_start();
-header("Access-Control-Allow-Origin: http://localhost:3000");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Credentials: true");
-$decoded = authenticate();
-
-$idRegistro = $decoded->id;
-$Usuario = $decoded->Usuario;
-$idRol = $decoded->idRol;
-
-
-if ($idRol != 1111) {
-  header("Location: http://localhost/sets/error.php");
-  exit();
-}
-
-include_once "conexion.php";
-
-
-
-
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete'])) {
-  $idIngreso_Peatonal = $_POST['delete_idIngreso_Peatonal'];
-
-
-  $sql = "DELETE FROM  ingreso_peatonal WHERE idIngreso_Peatonal  = :idIngreso_Peatonal";
-  $stmt = $base_de_datos->prepare($sql);
-
-  if ($stmt->execute(['idIngreso_Peatonal' => $idIngreso_Peatonal])) {
-  } else {
-    echo "Error al eliminar el ingreso.";
-  }
-}
-$sql = "SELECT * FROM  ingreso_peatonal";
-$stmt = $base_de_datos->query($sql);
-$Ingreso_Peatonal = $stmt->fetchAll(PDO::FETCH_ASSOC);
+require __DIR__ . '/../../Backend/auth/controller/admin.php';
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -73,20 +37,26 @@ $Ingreso_Peatonal = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
             <div class="offcanvas-body">
               <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                <li class="nav-item">
-                  <center><a class="nav-link active" aria-current="page" href="#" style="font-size: 20px;"><b>Inicio</b></a></center>
-                </li>
+                <div class="offcanvas-header">
+                  <img src="img/pagina-de-inicio.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                  <center>
+                    <a href="./inicioprincipal.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Inicio</b></a>
+                  </center>
+                </div>
                 <center>
                   <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      <img src="img/usuario.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
+
                       <b style="font-size: 20px;"> Perfil</b>
                     </a>
                     <ul class="dropdown-menu" role="menu">
                       <li>
-                        <center><a href="Perfil.php">Editar Datos</a></center>
+                        <center><a href="Perfil.php"><b>Perfil</b></a></center>
                       </li>
+
                       <li>
-                        <center> <a href="../../MODEL/backend/logout.php">Cerrar Sesión</a></center>
+                        <center> <a href="../../Backend/auth/logout.php"><b>Cerrar Sesión</b></a></center>
                       </li>
                     </ul>
                 </center>
@@ -102,168 +72,195 @@ $Ingreso_Peatonal = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
               </ul>
 
-              <form class="d-flex mt-3" role="search">
-                <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Buscar</button>
-              </form>
             </div>
           </div>
         </div>
       </nav>
-      <div id="chatContainer" class="chat-container">
-        <div class="chat-header">
-          <span id="chatHeader">Chat</span>
-          <button class="close-btn" onclick="closeChat()">×</button>
-        </div>
-        <div class="chat-messages" id="chatMessages">
-        </div>
-        <div class="chat-input">
-          <input type="text" id="chatInput" placeholder="Escribe tu mensaje...">
-          <button onclick="sendMessage()">Enviar</button>
-        </div>
-      </div>
   </header>
   <main>
-    <br> <br> <br>
-    <div class="alert alert-success" role="alert" style="text-align: center; font-size :30px;"><b>Ingreso Peatonal</b> </div>
-    <div class="container">
-      <div class="row">
-        <center>
-          <div class="col-sm-12 col-md-8 col-lg-8 mt-5">
-            <center>
-              <h2><b>Panel de Ingresos</b></h2>
-            </center>
-            <br>
-            <table class="table">
+    <center>
+      <br> <br> <br>
+      <div class="alert alert-success" role="alert" style="text-align: center; font-size :30px;">Ingreso Peatonal y Vehicular </div>
+      <div class="row justify-content-center"> 
+        <div class="col-sm-12 col-md-10 col-lg-10 mt-5"> 
+          <center>
+            <h2>Panel de Ingresos</h2>
+          </center>
+          <br>
+          <div class="table-responsive"> 
+            <table class="table table-bordered"> 
               <thead>
                 <tr>
                   <th scope="col">idIngreso</th>
                   <th scope="col">Nombre de Persona de Ingreso</th>
                   <th scope="col">fecha y Hora</th>
                   <th scope="col">Tipo y Numero de Documento</th>
-                  <th scope="col">Tipo ingreso</th>
+                  <th scope="col">Placa del Vehiculo</th>
                   <th scope="col">Acciones</th>
-
                 </tr>
               </thead>
-              <tbody>
-                <?php foreach ($Ingreso_Peatonal as $Ingreso_Peatonal): ?>
-                  <tr>
-                    <td><?php echo htmlspecialchars($Ingreso_Peatonal['idIngreso_Peatonal']); ?></td>
-                    <td><?php echo htmlspecialchars($Ingreso_Peatonal['personasIngreso']); ?></td>
-                    <td><?php echo htmlspecialchars($Ingreso_Peatonal['horaFecha']); ?></td>
-                    <td><?php echo htmlspecialchars($Ingreso_Peatonal['documento']); ?></td>
-                    <td><?php echo htmlspecialchars($Ingreso_Peatonal['tipo_ingreso']); ?></td>
-                    <td>
-                      <form action="" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar ?');">
-                        <input type="hidden" name="delete_idIngreso_Peatonal" value="<?php echo $Ingreso_Peatonal['idIngreso_Peatonal']; ?>">
-                        <button class="btn btn-danger mt-3 " type="submit" name="delete">Eliminar</button>
-                      </form>
-                    </td>
-
-                  </tr>
-                <?php endforeach; ?>
+              <tbody id="tablaIngresos">
+                <tr>
+                  <td colspan="6" class="text-center">
+                    <div class="spinner-border text-success" role="status">
+                      <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p>Cargando datos de ingresos...</p>
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
-          <br>
-          <div class="container mt-5">
-            <a href="torres.php" class="btn btn-success">Volver</a>
-          </div>
+        </div>
       </div>
-      </center>
-    </div>
-    <br>
-    </div>
-    <br>
-    </div>
-    <script>
-      document.getElementById('searchInput').addEventListener('input', function() {
-        const query = this.value.toLowerCase();
-        const cards = document.querySelectorAll('.product-card');
 
-        cards.forEach(card => {
-          const number = card.getAttribute('data-number').toLowerCase();
-          if (number.includes(query)) {
-            card.style.display = 'block';
-          } else {
-            card.style.display = 'none';
-          }
-        });
-      });
-    </script>
-    <script>
-      document.querySelector('.admin-img').addEventListener('click', function() {
-        document.querySelector('.dropdown-menu').classList.toggle('show');
-      });
+      <br>
 
-      document.querySelector('.chat-button').addEventListener('click', function() {
-        document.querySelector('.chat-menu').classList.toggle('show');
-      });
-
-      function filterChat() {
-        const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-        const chatItems = document.querySelectorAll('.chat-item');
-        chatItems.forEach(item => {
-          if (item.textContent.toLowerCase().includes(searchInput)) {
-            item.style.display = 'block';
-          } else {
-            item.style.display = 'none';
-          }
-        });
-      }
-
-      function showTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(tab => {
-          tab.classList.remove('active');
-        });
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-          btn.classList.remove('active');
-        });
-        document.getElementById(tabId).classList.add('active');
-        document.querySelector(`.tab-btn[onclick="showTab('${tabId}')"]`).classList.add('active');
-      }
-    </script>
-    <script>
-      function openChat(chatName) {
-        const chatContainer = document.getElementById('chatContainer');
-        const chatHeader = document.getElementById('chatHeader');
-        chatHeader.textContent = chatName;
-        chatContainer.classList.add('show');
-      }
-
-      function closeChat() {
-        const chatContainer = document.getElementById('chatContainer');
-        chatContainer.classList.remove('show');
-      }
-
-      function sendMessage() {
-        const messageInput = document.getElementById('chatInput');
-        const messageText = messageInput.value.trim();
-        if (messageText) {
-          const chatMessages = document.getElementById('chatMessages');
-          const messageElement = document.createElement('p');
-          messageElement.textContent = messageText;
-          chatMessages.appendChild(messageElement);
-          messageInput.value = '';
-          chatMessages.scrollTop = chatMessages.scrollHeight;
+      <div class="container mt-5">
+        <a href="torres.php" class="btn btn-success">Volver</a>
+      </div>
+      </div>
+    </center>
+  </main>
+  <script>
+    async function cargarIngresos() {
+      try {
+        const response = await fetch('http://192.168.1.100:3001/api/ingresos');
+        if (!response.ok) {
+          throw new Error('Error al obtener los datos');
         }
+        const ingresos = await response.json();
+
+        const tabla = document.getElementById('tablaIngresos');
+        tabla.innerHTML = '';
+
+        if (ingresos.length === 0) {
+          tabla.innerHTML = '<tr><td colspan="6" class="text-center">No hay ingresos registrados</td></tr>';
+          return;
+        }
+
+        ingresos.forEach(ingreso => {
+          const fila = document.createElement('tr');
+          fila.innerHTML = `
+                        <td>${ingreso.idIngreso_Peatonal}</td>
+                        <td>${ingreso.personasIngreso}</td>
+                        <td>${ingreso.horaFecha}</td>
+                        <td>${ingreso.documento}</td>
+                        <td>${ingreso.placa || '-'}</td>
+                        <td>
+                            <button class="btn btn-danger mt-3" onclick="eliminarIngreso(${ingreso.idIngreso_Peatonal})">Eliminar</button>
+                        </td>
+                    `;
+          tabla.appendChild(fila);
+        });
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('tablaIngresos').innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center text-danger">
+                            Error al cargar los datos: ${error.message}
+                            <button onclick="cargarIngresos()" class="btn btn-sm btn-warning">Reintentar</button>
+                        </td>
+                    </tr>
+                `;
+      }
+    }
+    async function guardarIngreso(event) {
+      event.preventDefault();
+
+      const form = event.target;
+      const formData = new FormData(form);
+      const data = {
+        tipo_ingreso: formData.get('tipo_ingreso'),
+        placa: formData.get('placa'),
+        personasIngreso: formData.get('personasIngreso'),
+        documento: formData.get('documento'),
+        horaFecha: formData.get('horaFecha')
+      };
+      const fechaSeleccionada = new Date(data.horaFecha);
+      const ahora = new Date();
+      if (fechaSeleccionada < ahora) {
+        alert('No puedes registrar ingresos con fecha/hora en el pasado');
+        return;
       }
 
-      function filterChat() {
-        const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-        const chatItems = document.querySelectorAll('.chat-item');
-        chatItems.forEach(item => {
-          if (item.textContent.toLowerCase().includes(searchInput)) {
-            item.style.display = 'block';
-          } else {
-            item.style.display = 'none';
-          }
+      try {
+        const response = await fetch('http://192.168.1.100:3001/api/ingresos', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
         });
+
+        if (!response.ok) {
+          throw new Error('Error al registrar el ingreso');
+        }
+
+        const result = await response.json();
+        alert('Ingreso registrado exitosamente');
+        form.reset();
+        cargarIngresos();
+      } catch (error) {
+        console.error('Error:', error);
+        alert(`Error al registrar el ingreso: ${error.message}`);
       }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    }
+
+
+    async function eliminarIngreso(id) {
+      if (!confirm('¿Estás seguro de que deseas eliminar este ingreso?')) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://192.168.1.100:3001/api/ingresos/${id}`, {
+          method: 'DELETE'
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al eliminar el ingreso');
+        }
+
+        alert('Ingreso eliminado exitosamente');
+        cargarIngresos();
+      } catch (error) {
+        console.error('Error:', error);
+        alert(`Error al eliminar el ingreso: ${error.message}`);
+      }
+    }
+
+
+    function togglePlaca() {
+      var tipoIngreso = document.getElementById("tipo_ingreso").value;
+      var placaContainer = document.getElementById("placaContainer");
+
+      if (tipoIngreso === "vehiculo") {
+        placaContainer.style.display = "block";
+        document.getElementById("placa").setAttribute("required", "required");
+      } else {
+        placaContainer.style.display = "none";
+        document.getElementById("placa").removeAttribute("required");
+        document.getElementById("placa").value = "";
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      cargarIngresos();
+      const fechaHoraInput = document.getElementById('horaFecha');
+      const now = new Date();
+      const timezoneOffset = now.getTimezoneOffset() * 60000;
+      const localISOTime = new Date(now - timezoneOffset).toISOString().slice(0, 16);
+      fechaHoraInput.min = localISOTime;
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
+<br>
+<br>
+<br>
 <br>
 <br>
 <br>
