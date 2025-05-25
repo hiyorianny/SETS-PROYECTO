@@ -1,24 +1,5 @@
 <?php
-
-require '../../MODEL/backend/authMiddleware.php';
-session_start();
-header("Access-Control-Allow-Origin: http://localhost:3000");  
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Credentials: true");  
-$decoded = authenticate();
-
-$idRegistro = $decoded->id;
-$Usuario = $decoded->Usuario; 
-$idRol = $decoded->idRol;
-
-
-if ($idRol != 1111) { 
-    header("Location: http://localhost/sets/error.php");
-    exit();
-}
-
-include_once "conexion.php";
+require __DIR__ . '/../../Backend/auth/controller/admin.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -55,39 +36,36 @@ include_once "conexion.php";
                     </div>
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                            <li class="nav-item">
-                                <center><a class="nav-link active" aria-current="page" href="#" style="font-size: 20px;"><b>Inicio</b></a></center>
-                            </li>
-                            <center>
+                             <div class="offcanvas-header">
+                                <img src="img/pagina-de-inicio.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                <center>
+                                    <a href="./inicioprincipal.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Inicio</b></a>
+                                </center>
+                            </div>
+                               <center>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <img src="img/usuario.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
+
                                         <b style="font-size: 20px;"> Perfil</b>
                                     </a>
                                     <ul class="dropdown-menu" role="menu">
                                         <li>
-                                            <center><a href="Perfil.php">Editar datos</a></center>
+                                            <center><a href="Perfil.php"><b>Perfil</b></a></center>
                                         </li>
+
                                         <li>
-                                            <center> <a href="../../MODEL/backend/logout.php">Cerrar sesión</a></center>
+                                            <center> <a href="../../Backend/auth/logout.php"><b>Cerrar Sesión</b></a></center>
                                         </li>
                                     </ul>
                             </center>
                             </li>
                             <div class="offcanvas-header">
                                 <img src="img/notificacion.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
-
-
                                 <center>
                                     <a href="notificaciones.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;">Notificaciones</a>
                                 </center>
                             </div>
-                          
-                        </ul>
-
-                        <form class="d-flex mt-3" role="search">
-                            <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-                            <button class="btn btn-outline-success" type="submit">Buscar</button>
-                        </form>
                     </div>
                 </div>
             </div>
@@ -116,9 +94,9 @@ include_once "conexion.php";
     <br>
     <br>
     <br>
-    <div class="container">
+      <div class="container">
         <section class="login-content">
-            <form action="../../CONTROLLER/anuncioadmin.php" method="post" enctype="multipart/form-data">
+            <form id="anuncioForm">
                 <img src="img/alt.png" alt="Logo" class="imgp">
                 <h2 class="title">Añadir Anuncio</h2>
 
@@ -127,11 +105,11 @@ include_once "conexion.php";
                         <path d="M8 0a.5.5 0 0 1 .473.337L9.046 2H14a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-1.85l1.323 3.837a.5.5 0 1 1-.946.326L11.092 11H8.5v3a.5.5 0 0 1-1 0v-3H4.908l-1.435 4.163a.5.5 0 1 1-.946-.326L3.85 11H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h4.954L7.527.337A.5.5 0 0 1 8 0M2 3v7h12V3z" />
                     </svg>
                     <div class="div">
-                        <h5>Nombres Del Anuncio</h5>
+                        <h5>Nombre Del Anuncio</h5>
                         <input type="text" class="input" id="titulo" name="titulo" required>
-
                     </div>
                 </div>
+
                 <div class="input-div one">
                     <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-easel" viewBox="0 0 16 16">
                         <path d="M8 0a.5.5 0 0 1 .473.337L9.046 2H14a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-1.85l1.323 3.837a.5.5 0 1 1-.946.326L11.092 11H8.5v3a.5.5 0 0 1-1 0v-3H4.908l-1.435 4.163a.5.5 0 1 1-.946-.326L3.85 11H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h4.954L7.527.337A.5.5 0 0 1 8 0M2 3v7h12V3z" />
@@ -139,9 +117,9 @@ include_once "conexion.php";
                     <div class="div">
                         <h5>Descripción Del Anuncio</h5>
                         <input type="text" class="input" id="descripcion" name="descripcion" required>
-
                     </div>
                 </div>
+
                 <div class="input-div one">
                     <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-calendar3" viewBox="0 0 16 16">
                         <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2M1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857z" />
@@ -150,9 +128,9 @@ include_once "conexion.php";
                     <div class="div">
                         <h5 class="input-title">Fecha</h5>
                         <input type="date" class="input" id="fechaPublicacion" name="fechaPublicacion" required>
-
                     </div>
                 </div>
+
                 <div class="input-div one">
                     <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-calendar3" viewBox="0 0 16 16">
                         <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2M1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857z" />
@@ -163,6 +141,7 @@ include_once "conexion.php";
                         <input type="time" class="input" id="horaPublicacion" name="horaPublicacion" required>
                     </div>
                 </div>
+
                 <div class="input-div one">
                     <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-easel" viewBox="0 0 16 16">
                         <path d="M8 0a.5.5 0 0 1 .473.337L9.046 2H14a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-1.85l1.323 3.837a.5.5 0 1 1-.946.326L11.092 11H8.5v3a.5.5 0 0 1-1 0v-3H4.908l-1.435 4.163a.5.5 0 1 1-.946-.326L3.85 11H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h4.954L7.527.337A.5.5 0 0 1 8 0M2 3v7h12V3z" />
@@ -170,103 +149,22 @@ include_once "conexion.php";
                     <div class="div">
                         <h5>Persona</h5>
                         <input type="text" class="input" id="persona" name="persona" required>
+                    </div>
+                </div>
 
-                    </div>
-                </div>
-                <div class="input-div one">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-easel" viewBox="0 0 16 16">
-                        <path d="M8 0a.5.5 0 0 1 .473.337L9.046 2H14a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-1.85l1.323 3.837a.5.5 0 1 1-.946.326L11.092 11H8.5v3a.5.5 0 0 1-1 0v-3H4.908l-1.435 4.163a.5.5 0 1 1-.946-.326L3.85 11H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h4.954L7.527.337A.5.5 0 0 1 8 0M2 3v7h12V3z" />
-                    </svg>
-                    <div class="div">
-                        <h5>apartamento</h5>
-                        <input type="text" class="input" id="apart" name="apart" required>
-
-                    </div>
-                </div>
-                <div class="input-div one">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-images" viewBox="0 0 16 16">
-                        <path d="M4.502 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
-                        <path d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-1.998 2M14 2H4a1 1 0 0 0-1 1h9.002a2 2 0 0 1 2 2v7A1 1 0 0 0 15 11V3a1 1 0 0 0-1-1M2.002 4a1 1 0 0 0-1 1v8l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094l1.777 1.947V5a1 1 0 0 0-1-1z" />
-                    </svg>
-                    <div class="div">
-                        <h5>Subir Imagen</h5>
-                        <input type="" class="input" id="img_anuncio" name="img_anuncio" placeholder="img/alertas.png"  required>
-                    </div>
-                </div>
-                <input type="submit" class="btn btn-success" value="Enviar">
+                <button type="submit" class="btn btn-success">Enviar</button>
                 <a href="inicioprincipal.php" class="btn btn-danger">VOLVER</a>
             </form>
         </section>
     </div>
-    <script type="text/javascript" src="JAVA/main.js"></script>
+
     <script>
-        document.querySelector('.admin-img').addEventListener('click', function() {
-            document.querySelector('.dropdown-menu').classList.toggle('show');
-        });
-
-        document.querySelector('.chat-button').addEventListener('click', function() {
-            document.querySelector('.chat-menu').classList.toggle('show');
-        });
-
-        function filterChat() {
-            const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-            const chatItems = document.querySelectorAll('.chat-item');
-            chatItems.forEach(item => {
-                if (item.textContent.toLowerCase().includes(searchInput)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
-    </script>
-    <script>
-        function openChat(chatName) {
-            const chatContainer = document.getElementById('chatContainer');
-            const chatHeader = document.getElementById('chatHeader');
-            chatHeader.textContent = chatName;
-            chatContainer.classList.add('show');
-        }
-
-        function closeChat() {
-            const chatContainer = document.getElementById('chatContainer');
-            chatContainer.classList.remove('show');
-        }
-
-        function sendMessage() {
-            const messageInput = document.getElementById('chatInput');
-            const messageText = messageInput.value.trim();
-            if (messageText) {
-                const chatMessages = document.getElementById('chatMessages');
-                const messageElement = document.createElement('p');
-                messageElement.textContent = messageText;
-                chatMessages.appendChild(messageElement);
-                messageInput.value = '';
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-        }
-
-        function filterChat() {
-            const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-            const chatItems = document.querySelectorAll('.chat-item');
-            chatItems.forEach(item => {
-                if (item.textContent.toLowerCase().includes(searchInput)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
-    </script>
-
-
-<script>
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('form');
+            const form = document.getElementById('anuncioForm');
             const fechaInput = document.getElementById('fechaPublicacion');
             const horaInput = document.getElementById('horaPublicacion');
 
-
+            // Configurar fecha mínima como hoy
             const today = new Date();
             const dd = String(today.getDate()).padStart(2, '0');
             const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -274,17 +172,19 @@ include_once "conexion.php";
             const fechaHoy = yyyy + '-' + mm + '-' + dd;
             fechaInput.setAttribute('min', fechaHoy);
 
-            form.addEventListener('submit', function(e) {
+            // Manejar envío del formulario
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                // Validar fecha y hora
                 const fechaSeleccionada = new Date(fechaInput.value);
                 const hoy = new Date();
                 hoy.setHours(0, 0, 0, 0);
 
                 if (fechaSeleccionada < hoy) {
                     alert('No puedes seleccionar una fecha pasada');
-                    e.preventDefault();
                     return false;
                 }
-
 
                 if (fechaSeleccionada.getTime() === hoy.getTime()) {
                     const ahora = new Date();
@@ -296,15 +196,53 @@ include_once "conexion.php";
                     if (horaSeleccionada < horaActual ||
                         (horaSeleccionada === horaActual && minutoSeleccionado < minutoActual)) {
                         alert('No puedes seleccionar una hora pasada para el día de hoy');
-                        e.preventDefault();
                         return false;
                     }
                 }
 
-                return true;
+                // Obtener valores del formulario
+                const titulo = document.getElementById('titulo').value;
+                const descripcion = document.getElementById('descripcion').value;
+                const persona = document.getElementById('persona').value;
+                const fechaPublicacion = fechaInput.value;
+                const horaPublicacion = horaInput.value;
+
+                // Crear objeto con los datos
+                const anuncioData = {
+                    titulo,
+                    descripcion,
+                    persona,
+                    fechaPublicacion,
+                    horaPublicacion,
+                    apart: null, // Puedes cambiar esto si necesitas
+                    img_anuncio: null // Puedes cambiar esto si necesitas
+                };
+
+                try {
+                    const response = await fetch('http://192.168.1.100:3001/api/anunciossubir', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(anuncioData)
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        alert('Anuncio creado exitosamente');
+                        window.location.href = 'inicioprincipal.php';
+                    } else {
+                        alert(data.error || 'Error al crear el anuncio');
+                        console.error('Error del servidor:', data);
+                    }
+                } catch (error) {
+                    console.error('Error de red:', error);
+                    alert('Hubo un error al conectar con el servidor');
+                }
             });
 
-
+            // Validaciones adicionales para fecha y hora
             fechaInput.addEventListener('change', function() {
                 const fechaSeleccionada = new Date(this.value);
                 const hoy = new Date();
@@ -315,7 +253,6 @@ include_once "conexion.php";
                     this.value = fechaHoy;
                 }
             });
-
 
             horaInput.addEventListener('change', function() {
                 const fechaSeleccionada = new Date(fechaInput.value);
