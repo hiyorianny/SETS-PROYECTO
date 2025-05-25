@@ -30,7 +30,7 @@ if (isset($_FILES['imagenPerfil']) && $_FILES['imagenPerfil']['error'] === UPLOA
     }
 
 
-    $targetDir = "uploads/";
+    $targetDir = "/uploads/profile-images/";
     if (!is_dir($targetDir)) {
         mkdir($targetDir, 0755, true);
     }
