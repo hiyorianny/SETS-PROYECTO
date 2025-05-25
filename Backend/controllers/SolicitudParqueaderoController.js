@@ -39,6 +39,28 @@ class SolicitudParqueaderoController {
             res.json({ message: 'Solicitud eliminada correctamente' });
         });
     }
+
+    
+    static async updateEstado(req, res) {
+        try {
+            const { id } = req.params;
+            const { estado } = req.body;
+            
+            const query = 'UPDATE solicitud_parqueadero SET estado = ? WHERE id_solicitud = ?';
+            db.query(query, [estado, id], (err, result) => {
+                if (err) {
+                    return res.status(500).json({ error: err.message });
+                }
+                if (result.affectedRows === 0) {
+                    return res.status(404).json({ error: 'Solicitud no encontrada' });
+                }
+                res.json({ success: true, message: 'Estado actualizado correctamente' });
+            });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
 }
 
 module.exports = SolicitudParqueaderoController;

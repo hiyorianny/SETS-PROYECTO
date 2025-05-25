@@ -9,5 +9,6 @@ router.get('/estado', SolicitudParqueaderoController.getEstadoParqueaderos);
 router.post('/', SolicitudParqueaderoController.create);
 
 router.delete('/:id', SolicitudParqueaderoController.delete);
+router.put('/:id/estado', SolicitudParqueaderoController.updateEstado);
 
 module.exports = router;
