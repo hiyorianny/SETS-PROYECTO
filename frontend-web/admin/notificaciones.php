@@ -1,67 +1,5 @@
 <?php
-require '../../MODEL/backend/authMiddleware.php';
-session_start();
-header("Access-Control-Allow-Origin: http://localhost:3000");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Credentials: true");
-$decoded = authenticate();
-
-$idRegistro = $decoded->id;
-$Usuario = $decoded->Usuario;
-$idRol = $decoded->idRol;
-
-
-if ($idRol != 1111) {
-    header("Location: http://localhost/sets/error.php");
-    exit();
-}
-
-include_once "conexion.php";
-
-
-
-$sqlAnuncios = "SELECT * FROM anuncio ";
-$stmtAnuncios = $base_de_datos->prepare($sqlAnuncios);
-
-$stmtAnuncios->execute();
-$anuncios = $stmtAnuncios->fetchAll(PDO::FETCH_ASSOC);
-
-$sqlCitas = "SELECT idcita, fechacita, horacita, tipocita FROM cita ORDER BY fechacita DESC, horacita DESC LIMIT 5";
-$stmtCitas = $base_de_datos->prepare($sqlCitas);
-$stmtCitas->execute();
-$citas = $stmtCitas->fetchAll(PDO::FETCH_ASSOC);
-
-
-$sqlParqueadero = "SELECT 	id_solicitud, fecha_inicio, fecha_final,TipoVehiculo, parqueadero_visitante FROM solicitud_parqueadero ORDER BY fecha_inicio DESC, fecha_final DESC LIMIT 5";
-$stmtParqueadero = $base_de_datos->prepare($sqlParqueadero);
-$stmtParqueadero->execute();
-$parqueaderos = $stmtParqueadero->fetchAll(PDO::FETCH_ASSOC);
-
-
-$sqlZonaComun = "SELECT ID_zonaComun, fechainicio, fechafinal FROM solicitud_zona ORDER BY fechainicio DESC LIMIT 5";
-$stmtZonaComun = $base_de_datos->prepare($sqlZonaComun);
-$stmtZonaComun->execute();
-$zonasComunes = $stmtZonaComun->fetchAll(PDO::FETCH_ASSOC);
-
-$sqlRegistros = "SELECT id_Registro, PrimerNombre, PrimerApellido, Correo, numeroDocumento, telefonoUno  FROM registro  ORDER BY id_Registro DESC LIMIT 5";
-$stmtRegistros = $base_de_datos->prepare($sqlRegistros);
-$stmtRegistros->execute();
-$registros = $stmtRegistros->fetchAll(PDO::FETCH_ASSOC);
-
-
-$sqlContactarnos = "SELECT * FROM contactarnos ORDER BY fecha DESC LIMIT 5";
-$stmtContactarnos = $base_de_datos->prepare($sqlContactarnos);
-$stmtContactarnos->execute();
-$contactarnos = $stmtContactarnos->fetchAll(PDO::FETCH_ASSOC);
-
-
-$sqlMensajesChat = "SELECT * FROM mensajes_chat   WHERE id_destinatario = :id_usuario   ORDER BY fecha_envio DESC  LIMIT 5";
-$stmtMensajesChat = $base_de_datos->prepare($sqlMensajesChat);
-$stmtMensajesChat->bindParam(':id_usuario', $idRegistro);
-$stmtMensajesChat->execute();
-$mensajesChat = $stmtMensajesChat->fetchAll(PDO::FETCH_ASSOC);
-
+require __DIR__ . '/../../Backend/auth/controller/admin.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -96,20 +34,26 @@ $mensajesChat = $stmtMensajesChat->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                            <li class="nav-item">
-                                <center><a class="nav-link active" aria-current="page" href="#" style="font-size: 20px;"><b>Inicio</b></a></center>
-                            </li>
-                            <center>
+                        <div class="offcanvas-header">
+                                <img src="img/pagina-de-inicio.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                <center>
+                                    <a href="./inicioprincipal.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Inicio</b></a>
+                                </center>
+                            </div>
+                               <center>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <img src="img/usuario.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
+
                                         <b style="font-size: 20px;"> Perfil</b>
                                     </a>
                                     <ul class="dropdown-menu" role="menu">
                                         <li>
-                                            <center><a href="Perfil.php">Editar Datos</a></center>
+                                            <center><a href="Perfil.php"><b>Perfil</b></a></center>
                                         </li>
+
                                         <li>
-                                            <center> <a href="../../MODEL/backend/logout.php">Cerrar Sesión</a></center>
+                                            <center> <a href="../../Backend/auth/logout.php"><b>Cerrar Sesión</b></a></center>
                                         </li>
                                     </ul>
                             </center>
@@ -124,11 +68,6 @@ $mensajesChat = $stmtMensajesChat->fetchAll(PDO::FETCH_ASSOC);
                             </div>
 
                         </ul>
-
-                        <form class="d-flex mt-3" role="search">
-                            <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-                            <button class="btn btn-outline-success" type="submit">Buscar</button>
-                        </form>
                     </div>
                 </div>
             </div>
@@ -136,178 +75,339 @@ $mensajesChat = $stmtMensajesChat->fetchAll(PDO::FETCH_ASSOC);
     </header>
     <br>
     <br><br>
-
-
-
     <main>
         <br>
         <br>
-
-        <div class="container">
-            <center>
-                <div class="alert alert-success" role="alert" style="font-size: 34px;">
-                    <b> NOTIFICACIONES</b>
+    <div class="container">
+        <center>
+            <div class="alert alert-success" role="alert" style="font-size: 34px;">
+                <b> NOTIFICACIONES</b>
+            </div>
+        </center>
+        <div class="email-list" id="notifications-container">
+            <div class="text-center mt-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando notificaciones...</span>
                 </div>
-            </center>
-            <div class="email-list">
-                <?php foreach ($citas as $cita): ?>
-                    <div class="email-item" onclick="toggleExpand(this)">
-                        <div class="email-sender">Cita: <?php echo htmlspecialchars($cita['tipocita']); ?></div>
-                        <div class="email-subject">Fecha: <?php echo htmlspecialchars($cita['fechacita']); ?> - Hora: <?php echo htmlspecialchars($cita['horacita']); ?></div>
-                        <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
-                        <a href="./citas.php" class="btn btn-outline-success" style="font-size:15px;  ">
-                            <center>IR</center>
-                        </a>
-                    </div>
-                    <br>
-                <?php endforeach; ?>
-                <br>
-
-                <?php foreach ($anuncios as $anuncio): ?>
-                    <div class="email-item" onclick="toggleExpand(this)">
-                        <div class="email-sender">Anuncio: <?php echo htmlspecialchars($anuncio['titulo']); ?></div>
-                        <div class="email-subject">Publicado el: <?php echo htmlspecialchars($anuncio['fechaPublicacion']); ?></div>
-                        <div class="email-snippet">Descripción: <?php echo htmlspecialchars($anuncio['descripcion']); ?></div>
-                        <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
-                        <a href="inicioprincipal.php" class="btn btn-outline-success" style="font-size:15px;  ">
-                            <center>IR</center>
-                        </a>
-                    </div>
-                    <br>
-                <?php endforeach; ?>
-                <br>
-                <?php foreach ($parqueaderos as $parqueadero): ?>
-                    <div class="email-item" data-id="<?php echo $parqueadero['id_solicitud']; ?>">
-                        <b>Solicitud de Parqueadero</b><br>
-                        <b>Fecha Inicio:</b> <?php echo htmlspecialchars($parqueadero['fecha_inicio']); ?><br>
-                        <b>Parqueadero:</b> <?php echo htmlspecialchars($parqueadero['parqueadero_visitante']); ?><br>
-                        <b>Tipo Vehiculo:</b> <?php echo htmlspecialchars($parqueadero['TipoVehiculo']); ?><br>
-                        <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
-                        <a href="./parqueaderocarro.php" class="btn btn-outline-success" style="font-size:15px;  ">
-                            <center>IR CARRO</center>
-                        </a>
-                        <a href="./paromoto.php" class="btn btn-outline-success" style="font-size:15px;  ">
-                            <center>IR MOTO</center>
-                        </a>
-                    </div>
-                    <br>
-                <?php endforeach; ?>
-                <br>
-                <?php foreach ($zonasComunes as $zonaComun): ?>
-                    <div class="email-item" data-id="<?php echo $zonaComun['ID_zonaComun']; ?>">
-                        <b>Solicitud de Zona Común</b><br>
-                        <b>ID_zonaComun:</b> <?php echo htmlspecialchars($zonaComun['ID_zonaComun']); ?><br>
-                        <b>Inicio:</b> <?php echo htmlspecialchars($zonaComun['fechainicio']); ?><br>
-                        <b>Final:</b> <?php echo htmlspecialchars($zonaComun['fechafinal']); ?><br>
-                        <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
-                        <a href="./zonas_comunes.php" class="btn btn-outline-success" style="font-size:15px;  ">
-                            <center>IR </center>
-                        </a>
-                    </div>
-                    <br>
-                <?php endforeach; ?>
-                <br>
-
-                <?php foreach ($registros as $registro): ?>
-                    <div class="email-item" data-id="<?php echo $registro['id_Registro']; ?>">
-                        <b>Nuevo Registro</b><br>
-                        <b>Nombre:</b> <?php echo htmlspecialchars($registro['PrimerNombre'] . " " . $registro['PrimerApellido']); ?><br>
-                        <b>Correo:</b> <?php echo htmlspecialchars($registro['Correo']); ?><br>
-                        <b>Documento:</b> <?php echo htmlspecialchars($registro['numeroDocumento']); ?><br>
-                        <b>Teléfono:</b> <?php echo htmlspecialchars($registro['telefonoUno']); ?><br>
-                        <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
-                        <a href="./datos_usuario.php" class="btn btn-outline-success" style="font-size:15px;  ">
-                            <center>IR A Datos de usuario </center>
-                        </a>
-                    </div>
-                    <br>
-                <?php endforeach; ?>
-                <br>
-
-                <?php foreach ($mensajesChat as $mensaje): ?>
-                    <div class="email-item" data-id="<?php echo $mensaje['id_mensaje']; ?>">
-                        <b>Nuevo Mensaje</b><br>
-                        <b>De:</b> <?php echo htmlspecialchars($mensaje['id_remitente']); ?><br>
-                        <b>Fecha:</b> <?php echo htmlspecialchars($mensaje['fecha_envio']); ?><br>
-                        <b>Mensaje:</b> <?php echo htmlspecialchars($mensaje['contenido']); ?><br>
-                        <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
-                        <a href="inicioprincipal.php" class="btn btn-outline-success" style="font-size:15px;">
-                            <center>IR AL CHAT</center>
-                        </a>
-                    </div>
-                    <br>
-                <?php endforeach; ?>
-
-                <br>
-
-                <?php foreach ($contactarnos as $mensaje): ?>
-                    <div class="email-item" data-id="<?php echo $mensaje['idcontactarnos']; ?>">
-                        <b>Mensaje Recibido</b><br>
-                        <b>Nombre:</b> <?php echo htmlspecialchars($mensaje['nombre']); ?><br>
-                        <b>Correo:</b> <?php echo htmlspecialchars($mensaje['correo']); ?><br>
-                        <b>Fecha:</b> <?php echo htmlspecialchars($mensaje['fecha']); ?><br>
-                        <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
-                        <a href="contactanos.php" class="btn btn-outline-success" style="font-size:15px;  ">
-                            <center>IR</center>
-                        </a>
-                    </div>
-                    <br>
-                <?php endforeach; ?>
-
+                <p>Cargando notificaciones...</p>
             </div>
         </div>
-        </div>
+    </div>
 
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
+       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const apiBaseUrl = 'http://192.168.1.100:3001/api';
+        const usuario = "<?php echo htmlspecialchars($Usuario); ?>";
+        const idRegistro = "<?php echo $idRegistro; ?>";
+        let hiddenNotifications = JSON.parse(localStorage.getItem("hiddenNotifications_" + usuario)) || [];
+        let lastCheckTime = localStorage.getItem("lastCheckTime_" + usuario) || new Date(0).toISOString();
 
-                let usuario = "<?php echo htmlspecialchars($Usuario); ?>";
+        // Función para formatear fechas
+        function formatDate(dateString) {
+            if (!dateString) return 'Fecha no disponible';
+            const date = new Date(dateString);
+            return date.toLocaleString('es-ES');
+        }
 
+        // Función para escapar HTML
+        function escapeHtml(unsafe) {
+            if (!unsafe) return '';
+            return unsafe.toString()
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
 
-                let hiddenNotifications = JSON.parse(localStorage.getItem("hiddenNotifications_" + usuario)) || [];
+        // Función para mostrar notificación con SweetAlert2
+        function showNotificationAlert(title, message, icon = 'info') {
+            Swal.fire({
+                title: title,
+                text: message,
+                icon: icon,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 5000,
+                timerProgressBar: true
+            });
+        }
 
-                // Ocultar notificaciones descartadas
-                document.querySelectorAll(".email-item").forEach(item => {
-                    let notifId = item.getAttribute("data-id");
-                    if (hiddenNotifications.includes(notifId)) {
-                        item.style.display = "none"; // Ocultar
+        // Función para obtener datos de la API con manejo de errores
+        async function fetchApiData(endpoint) {
+            try {
+                const response = await fetch(`${apiBaseUrl}${endpoint}`);
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching data from', endpoint, error);
+                return [];
+            }
+        }
+
+        // Función para crear elementos de notificación
+        function createNotificationElement(item, type) {
+            const notifId = `${type}_${item.idAnuncio || item.id_solicitud || item.ID_zonaComun || item.id_mensaje || item.idcita || item.id_Registro || item.idcontactarnos}`;
+            
+            if (hiddenNotifications.includes(notifId)) return null;
+
+            const element = document.createElement('div');
+            element.className = 'email-item';
+            element.setAttribute('data-id', notifId);
+
+            let htmlContent = '';
+            let actionUrl = 'inicioprincipal.php';
+            let isNew = false;
+
+            // Verificar si es una notificación nueva
+            const itemDate = new Date(item.fechaPublicacion || item.fecha_inicio || item.fechainicio || item.fecha_envio || item.fechacita || item.fecha);
+            const checkDate = new Date(lastCheckTime);
+            isNew = itemDate > checkDate;
+
+            switch (type) {
+                case 'anuncio':
+                    htmlContent = `
+                        <div class="email-sender ${isNew ? 'text-primary fw-bold' : ''}">Anuncio: ${escapeHtml(item.titulo)}</div>
+                        <div class="email-subject">Publicado el: ${formatDate(item.fechaPublicacion)}</div>
+                        <div class="email-snippet">Descripción: ${escapeHtml(item.descripcion)}</div>
+                        <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
+                        <a href="${actionUrl}" class="btn btn-outline-success" style="font-size:15px;">
+                            <center>IR</center>
+                        </a>
+                    `;
+                    break;
+
+                case 'cita':
+                    htmlContent = `
+                        <div class="email-sender ${isNew ? 'text-primary fw-bold' : ''}">Cita: ${escapeHtml(item.tipocita)}</div>
+                        <div class="email-subject">Fecha: ${formatDate(item.fechacita)} - Hora: ${escapeHtml(item.horacita)}</div>
+                        <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
+                        <a href="./citas.php" class="btn btn-outline-success" style="font-size:15px;">
+                            <center>IR</center>
+                        </a>
+                    `;
+                    break;
+
+                case 'parqueadero':
+                    actionUrl = item.TipoVehiculo === 'Carro' ? './parqueaderocarro.php' : './paromoto.php';
+                    htmlContent = `
+                        <b class="${isNew ? 'text-primary' : ''}">Solicitud de Parqueadero</b><br>
+                        <b>Tipo Vehiculo:</b> ${escapeHtml(item.TipoVehiculo)}<br>
+                        <b>Fecha Inicio:</b> ${formatDate(item.fecha_inicio)}<br>
+                        <b>Parqueadero:</b> ${escapeHtml(item.parqueadero_visitante)}<br>
+                        <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
+                        <a href="${actionUrl}" class="btn btn-outline-success" style="font-size:15px;">
+                            <center>IR</center>
+                        </a>
+                    `;
+                    break;
+
+                case 'zona':
+                    actionUrl = './zonas_comunes.php';
+                    htmlContent = `
+                        <b class="${isNew ? 'text-primary' : ''}">Solicitud de Zona Común</b><br>
+                        <b>ID:</b> ${escapeHtml(item.ID_zonaComun)}<br>
+                        <b>Inicio:</b> ${formatDate(item.fechainicio)}<br>
+                        <b>Final:</b> ${formatDate(item.fechafinal)}<br>
+                        <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
+                        <a href="${actionUrl}" class="btn btn-outline-success" style="font-size:15px;">
+                            <center>IR</center>
+                        </a>
+                    `;
+                    break;
+
+                case 'registro':
+                    actionUrl = './datos_usuario.php';
+                    htmlContent = `
+                        <b class="${isNew ? 'text-primary' : ''}">Nuevo Registro</b><br>
+                        <b>Nombre:</b> ${escapeHtml(item.PrimerNombre + ' ' + item.PrimerApellido)}<br>
+                        <b>Correo:</b> ${escapeHtml(item.Correo)}<br>
+                        <b>Documento:</b> ${escapeHtml(item.numeroDocumento)}<br>
+                        <b>Teléfono:</b> ${escapeHtml(item.telefonoUno)}<br>
+                        <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
+                        <a href="${actionUrl}" class="btn btn-outline-success" style="font-size:15px;">
+                            <center>IR</center>
+                        </a>
+                    `;
+                    break;
+
+                case 'mensaje':
+                    actionUrl = 'inicioprincipal.php';
+                    htmlContent = `
+                        <b class="${isNew ? 'text-primary' : ''}">Nuevo Mensaje</b><br>
+                        <b>De:</b> ${escapeHtml(item.id_remitente)}<br>
+                        <b>Fecha:</b> ${formatDate(item.fecha_envio)}<br>
+                        <b>Mensaje:</b> ${escapeHtml(item.contenido)}<br>
+                        <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
+                        <a href="${actionUrl}" class="btn btn-outline-success" style="font-size:15px;">
+                            <center>IR AL CHAT</center>
+                        </a>
+                    `;
+                    break;
+
+                case 'contacto':
+                    actionUrl = 'contactanos.php';
+                    htmlContent = `
+                        <b class="${isNew ? 'text-primary' : ''}">Mensaje Recibido</b><br>
+                        <b>Nombre:</b> ${escapeHtml(item.nombre)}<br>
+                        <b>Correo:</b> ${escapeHtml(item.correo)}<br>
+                        <b>Fecha:</b> ${formatDate(item.fecha)}<br>
+                        <button class="btn btn-sm btn-danger remove-notif">Descartar</button>
+                        <a href="${actionUrl}" class="btn btn-outline-success" style="font-size:15px;">
+                            <center>IR</center>
+                        </a>
+                    `;
+                    break;
+            }
+
+            element.innerHTML = htmlContent;
+            
+            // Configurar evento para el botón de descartar
+            const removeBtn = element.querySelector('.remove-notif');
+            if (removeBtn) {
+                removeBtn.addEventListener('click', function() {
+                    hiddenNotifications.push(notifId);
+                    localStorage.setItem("hiddenNotifications_" + usuario, JSON.stringify(hiddenNotifications));
+                    element.style.display = 'none';
+                    showNotificationAlert('Notificación descartada', 'La notificación ha sido eliminada', 'success');
+                });
+            }
+
+            return element;
+        }
+
+        // Función principal para cargar notificaciones
+        async function loadNotifications() {
+            const container = document.getElementById('notifications-container');
+            
+            try {
+                // Mostrar spinner de carga
+                container.innerHTML = `
+                    <div class="text-center mt-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando notificaciones...</span>
+                        </div>
+                        <p>Cargando notificaciones...</p>
+                    </div>
+                `;
+
+                // Obtener datos de la API
+                const [anuncios, citas, parqueaderos, zonas, registros, mensajes, contactos] = await Promise.all([
+                    fetchApiData('/anuncios'),
+                    fetchApiData('/citas?limit=5'),
+                    fetchApiData('/solicitudes-parqueadero?limit=5'),
+                    fetchApiData('/solicitudes-zonas?limit=5'),
+                    fetchApiData('/usuarios?limit=5'),
+                    fetchApiData(`/mensajes-chat?id_destinatario=${idRegistro}&limit=5`),
+                    fetchApiData('/contactarnos?limit=5')
+                ]);
+
+                // Limpiar contenedor
+                container.innerHTML = '';
+
+                // Procesar todas las notificaciones
+                const allNotifications = [
+                    ...anuncios.map(item => ({ item, type: 'anuncio' })),
+                    ...citas.map(item => ({ item, type: 'cita' })),
+                    ...parqueaderos.map(item => ({ item, type: 'parqueadero' })),
+                    ...zonas.map(item => ({ item, type: 'zona' })),
+                    ...registros.map(item => ({ item, type: 'registro' })),
+                    ...mensajes.map(item => ({ item, type: 'mensaje' })),
+                    ...contactos.map(item => ({ item, type: 'contacto' }))
+                ];
+
+                // Ordenar por fecha (más recientes primero)
+                allNotifications.sort((a, b) => {
+                    const dateA = new Date(a.item.fechaPublicacion || a.item.fecha_inicio || a.item.fechainicio || 
+                                    a.item.fecha_envio || a.item.fechacita || a.item.fecha);
+                    const dateB = new Date(b.item.fechaPublicacion || b.item.fecha_inicio || b.item.fechainicio || 
+                                    b.item.fecha_envio || b.item.fechacita || b.item.fecha);
+                    return dateB - dateA;
+                });
+
+                if (allNotifications.length === 0) {
+                    container.innerHTML = '<div class="text-center py-5"><p>No hay notificaciones nuevas</p></div>';
+                    return;
+                }
+
+                // Mostrar notificaciones
+                allNotifications.forEach(({ item, type }) => {
+                    const element = createNotificationElement(item, type);
+                    if (element) {
+                        container.appendChild(element);
+                        
+                        // Mostrar alerta para notificaciones nuevas
+                        const itemDate = new Date(item.fechaPublicacion || item.fecha_inicio || item.fechainicio || 
+                                               item.fecha_envio || item.fechacita || item.fecha);
+                        const checkDate = new Date(lastCheckTime);
+                        
+                        if (itemDate > checkDate) {
+                            let title = '';
+                            let message = '';
+                            
+                            switch (type) {
+                                case 'anuncio':
+                                    title = 'Nuevo anuncio';
+                                    message = item.titulo;
+                                    break;
+                                case 'cita':
+                                    title = 'Nueva cita';
+                                    message = `Tipo: ${item.tipocita}`;
+                                    break;
+                                case 'parqueadero':
+                                    title = 'Nueva solicitud de parqueadero';
+                                    message = `Para ${item.parqueadero_visitante}`;
+                                    break;
+                                case 'zona':
+                                    title = 'Nueva solicitud de zona común';
+                                    message = `ID: ${item.ID_zonaComun}`;
+                                    break;
+                                case 'registro':
+                                    title = 'Nuevo usuario registrado';
+                                    message = `Nombre: ${item.PrimerNombre} ${item.PrimerApellido}`;
+                                    break;
+                                case 'mensaje':
+                                    title = 'Nuevo mensaje';
+                                    message = `De: ${item.id_remitente}`;
+                                    break;
+                                case 'contacto':
+                                    title = 'Nuevo mensaje de contacto';
+                                    message = `De: ${item.nombre}`;
+                                    break;
+                            }
+                            
+                            showNotificationAlert(title, message);
+                        }
                     }
                 });
 
-                document.querySelectorAll(".remove-notif").forEach(button => {
-                    button.addEventListener("click", function() {
-                        let parent = this.parentElement;
-                        let notifId = parent.getAttribute("data-id");
+                // Actualizar última hora de verificación
+                lastCheckTime = new Date().toISOString();
+                localStorage.setItem("lastCheckTime_" + usuario, lastCheckTime);
 
-                        // Agregar la notificación
-                        if (!hiddenNotifications.includes(notifId)) {
-                            hiddenNotifications.push(notifId);
-                        }
-
-                        // Guardar en localStorage con el nombre del usuario
-                        localStorage.setItem("hiddenNotifications_" + usuario, JSON.stringify(hiddenNotifications));
-
-
-                        parent.style.display = "none";
-                    });
-                });
-            });
-        </script>
-        <script>
-            function checkNewMessages() {
-                fetch('./chat/check_messages.php?id_usuario=<?php echo $idRegistro; ?>')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.newMessages) {
-
-                            alert('Tienes nuevos mensajes!');
-
-                            location.reload();
-                        }
-                    });
+            } catch (error) {
+                console.error('Error al cargar notificaciones:', error);
+                container.innerHTML = `
+                    <div class="alert alert-danger">
+                        Error al cargar notificaciones. Por favor recarga la página.
+                    </div>
+                `;
             }
-            setInterval(checkNewMessages, 30000);
-        </script>
+        }
+
+        // Inicializar
+        loadNotifications();
+        
+        // Actualizar periódicamente (cada 30 segundos)
+        setInterval(loadNotifications, 30000);
+    });
+    </script>
     </main>
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
         <a href="inicioprincipal.php" class="btn btn-outline-success" style="font-size:30px;   background-color: #0e2c0a;">
@@ -321,7 +421,7 @@ $mensajesChat = $stmtMensajesChat->fetchAll(PDO::FETCH_ASSOC);
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
