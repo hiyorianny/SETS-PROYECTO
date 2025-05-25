@@ -1,69 +1,5 @@
 <?php
-require '../../MODEL/backend/authMiddleware.php';
-session_start();
-header("Access-Control-Allow-Origin: http://localhost:3000");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Credentials: true");
-$decoded = authenticate();
-
-$idRegistro = $decoded->id;
-$Usuario = $decoded->Usuario;
-$idRol = $decoded->idRol;
-
-if ($idRol != 3333) {
-    header("Location: http://localhost/sets/error.php");
-    exit();
-}
-
-include_once "conexion.php";
-
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete'])) {
-    $id_solicitud = $_POST['delete_id_solicitud'];
-
-    $sql = "DELETE FROM solicitud_parqueadero WHERE id_solicitud = :id_solicitud";
-    $stmt = $base_de_datos->prepare($sql);
-
-    if ($stmt->execute(['id_solicitud' => $id_solicitud])) {
-    } else {
-        echo "Error al eliminar la solicitud.";
-    }
-}
-
-$sql = "SELECT * FROM solicitud_parqueadero WHERE tipoVehiculo = 'carro'";
-
-$stmt = $base_de_datos->query($sql);
-$solicitudes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
-
-
-
-$sql_estado = "SELECT 
-    p.parqueadero_visitante AS parqueadero,
-    CASE 
-        WHEN p.estado = 'aprobado' AND NOW() BETWEEN p.fecha_inicio AND p.fecha_final THEN 'ocupado'
-        WHEN p.estado = 'aprobado' AND NOW() < p.fecha_inicio THEN 'reservado'
-        ELSE 'disponible'
-    END AS estado,
-    IFNULL(p.nombre_visitante, '') AS visitante,
-    IFNULL(p.placaVehiculo, '') AS placa,
-    IFNULL(CONCAT(DATE_FORMAT(p.fecha_inicio, '%d/%m/%Y %H:%i'), ' - ', DATE_FORMAT(p.fecha_final, '%d/%m/%Y %H:%i')), '') AS horario
-FROM 
-    (SELECT 'V1' AS parqueadero_visitante UNION SELECT 'V2' UNION SELECT 'V3' UNION 
-     SELECT 'V4' UNION SELECT 'V5' UNION SELECT 'V6' UNION 
-     SELECT 'V7' UNION SELECT 'V8' UNION SELECT 'V9' UNION SELECT 'V10') AS todos_parqueaderos
-LEFT JOIN solicitud_parqueadero p ON 
-    todos_parqueaderos.parqueadero_visitante = p.parqueadero_visitante AND
-    p.estado = 'aprobado' AND
-    NOW() <= p.fecha_final
-GROUP BY 
-    todos_parqueaderos.parqueadero_visitante
-ORDER BY parqueadero";
-
-$stmt_estado = $base_de_datos->query($sql_estado);
-$estado_parqueaderos = $stmt_estado->fetchAll(PDO::FETCH_ASSOC);
-
+require __DIR__ . '/../../Backend/auth/controller/residente.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -75,6 +11,8 @@ $estado_parqueaderos = $stmt_estado->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="css/parqueadero.css?v=<?php echo (rand()); ?>">
     <link rel="shortcut icon" href="img/c.png" type="image/x-icon" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
 
 <body>
@@ -99,23 +37,29 @@ $estado_parqueaderos = $stmt_estado->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         <div class="offcanvas-body">
                             <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                                <li class="nav-item">
-                                    <center><a class="nav-link active" aria-current="page" href="#" style="font-size: 20px;"><b>Inicio</b></a></center>
-                                </li>
+                                  <div class="offcanvas-header">
+                                <img src="img/pagina-de-inicio.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
                                 <center>
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <b style="font-size: 20px;"> Perfil</b>
-                                        </a>
-                                        <ul class="dropdown-menu" role="menu">
-                                            <li>
-                                                <center><a href="Perfil.php">Editar datos</a></center>
-                                            </li>
-                                            <li>
-                                                <center> <a href="../../MODEL/backend/logout.php">Cerrar sesión</a></center>
-                                            </li>
-                                        </ul>
+                                    <a href="./inicioprincipal.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Inicio</b></a>
                                 </center>
+                            </div>
+                                  <center>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <img src="img/usuario.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
+
+                                        <b style="font-size: 20px;"> Perfil</b>
+                                    </a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li>
+                                            <center><a href="Perfil.php"><b>Perfil</b></a></center>
+                                        </li>
+
+                                        <li>
+                                            <center> <a href="../../Backend/auth/logout.php"><b>Cerrar Sesión</b></a></center>
+                                        </li>
+                                    </ul>
+                            </center>
                                 </li>
                                 <div class="offcanvas-header">
                                     <img src="img/notificacion.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
@@ -127,160 +71,180 @@ $estado_parqueaderos = $stmt_estado->fetchAll(PDO::FETCH_ASSOC);
                                 </div>
 
                             </ul>
-                            <form class="d-flex mt-3" role="search">
-                                <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-                                <button class="btn btn-outline-success" type="submit">Buscar</button>
-                            </form>
+
                         </div>
                     </div>
                 </div>
             </nav>
     </header>
-    <main>
-        <br><br>
-        <br><br>
-        <div class="container">
-            <div class="alert alert-success" role="alert" style="text-align: center; font-size: 24px;">
-                <b>Estado de Parqueaderos Carros Visitantes</b>
-            </div>
-
-            <div class="row mb-5">
-                <?php foreach ($estado_parqueaderos as $parqueadero): ?>
-                    <div class="col-md-4 mb-4">
-                        <div class="card parking-card parking-status-<?php echo $parqueadero['estado']; ?>">
-                            <div class="card-header">
-                                <h5 class="card-title">Parqueadero <?php echo htmlspecialchars($parqueadero['parqueadero']); ?></h5>
+  <main>
+        <div class="container mt-5 pt-4">
+     <div class="card shadow mb-5">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0"><i class="bi bi-p-square"></i> Estado de Parqueaderos Carro Visitantes</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="estadoParqueaderosContainer">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-success" role="status">
+                                <span class="visually-hidden">Cargando...</span>
                             </div>
-                            <div class="card-body">
-                                <p class="card-text">
-                                    <strong>Estado:</strong> <?php echo ucfirst(htmlspecialchars($parqueadero['estado'])); ?><br>
-                                    <?php if ($parqueadero['estado'] != 'disponible'): ?>
-                                        <strong>Visitante:</strong> <?php echo htmlspecialchars($parqueadero['visitante']); ?><br>
-                                        <strong>Placa:</strong> <?php echo htmlspecialchars($parqueadero['placa']); ?><br>
-                                        <strong>Horario:</strong> <?php echo htmlspecialchars($parqueadero['horario']); ?>
-                                    <?php else: ?>
-                                        <strong>Disponible para reserva</strong>
-                                    <?php endif; ?>
-                                </p>
-                            </div>
+                            <p class="mt-2">Cargando disponibilidad...</p>
                         </div>
                     </div>
-                <?php endforeach; ?>
+                </div>
             </div>
 
             <div class="row">
-                <div class="col-sm-12 col-md-3 col-lg-4 mt-5">
-                    <form action="../../CONTROLLER/carro.php" method="post">
-                        <fieldset>
-                            <center>
-                                <legend><b>Nueva Solicitud</b></legend>
-                            </center>
-                            <div class="mb-3">
-                                <label for="id_apartamento" class="form-label" style="font-size: 15px;">Apartamento:</label>
-                                <input type="text" class="form-control" id="id_apartamento" name="id_apartamento" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="parqueadero_visitante" class="form-label" style="font-size: 15px;">Parqueadero Visitante:</label>
-                                <select class="form-control" id="parqueadero_visitante" name="parqueadero_visitante" required>
-                                    <option value="V1">V1</option>
-                                    <option value="V2">V2</option>
-                                    <option value="V3">V3</option>
-                                    <option value="V4">V4</option>
-                                    <option value="V5">V5</option>
-                                    <option value="V6">V6</option>
-                                    <option value="V7">V7</option>
-                                    <option value="V8">V8</option>
-                                    <option value="V9">V9</option>
-                                    <option value="V10">V10</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="nombre_visitante" class="form-label" style="font-size: 15px;">Nombre del Visitante:</label>
-                                <input type="text" class="form-control" id="nombre_visitante" name="nombre_visitante" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="placaVehiculo" class="form-label" style="font-size: 15px;">Placa del Vehículo:</label>
-                                <input type="text" class="form-control" id="placaVehiculo" name="placaVehiculo" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="colorVehiculo" class="form-label" style="font-size: 15px;">Color del Vehículo:</label>
-                                <input type="text" class="form-control" id="colorVehiculo" name="colorVehiculo" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="tipoVehiculo" class="form-label" style="font-size: 15px;">Tipo de Vehículo:</label>
-                                <input type="text" class="form-control" id="tipoVehiculo" name="tipoVehiculo" placeholder="carro" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="modelo" class="form-label" style="font-size: 15px;">Modelo:</label>
-                                <input type="text" class="form-control" id="modelo" name="modelo" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="marca" class="form-label" style="font-size: 15px;">Marca:</label>
-                                <input type="text" class="form-control" id="marca" name="marca" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="fecha_inicio" class="form-label" style="font-size: 15px;">Fecha de Inicio:</label>
-                                <input type="datetime-local" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="fecha_final" class="form-label" style="font-size: 15px;">Fecha Final:</label>
-                                <input type="datetime-local" class="form-control" id="fecha_final" name="fecha_final" required>
-                            </div>
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-success" type="submit" style="font-size: 15px;">Enviar Solicitud</button>
-                            </div>
-                        </fieldset>
-                    </form>
+                <div class="col-lg-5">
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h3 class="mb-0"><i class="bi bi-car-front"></i> Nueva Solicitud</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="solicitudForm" class="needs-validation" novalidate>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="id_apartamento" class="form-label">Apartamento</label>
+                                        <input type="text" class="form-control" id="id_apartamento"  required>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="parqueadero_visitante" class="form-label">Parqueadero</label>
+                                        <select class="form-select" id="parqueadero_visitante" required>
+                                            <option value="" selected disabled>Seleccione...</option>
+                                            <option value="V1">V1</option>
+                                            <option value="V2">V2</option>
+                                            <option value="V3">V3</option>
+                                            <option value="V4">V4</option>
+                                            <option value="V5">V5</option>
+                                            <option value="V6">V6</option>
+                                            <option value="V7">V7</option>
+                                            <option value="V8">V8</option>
+                                            <option value="V9">V9</option>
+                                            <option value="V10">V10</option>
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Por favor seleccione un parqueadero
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <label for="nombre_visitante" class="form-label">Nombre del Visitante</label>
+                                        <input type="text" class="form-control" id="nombre_visitante" required>
+                                        <div class="invalid-feedback">
+                                            Por favor ingrese el nombre del visitante
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="tipoVehiculo" class="form-label">Tipo de Vehículo</label>
+                                        <select class="form-select" id="tipoVehiculo" required>
+                                            <option value="carro" selected>Carro</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="placaVehiculo" class="form-label">Placa</label>
+                                        <input type="text" class="form-control" id="placaVehiculo" required>
+                                        <div class="invalid-feedback">
+                                            Por favor ingrese la placa del vehículo
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="marca" class="form-label">Marca</label>
+                                        <input type="text" class="form-control" id="marca" required>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="modelo" class="form-label">Modelo</label>
+                                        <input type="text" class="form-control" id="modelo" required>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="colorVehiculo" class="form-label">Color</label>
+                                        <input type="text" class="form-control" id="colorVehiculo" required>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="fecha_inicio" class="form-label">Fecha y Hora de Inicio</label>
+                                        <input type="datetime-local" class="form-control" id="fecha_inicio" required>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="fecha_final" class="form-label">Fecha y Hora Final</label>
+                                        <input type="datetime-local" class="form-control" id="fecha_final" required>
+                                    </div>
+                                    
+                                    <div class="col-12 mt-4">
+                                        <button type="submit" class="btn btn-success w-100 py-2">
+                                            <i class="bi bi-send-check"></i> Enviar Solicitud
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-sm-12 col-md-8 col-lg-8 mt-5">
-                    <center>
-                        <h2>Panel de Solicitudes Carros</h2>
-                    </center>
-                    <br>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col" style="font-size: 15px;">ID Solicitud</th>
-                                <th scope="col" style="font-size: 15px;">Apartamento</th>
-                                <th scope="col" style="font-size: 15px;">Parqueadero Visitante</th>
-                                <th scope="col" style="font-size: 15px;">Nombre del Visitante</th>
-                                <th scope="col" style="font-size: 15px;">Placa del Vehículo</th>
-                                <th scope="col" style="font-size: 15px;">Color del Vehículo</th>
-                                <th scope="col" style="font-size: 15px;">Tipo de Vehículo</th>
-                                <th scope="col" style="font-size: 15px;">Modelo</th>
-                                <th scope="col" style="font-size: 15px;">Marca</th>
-                                <th scope="col" style="font-size: 15px;">Fecha de Inicio</th>
-                                <th scope="col" style="font-size: 15px;">Fecha Final</th>
-                                <th scope="col" style="font-size: 15px;">Estado</th>
-                                <th scope="col" style="font-size: 15px;">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($solicitudes as $solicitud): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($solicitud['id_solicitud']); ?></td>
-                                    <td><?php echo htmlspecialchars($solicitud['id_apartamento']); ?></td>
-                                    <td><?php echo htmlspecialchars($solicitud['parqueadero_visitante']); ?></td>
-                                    <td><?php echo htmlspecialchars($solicitud['nombre_visitante']); ?></td>
-                                    <td><?php echo htmlspecialchars($solicitud['placaVehiculo']); ?></td>
-                                    <td><?php echo htmlspecialchars($solicitud['colorVehiculo']); ?></td>
-                                    <td><?php echo htmlspecialchars($solicitud['tipoVehiculo']); ?></td>
-                                    <td><?php echo htmlspecialchars($solicitud['modelo']); ?></td>
-                                    <td><?php echo htmlspecialchars($solicitud['marca']); ?></td>
-                                    <td><?php echo htmlspecialchars($solicitud['fecha_inicio']); ?></td>
-                                    <td><?php echo htmlspecialchars($solicitud['fecha_final']); ?></td>
-                                    <td><?php echo htmlspecialchars($solicitud['estado']); ?></td>
-                                    <td>
-                                        <form action="" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta solicitud?');">
-                                            <input type="hidden" name="delete_id_solicitud" value="<?php echo $solicitud['id_solicitud']; ?>">
-                                            <button class="btn btn-danger mt-3" type="submit" name="delete">Eliminar</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                
+                <!-- Historial de solicitudes -->
+                <div class="col-lg-7">
+                    <div class="card shadow">
+                        <div class="card-header bg-success text-white">
+                            <h3 class="mb-0"><i class="bi bi-clock-history"></i> Historial de Solicitudes</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Parqueadero</th>
+                                            <th>Visitante</th>
+                                            <th>Vehículo</th>
+                                            <th>Fecha/Hora</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="solicitudesTableBody">
+                                        <tr>
+                                            <td colspan="6" class="text-center py-5">
+                                                <div class="spinner-border text-success" role="status">
+                                                    <span class="visually-hidden">Cargando...</span>
+                                                </div>
+                                                <p class="mt-2">Cargando historial...</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Modal de confirmación -->
+        <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmar acción</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="modalBody">
+                        ¿Está seguro de que desea eliminar esta solicitud?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger" id="confirmActionBtn">Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
                 <br>
                 <div class="container mt-5">
                     <a href="parqueaderocarro.php" class="btn btn-success">Volver</a>
@@ -338,153 +302,433 @@ $estado_parqueaderos = $stmt_estado->fetchAll(PDO::FETCH_ASSOC);
                 document.querySelector(`.tab-btn[onclick="showTab('${tabId}')"]`).classList.add('active');
             }
         </script>
-        <script>
-            function openChat(chatName) {
-                const chatContainer = document.getElementById('chatContainer');
-                const chatHeader = document.getElementById('chatHeader');
-                chatHeader.textContent = chatName;
-                chatContainer.classList.add('show');
-            }
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+      <script>
+               const API_BASE_URL = 'http://192.168.1.100:3001/api';
+        let solicitudes = [];
+        let currentActionId = null;
+        let confirmModal = null;
 
-            function closeChat() {
-                const chatContainer = document.getElementById('chatContainer');
-                chatContainer.classList.remove('show');
-            }
+        document.addEventListener('DOMContentLoaded', function() {
+            confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+            document.getElementById('confirmActionBtn').addEventListener('click', confirmAction);
+            
+            const form = document.getElementById('solicitudForm');
+            form.addEventListener('submit', handleSubmit);
+            
+            loadInitialData();
+            
+            setupDateValidation();
+        });
 
-            function sendMessage() {
-                const messageInput = document.getElementById('chatInput');
-                const messageText = messageInput.value.trim();
-                if (messageText) {
-                    const chatMessages = document.getElementById('chatMessages');
-                    const messageElement = document.createElement('p');
-                    messageElement.textContent = messageText;
-                    chatMessages.appendChild(messageElement);
-                    messageInput.value = '';
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
+        async function loadInitialData() {
+            try {
+                await Promise.all([
+                    loadParkingStatus(),
+                    loadRequests()
+                ]);
+            } catch (error) {
+                showError('Error al cargar datos', error);
+            }
+        }
+
+        async function loadParkingStatus() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/solicitudes-parqueadero/estado`);
+                if (!response.ok) throw new Error('Error al cargar estado');
+                
+                const data = await response.json();
+                displayParkingStatus(data);
+            } catch (error) {
+                document.getElementById('estadoParqueaderosContainer').innerHTML = `
+                    <div class="alert alert-danger">
+                        Error al cargar disponibilidad: ${error.message}
+                        <button onclick="loadParkingStatus()" class="btn btn-sm btn-warning">Reintentar</button>
+                    </div>
+                `;
+            }
+        }
+
+        function displayParkingStatus(parqueaderos) {
+            const container = document.getElementById('estadoParqueaderosContainer');
+            
+            if (!parqueaderos || parqueaderos.length === 0) {
+                container.innerHTML = '<div class="alert alert-warning">No hay información de parqueaderos</div>';
+                return;
+            }
+            
+            // Filtrar solo parqueaderos con estado diferente a NULL
+            const parqueaderosFiltrados = parqueaderos.filter(p => p.estado !== null);
+            
+            container.innerHTML = parqueaderosFiltrados.map(p => {
+                // Manejo seguro de valores NULL
+                const estado = p.estado || 'disponible';
+                const parqueadero = p.parqueadero || 'N/A';
+                const visitante = p.visitante || 'N/A';
+                const placa = p.placa || 'N/A';
+                const horario = p.horario || 'N/A';
+                
+                const statusClass = getStatusClass(estado);
+                const statusText = getStatusText(estado);
+                
+                const details = estado !== 'disponible' ? `
+                    <div class="mt-2">
+                        <small class="d-block"><strong>Visitante:</strong> ${visitante}</small>
+                        <small class="d-block"><strong>Placa:</strong> ${placa}</small>
+                        <small class="d-block"><strong>Horario:</strong> ${horario}</small>
+                    </div>
+                ` : '<div class="mt-2"><small>Disponible para reserva</small></div>';
+                
+                return `
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-${statusClass} animate__animated animate__fadeIn">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">${parqueadero}</h5>
+                                <span class="badge bg-${statusClass} mb-2">${statusText}</span>
+                                ${details}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getStatusClass(status) {
+            switch((status || '').toLowerCase()) {
+                case 'ocupado': return 'danger';
+                case 'reservado': return 'warning';
+                case 'disponible': return 'success';
+                default: return 'secondary';
+            }
+        }
+
+        function getStatusText(status) {
+            switch((status || '').toLowerCase()) {
+                case 'ocupado': return 'Ocupado';
+                case 'reservado': return 'Reservado';
+                case 'disponible': return 'Disponible';
+                default: return status || 'Desconocido';
+            }
+        }
+
+        async function loadRequests() {
+            try {
+                // Filtrar solo solicitudes de carros
+                const response = await fetch(`${API_BASE_URL}/solicitudes-parqueadero?tipoVehiculo=carro`);
+                if (!response.ok) throw new Error('Error al cargar solicitudes');
+                
+                solicitudes = await response.json();
+                displayRequests();
+            } catch (error) {
+                document.getElementById('solicitudesTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center text-danger py-3">
+                            Error al cargar historial: ${error.message}
+                            <button onclick="loadRequests()" class="btn btn-sm btn-warning">Reintentar</button>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function displayRequests() {
+            const tbody = document.getElementById('solicitudesTableBody');
+            
+            if (!solicitudes || solicitudes.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-4">
+                            <i class="bi bi-info-circle"></i> No hay solicitudes registradas
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Filtrar solo solicitudes de carros (por si acaso)
+            const solicitudesCarros = solicitudes.filter(s => s.tipoVehiculo === 'carro');
+            
+            tbody.innerHTML = solicitudesCarros.map(solicitud => {
+                const statusClass = solicitud.estado === 'aprobado' ? 'success' : 
+                                  solicitud.estado === 'rechazado' ? 'danger' : 'warning';
+                
+                // Manejo seguro de valores NULL
+                const parqueadero = solicitud.parqueadero_visitante || 'N/A';
+                const visitante = solicitud.nombre_visitante || 'N/A';
+                const tipoVehiculo = solicitud.tipoVehiculo || 'N/A';
+                const placa = solicitud.placaVehiculo || 'Sin placa';
+                const estado = solicitud.estado || 'pendiente';
+                
+                return `
+                    <tr class="animate__animated animate__fadeIn">
+                        <td>${parqueadero}</td>
+                        <td>${visitante}</td>
+                        <td>
+                            <small class="d-block">${tipoVehiculo}</small>
+                            <small class="text-muted">${placa}</small>
+                        </td>
+                        <td>
+                            <small class="d-block">${formatDate(solicitud.fecha_inicio)}</small>
+                            <small class="text-muted">a ${formatDate(solicitud.fecha_final)}</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-${statusClass}">
+                                ${estado}
+                            </span>
+                        </td>
+                        <td>
+                            ${estado === 'pendiente' ? `
+                            <button class="btn btn-sm btn-outline-danger" 
+                                    onclick="showConfirmModal(${solicitud.id_solicitud}, 'eliminar')"
+                                    title="Cancelar solicitud">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleString('es-CO', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function setupDateValidation() {
+    const fechaInicio = document.getElementById('fecha_inicio');
+    const fechaFinal = document.getElementById('fecha_final');
+    
+    // Establecer fecha mínima como la fecha/hora actual
+    const now = new Date();
+    const nowISO = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    fechaInicio.min = nowISO;
+    
+    fechaInicio.addEventListener('change', function() {
+        // Validar que la fecha de inicio no sea en el pasado
+        const fechaInicioValue = new Date(fechaInicio.value);
+        if (fechaInicioValue < now) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Fecha inválida',
+                text: 'La fecha de inicio no puede ser en el pasado',
+                timer: 3000
+            });
+            fechaInicio.value = '';
+            return;
+        }
+        
+        // Establecer fecha mínima para fecha final (1 hora después de la fecha de inicio)
+        if (fechaInicio.value) {
+            const minFechaFinal = new Date(fechaInicio.value);
+            minFechaFinal.setHours(minFechaFinal.getHours() + 1);
+            fechaFinal.min = minFechaFinal.toISOString().slice(0, 16);
+            
+            if (fechaFinal.value && new Date(fechaFinal.value) <= minFechaFinal) {
+                fechaFinal.value = '';
+                fechaFinal.setCustomValidity('La fecha final debe ser al menos 1 hora después de la fecha de inicio');
+            }
+        }
+    });
+    
+    fechaFinal.addEventListener('change', function() {
+        if (fechaInicio.value && new Date(fechaFinal.value) <= new Date(fechaInicio.value)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Rango inválido',
+                text: 'La fecha final debe ser posterior a la fecha de inicio',
+                timer: 3000
+            });
+            fechaFinal.value = '';
+            fechaFinal.setCustomValidity('La fecha final debe ser posterior a la de inicio');
+        } else {
+            fechaFinal.setCustomValidity('');
+            
+            // Validar que la reserva no exceda 24 horas
+            if (fechaInicio.value && fechaFinal.value) {
+                const inicio = new Date(fechaInicio.value);
+                const fin = new Date(fechaFinal.value);
+                const diffHours = (fin - inicio) / (1000 * 60 * 60);
+                
+                if (diffHours > 24) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Tiempo excedido',
+                        text: 'La reserva no puede exceder las 24 horas',
+                        timer: 3000
+                    });
+                    fechaFinal.value = '';
                 }
             }
+        }
+    });
+}
 
-            function filterChat() {
-                const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-                const chatItems = document.querySelectorAll('.chat-item');
-                chatItems.forEach(item => {
-                    if (item.textContent.toLowerCase().includes(searchInput)) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
+
+        async function handleSubmit(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const form = event.target;
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
             }
-        </script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const form = document.querySelector('form');
-                const fechaInicioInput = document.getElementById('fecha_inicio');
-                const fechaFinalInput = document.getElementById('fecha_final');
-                const parqueaderoSelect = document.getElementById('parqueadero_visitante');
-
-
-                const now = new Date();
-                const timezoneOffset = now.getTimezoneOffset() * 60000;
-                const localISOTime = new Date(now - timezoneOffset).toISOString().slice(0, 16);
-
-                fechaInicioInput.min = localISOTime;
-                fechaFinalInput.min = localISOTime;
-
-                fechaInicioInput.addEventListener('change', function() {
-                    const fechaInicio = new Date(this.value);
-                    const fechaFinal = new Date(fechaFinalInput.value);
-
-      
-                    if (fechaFinal <= fechaInicio) {
-
-                        const nuevaFechaFinal = new Date(fechaInicio);
-                        nuevaFechaFinal.setHours(nuevaFechaFinal.getHours() + 1);
-                        fechaFinalInput.value = nuevaFechaFinal.toISOString().slice(0, 16);
-                    }
-
-
-                    fechaFinalInput.min = this.value;
+            
+            try {
+                const formData = {
+                    id_apartamento: document.getElementById('id_apartamento').value,
+                    parqueadero_visitante: document.getElementById('parqueadero_visitante').value,
+                    nombre_visitante: document.getElementById('nombre_visitante').value,
+                    placaVehiculo: document.getElementById('placaVehiculo').value,
+                    colorVehiculo: document.getElementById('colorVehiculo').value,
+                    tipoVehiculo: document.getElementById('tipoVehiculo').value,
+                    modelo: document.getElementById('modelo').value,
+                    marca: document.getElementById('marca').value,
+                    fecha_inicio: document.getElementById('fecha_inicio').value,
+                    fecha_final: document.getElementById('fecha_final').value,
+                    estado: 'pendiente'
+                };
+                
+                const response = await fetch(`${API_BASE_URL}/solicitudes-parqueadero`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
                 });
-
-
-                form.addEventListener('submit', function(e) {
-                    const fechaInicio = new Date(fechaInicioInput.value);
-                    const fechaFinal = new Date(fechaFinalInput.value);
-                    const ahora = new Date();
-
-
-                    if (fechaInicio < ahora) {
-                        alert('La fecha de inicio no puede ser en el pasado');
-                        e.preventDefault();
-                        return false;
-                    }
-
-                    if (fechaFinal < ahora) {
-                        alert('La fecha final no puede ser en el pasado');
-                        e.preventDefault();
-                        return false;
-                    }
-
-
-                    if (fechaFinal <= fechaInicio) {
-                        alert('La fecha final debe ser posterior a la fecha de inicio');
-                        e.preventDefault();
-                        return false;
-                    }
-
-                    return true;
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Error al enviar solicitud');
+                }
+                
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Solicitud enviada',
+                    text: 'Tu solicitud ha sido registrada correctamente',
+                    timer: 2000,
+                    showConfirmButton: false
                 });
+                
+                form.reset();
+                form.classList.remove('was-validated');
+                
+                // Recargar datos
+                await Promise.all([
+                    loadParkingStatus(),
+                    loadRequests()
+                ]);
+                
+            } catch (error) {
+                showError('Error al enviar solicitud', error);
+            }
+        }
 
+        function showConfirmModal(id, action) {
+            currentActionId = id;
+            const modal = document.getElementById('confirmModal');
+            const modalBody = document.getElementById('modalBody');
+            const confirmBtn = document.getElementById('confirmActionBtn');
+            
+            if (action === 'eliminar') {
+                modalBody.textContent = '¿Está seguro de que desea cancelar esta solicitud?';
+                confirmBtn.textContent = 'Cancelar solicitud';
+                confirmBtn.className = 'btn btn-danger';
+            }
+            
+            confirmModal.show();
+        }
 
-                parqueaderoSelect.addEventListener('change', validarDisponibilidad);
-                fechaInicioInput.addEventListener('change', validarDisponibilidad);
-                fechaFinalInput.addEventListener('change', validarDisponibilidad);
+        async function confirmAction() {
+            if (!currentActionId) return;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/solicitudes-parqueadero/${currentActionId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Error al eliminar solicitud');
+                }
+                
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Solicitud cancelada',
+                    text: 'La solicitud ha sido cancelada correctamente',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                
+                confirmModal.hide();
+                await Promise.all([
+                    loadParkingStatus(),
+                    loadRequests()
+                ]);
+                
+            } catch (error) {
+                showError('Error al procesar la acción', error);
+            } finally {
+                currentActionId = null;
+            }
+        }
 
-             
+        function showError(title, error) {
+            Swal.fire({
+                icon: 'error',
+                title: title,
+                text: error.message || 'Ocurrió un error inesperado',
+                footer: 'Por favor intente nuevamente'
             });
-        </script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        }
+    </script>
+    </main>
+    <style>
+        .parking-card {
+            transition: all 0.3s ease;
+        }
+
+        .parking-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .parking-status-ocupado {
+            background-color: #ff6b6b;
+            color: white;
+        }
+
+        .parking-status-reservado {
+            background-color: rgb(102, 255, 153);
+            color: black;
+        }
+
+        .parking-status-disponible {
+            background-color: rgb(19, 88, 70);
+            color: white;
+        }
+    </style>
+    <br>
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 SETS. Todos los derechos reservados.</p>
+            <ul>
+                <li><a href="#">Términos y Condiciones</a></li>
+                <li><a href="#">Política de Privacidad</a></li>
+                <li><a href="#">Contacto</a></li>
+            </ul>
+        </div>
+    </footer>
 </body>
-<style>
-    .parking-card {
-        transition: all 0.3s ease;
-    }
-
-    .parking-card:hover {
-        transform: scale(1.03);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    .parking-status-ocupado {
-        background-color: #ff6b6b;
-        color: white;
-    }
-
-    .parking-status-reservado {
-        background-color: rgb(102, 255, 153);
-        color: black;
-    }
-
-    .parking-status-disponible {
-        background-color: rgb(19, 88, 70);
-        color: white;
-    }
-</style>
-<br>
-
-<br>
-<br>
-<footer>
-
-    <div class="footer-content">
-        <li>&copy; 2025 SETS. Todos los derechos reservados.</li>
-        <ul>
-            <li><a href="#">Términos y Condiciones</a></li>
-            <li><a href="#">Política de Privacidad</a></li>
-            <li><a href="#">Contacto</a></li>
-        </ul>
-    </div>
-</footer>
 
 </html>
