@@ -1,38 +1,5 @@
 <?php
-require '../../MODEL/backend/authMiddleware.php';
-session_start();
-header("Access-Control-Allow-Origin: http://localhost:3000");  
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Credentials: true");  
-$decoded = authenticate();
-
-$idRegistro = $decoded->id;
-$Usuario = $decoded->Usuario; 
-$idRol = $decoded->idRol;
-
-
-if ($idRol != 1111) { 
-    header("Location: http://localhost/sets/error.php");
-    exit();
-}
-
-include_once "conexion.php";
-
-
-$sql = "SELECT sz.*
-        FROM solicitud_zona sz 
-        WHERE sz.ID_zonaComun = 2";
-
-$stmt = $base_de_datos->query($sql);
-$solicitudes = [];
-
-if ($stmt->rowCount() > 0) {
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $solicitudes[] = $row;
-    }
-}
-
+require __DIR__ . '/../../Backend/auth/controller/admin.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -51,9 +18,9 @@ if ($stmt->rowCount() > 0) {
     <header>
         <nav class="navbar bg-body-tertiary fixed-top">
             <div class="container-fluid" style="background-color: #0e2c0a;">
-            <img src="img/ajustes.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top" style="background-color: #0e2c0a;">
-            <b style="font-size: 25px;color:aliceblue"> ADMIN - <?php echo htmlspecialchars($Usuario); ?>  </b></a>
-             <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation" style="background-color: white;">
+                <img src="img/ajustes.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top" style="background-color: #0e2c0a;">
+                <b style="font-size: 25px;color:aliceblue"> ADMIN - <?php echo htmlspecialchars($Usuario); ?> </b></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation" style="background-color: white;">
                     <span class="navbar-toggler-icon" style="color: white;"></span>
                 </button>
                 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
@@ -67,21 +34,26 @@ if ($stmt->rowCount() > 0) {
                     </div>
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                            <li class="nav-item">
-                                <center><a class="nav-link active" aria-current="page" href="#" style="font-size: 20px;"><b>Inicio</b></a></center>
-                            </li>
-                            <center>
+                             <div class="offcanvas-header">
+                                <img src="img/pagina-de-inicio.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                <center>
+                                    <a href="./inicioprincipal.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Inicio</b></a>
+                                </center>
+                            </div>
+                               <center>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <img src="img/usuario.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
+
                                         <b style="font-size: 20px;"> Perfil</b>
                                     </a>
                                     <ul class="dropdown-menu" role="menu">
                                         <li>
-                                            <center><a href="Perfil.php">Editar Datos</a></center>
+                                            <center><a href="Perfil.php"><b>Perfil</b></a></center>
                                         </li>
-                                     
+
                                         <li>
-                                            <center> <a href="../../MODEL/backend/logout.php">Cerrar Sesión</a></center>
+                                            <center> <a href="../../Backend/auth/logout.php"><b>Cerrar Sesión</b></a></center>
                                         </li>
                                     </ul>
                             </center>
@@ -94,13 +66,8 @@ if ($stmt->rowCount() > 0) {
                                     <a href="notificaciones.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;">Notificaciones</a>
                                 </center>
                             </div>
-                        
-                        </ul>
 
-                        <form class="d-flex mt-3" role="search">
-                            <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-                            <button class="btn btn-outline-success" type="submit">Buscar</button>
-                        </form>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -110,11 +77,8 @@ if ($stmt->rowCount() > 0) {
     <br>
     <br><br>
     <main>
-        <br>
-        <br>
-        <br>
         <div class="alert alert-success g" role="alert">
-            <h2><b>Horarios  Disponibles - ZONA BBQ</b></h2>
+            <h2><b>Horarios Disponibles - ZONA BBQ</b></h2>
         </div>
 
         <div class="container">
@@ -123,15 +87,16 @@ if ($stmt->rowCount() > 0) {
                     <div class="calendar-header">
                         <h2 id="calendar-title"><b>Calendario de Disponibilidad</b></h2>
                         <br>
-                        <p>
-                            <span id="month-year" style="color: #0e2c0a;"><b></b></span>
                         <div id="calendar-controls">
-                            <button id="prev-month" onclick="prevMonth()"><</button>
-                            <span id="month-year"></span>
-                            <button id="next-month" onclick="nextMonth()">></button>
+                              <span id="month-year" style="color: #0e2c0a;"><b></b></span>
+                                   
+                            <button id="prev-month" class="btn btn-primary">
+                                <</button>
+            
+                                    <button id="next-month" class="btn btn-primary">></button>
                         </div>
                     </div>
-                    <table id="calendar-table">
+                    <table id="calendar-table" class="table table-bordered">
                         <thead>
                             <tr>
                                 <th>Lu</th>
@@ -144,261 +109,276 @@ if ($stmt->rowCount() > 0) {
                             </tr>
                         </thead>
                         <tbody id="calendar-body">
-                            <!-- Las fechas serán generadas aquí por JavaScript -->
+
                         </tbody>
                     </table>
                     <br>
-                    <h2 id="calendar-title" style="font-size: 15px;"><b>Verde : Aceptada , Amarilla:Pendiente  , Rojo: Rechazada</b></h2>
-              
+                    <h2 id="calendar-title" style="font-size: 15px;"><b>Verde :🟩 Aceptada , Amarilla:🟨 Pendiente , Rojo:🟥 Rechazada</b></h2>
                 </div>
             </div>
 
             <aside class="sidebar">
                 <h2>Reservadas</h2>
                 <div class="search-bar">
-                    <input type="search" id="searchInput" placeholder="Buscar ..." />
-                    <ion-icon name="search-outline"></ion-icon>
+                    <input type="search" id="searchInput" placeholder="Buscar ..." class="form-control" />
                 </div>
                 <div class="appointment-list" id="appointmentList">
-                    <?php foreach ($solicitudes as $solicitud): ?>
-                        <div class="appointment"
-                            data-fecha-inicio="<?= date('d/m/Y', strtotime($solicitud['fechainicio'])) ?>"
-                            data-fecha-final="<?= date('d/m/Y', strtotime($solicitud['fechafinal'])) ?>"
-                            data-hora-inicio="<?= date('h:i A', strtotime($solicitud['Hora_inicio'])) ?>"
-                            data-hora-final="<?= date('h:i A', strtotime($solicitud['Hora_final'])) ?>"
-                            data-apartamento="<?= $solicitud['ID_Apartamentooss'] ?>"
-                            data-estado="<?= $solicitud['estado'] ?>">
-                            <h3><b>ZONA BBQ</b></h3>
-                            <p><strong>fecha Inicio:</strong> <?= date('d/m/Y', strtotime($solicitud['fechainicio'])) ?></p>
-                            <p><strong>fecha Final:</strong> <?= date('d/m/Y', strtotime($solicitud['fechafinal'])) ?></p>
-                            <p><strong>Hora_inicio:</strong> <?= date('h:i A', strtotime($solicitud['Hora_inicio'])) ?></p>
-                            <p><strong>Hora_final:</strong> <?= date('h:i A', strtotime($solicitud['Hora_final'])) ?></p>
-                            <p><strong>Apartamento:</strong> <?= $solicitud['ID_Apartamentooss'] ?></p>
-                            <p><strong>SOLICITUD FUE:</strong>
-                                <span class="badge 
-                                    <?php
-                                    switch (strtolower($solicitud['estado'])) {
-                                        case 'aprobado':
-                                            echo 'bg-success';
-                                            break;
-                                        case 'pendiente':
-                                            echo 'bg-warning';
-                                            break;
-                                        case 'rechazado':
-                                            echo 'bg-danger';
-                                            break;
-                                        default:
-                                            echo 'bg-secondary';
-                                    }
-                                    ?>">
-                                    <?= $solicitud['estado'] ?>
-                                </span>
-                            </p>
-                            <br>
 
-                            <div class="btn-group" role="group" aria-label="Basic mixed styles example">
-                                <!-- Formulario para aceptar la solicitud -->
-                                <form action="../../CONTROLLER/aczona.php" method="POST">
-                                    <input type="hidden" name="id_solicitud" value="<?= $solicitud['ID_Apartamentooss'] ?>"> <!-- o ID_zonaComun -->
-                                    <input type="hidden" name="accion" value="aceptar">
-                                    <input type="hidden" name="zona" value="2"> 
-                                    <button type="submit" class="btn btn-success"><b>Aceptar</b></button>
-                                </form>
-
-                                <!-- Formulario para dejar la solicitud como pendiente -->
-                                <form action="../../CONTROLLER/aczona.php" method="POST">
-                                    <input type="hidden" name="id_solicitud" value="<?= $solicitud['ID_Apartamentooss'] ?>"> <!-- o ID_zonaComun -->
-                                    <input type="hidden" name="accion" value="pendiente">
-                                    <input type="hidden" name="zona" value="2"> 
-                                    <button type="submit" class="btn btn-warning"><b>Pendiente</b></button>
-                                </form>
-
-                                <!-- Formulario para eliminar la solicitud -->
-                                <form action="../../CONTROLLER/aczona.php" method="POST">
-                                    <input type="hidden" name="id_solicitud" value="<?= $solicitud['ID_Apartamentooss'] ?>"> <!-- o ID_zonaComun -->
-                                    <input type="hidden" name="accion" value="eliminar">
-                                    <input type="hidden" name="zona" value="2"> 
-                                    <button type="submit" class="btn btn-danger"><b>Eliminar</b></button>
-                                </form>
-
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
                 </div>
             </aside>
-
         </div>
-
 
         <a href="zonas_comunes.php" class="btn btn-success" style="font-size: 30px;">
             <center>Volver</center>
         </a>
-
-        <div id="chatContainer" class="chat-container">
-            <div class="chat-header">
-                <span id="chatHeader">Chat</span>
-                <button class="close-btn" onclick="closeChat()">×</button>
-            </div>
-            <div class="chat-messages" id="chatMessages">
-            </div>
-            <div class="chat-input">
-                <input type="text" id="chatInput" placeholder="Escribe tu mensaje...">
-                <button onclick="sendMessage()">Enviar</button>
-            </div>
-        </div>
-
     </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        // Convertir los datos de PHP a JavaScript
-        const solicitudes = <?php echo json_encode($solicitudes); ?>;
-    </script>
-    <script>
-        function cambiarEstado(estado, idSolicitud) {
-            fetch('cambiarEstado.php', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        estado: estado,
-                        idSolicitud: idSolicitud
-                    }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                }).then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Estado cambiado con éxito');
-                        location.reload(); // Recargar la página para mostrar los cambios
-                    } else {
-                        alert('Error al cambiar el estado');
-                    }
-                });
-        }
 
-        function eliminarSolicitud(idSolicitud) {
-            if (confirm('¿Estás seguro de que deseas eliminar esta solicitud?')) {
-                fetch('eliminarSolicitud.php', {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            idSolicitud: idSolicitud
-                        }),
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    }).then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Solicitud eliminada con éxito');
-                            location.reload();
-                        } else {
-                            alert('Error al eliminar la solicitud');
-                        }
-                    });
-            }
-        }
-    </script>
-    <script>
-          document.addEventListener('DOMContentLoaded', function() {
-            const calendarBody = document.getElementById('calendar-body');
-            const monthYearDisplay = document.getElementById('month-year');
-            const today = new Date();
-            const months = [
-                'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-            ];
-            let currentYear = today.getFullYear();
-            let currentMonth = today.getMonth();
+        let solicitudes = [];
+        const ZONA_ID = 2; // ID de la zona BBQ
 
-            // Función para generar el calendario del mes y año dados
-            function generarCalendario(mes, anio) {
-                calendarBody.innerHTML = '';
-                monthYearDisplay.textContent = `${months[mes]} ${anio}`;
-                const firstDayOfMonth = new Date(anio, mes, 1).getDay() || 7;
-                const daysInMonth = new Date(anio, mes + 1, 0).getDate();
-                let date = 1;
+  
+        async function loadSolicitudes() {
+            try {
+                const response = await fetch(`http://192.168.1.100:3001/api/solicitudes-zonas?zona=${ZONA_ID}`);
 
-                // Crear un mapa de fechas con sus estados para mejor performance
-                const fechasConEstado = {};
-                solicitudes.forEach(solicitud => {
-                    const fecha = new Date(solicitud.fechainicio).toISOString().split('T')[0];
-                    fechasConEstado[fecha] = solicitud.estado.toUpperCase(); // Aseguramos mayúsculas
-                });
-
-                for (let i = 0; i < 6; i++) {
-                    const row = document.createElement('tr');
-
-                    for (let j = 1; j <= 7; j++) {
-                        const cell = document.createElement('td');
-
-                        if (i === 0 && j < firstDayOfMonth) {
-                            cell.innerHTML = '';
-                        } else if (date > daysInMonth) {
-                            break;
-                        } else {
-                            const fechaActual = new Date(anio, mes, date);
-                            const fechaActualStr = fechaActual.toISOString().split('T')[0];
-
-                            cell.textContent = date;
-                            cell.setAttribute('data-date', fechaActualStr);
-
-                            // Verificar si la fecha tiene una solicitud
-                            if (fechasConEstado[fechaActualStr]) {
-                                const estado = fechasConEstado[fechaActualStr];
-
-                                // Aplicar clases según el estado
-                                if (estado === 'ACEPTADA') {
-                                    cell.classList.add('estado-aceptada');
-                                } else if (estado === 'PENDIENTE') {
-                                    cell.classList.add('estado-pendiente');
-                                } else if (estado === 'RECHAZADA' || estado === 'RECHAZADO') {
-                                    cell.classList.add('estado-rechazada');
-                                }
-
-                                // Tooltip con información
-                                cell.setAttribute('title', `Estado: ${estado}`);
-                            }
-
-                            // Resaltar fines de semana
-                            if (j === 6 || j === 7) {
-                                cell.classList.add('fin-de-semana');
-                            }
-
-                            date++;
-                        }
-                        row.appendChild(cell);
-                    }
-                    calendarBody.appendChild(row);
+                if (!response.ok) {
+                    throw new Error('Error al cargar las solicitudes');
                 }
-            }
 
-            function prevMonth() {
-                currentMonth = (currentMonth - 1 + 12) % 12;
-                if (currentMonth === 11) currentYear--;
+                solicitudes = await response.json();
+                displaySolicitudes();
                 generarCalendario(currentMonth, currentYear);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('appointmentList').innerHTML = `
+                    <div class="alert alert-danger">
+                        Error al cargar las solicitudes: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+    
+        function displaySolicitudes() {
+            const container = document.getElementById('appointmentList');
+            container.innerHTML = '';
+
+            if (solicitudes.length === 0) {
+                container.innerHTML = '<p>No hay solicitudes para esta zona</p>';
+                return;
             }
 
-            function nextMonth() {
-                currentMonth = (currentMonth + 1) % 12;
-                if (currentMonth === 0) currentYear++;
-                generarCalendario(currentMonth, currentYear);
-            }
+            solicitudes.forEach(solicitud => {
+                const fechaInicio = formatDate(solicitud.fechainicio);
+                const fechaFinal = formatDate(solicitud.fechafinal);
+                const horaInicio = formatTime(solicitud.Hora_inicio);
+                const horaFinal = formatTime(solicitud.Hora_final);
+                const estado = solicitud.estado.toUpperCase();
 
-            // Inicializar calendario
+                const estadoClass = {
+                    'ACEPTADA': 'bg-success',
+                    'PENDIENTE': 'bg-warning',
+                    'RECHAZADA': 'bg-danger'
+                } [estado] || 'bg-secondary';
+
+                const appointmentDiv = document.createElement('div');
+                appointmentDiv.className = 'appointment mb-3 p-3 border rounded';
+                appointmentDiv.setAttribute('data-fecha-inicio', fechaInicio);
+                appointmentDiv.setAttribute('data-fecha-final', fechaFinal);
+                appointmentDiv.setAttribute('data-hora-inicio', horaInicio);
+                appointmentDiv.setAttribute('data-hora-final', horaFinal);
+                appointmentDiv.setAttribute('data-apartamento', solicitud.ID_Apartamentooss);
+                appointmentDiv.setAttribute('data-estado', estado);
+
+
+                appointmentDiv.innerHTML = `
+    <h3><b>ZONA BBQ</b></h3>
+    <p><strong>Fecha Inicio:</strong> ${fechaInicio}</p>
+    <p><strong>Fecha Final:</strong> ${fechaFinal}</p>
+    <p><strong>Hora inicio:</strong> ${horaInicio}</p>
+    <p><strong>Hora final:</strong> ${horaFinal}</p>
+    <p><strong>Apartamento:</strong> ${solicitud.ID_Apartamentooss}</p>
+    <p><strong>SOLICITUD FUE:</strong>
+        <span class="badge ${estadoClass}">${estado}</span>
+    </p>
+    <br>
+    <div class="btn-group" role="group">
+        <button class="btn btn-success" onclick="cambiarEstado('ACEPTADA', '${solicitud.ID_Apartamentooss}')">
+            <b>ACEPTADA</b>
+        </button>
+        <button class="btn btn-warning" onclick="cambiarEstado('PENDIENTE', '${solicitud.ID_Apartamentooss}')">
+            <b>PENDIENTE</b>
+        </button>
+        <button class="btn btn-danger" onclick="cambiarEstado('RECHAZADA', '${solicitud.ID_Apartamentooss}')">
+            <b>RECHAZADA</b>
+        </button>
+    </div>
+`;
+
+                container.appendChild(appointmentDiv);
+            });
+        }
+
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES');
+        }
+
+        function formatTime(timeString) {
+            const time = new Date(`1970-01-01T${timeString}`);
+            return time.toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        async function cambiarEstado(accion, ID_Apartamentooss) {
+            try {
+
+                if (!ID_Apartamentooss) {
+                    throw new Error('ID de apartamento no proporcionado');
+                }
+
+                let nuevoEstado;
+                switch (accion) {
+                    case 'ACEPTADA':
+                        nuevoEstado = 'ACEPTADA';
+                        break;
+                    case 'PENDIENTE':
+                        nuevoEstado = 'PENDIENTE';
+                        break;
+                    case 'RECHAZADA':
+                        nuevoEstado = 'RECHAZADA';
+                        break;
+                    default:
+                        throw new Error('Acción no válida');
+                }
+
+                console.log(`Cambiando estado de solicitud ${ID_Apartamentooss} a ${nuevoEstado}`);
+
+                const response = await fetch(`http://192.168.1.100:3001/api/solicitudes-zonas/${ID_Apartamentooss}/actualizar-estado`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        estado: nuevoEstado
+                    })
+                });
+
+    
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Error al cambiar el estado');
+                }
+
+                if (!result.success) {
+                    throw new Error('No se pudo actualizar el estado');
+                }
+
+                alert('Estado cambiado con éxito');
+                loadSolicitudes();
+            } catch (error) {
+                console.error('Error en cambiarEstado:', error);
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+
+        const calendarBody = document.getElementById('calendar-body');
+        const monthYearDisplay = document.getElementById('month-year');
+        const today = new Date();
+        const months = [
+            'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+            'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+        ];
+        let currentYear = today.getFullYear();
+        let currentMonth = today.getMonth();
+
+        function generarCalendario(mes, anio) {
+            calendarBody.innerHTML = '';
+            monthYearDisplay.textContent = `${months[mes]} ${anio}`;
+            const firstDayOfMonth = new Date(anio, mes, 1).getDay() || 7;
+            const daysInMonth = new Date(anio, mes + 1, 0).getDate();
+            let date = 1;
+
+
+            const fechasConEstado = {};
+            solicitudes.forEach(solicitud => {
+                const fecha = new Date(solicitud.fechainicio).toISOString().split('T')[0];
+                fechasConEstado[fecha] = solicitud.estado.toUpperCase();
+            });
+
+            for (let i = 0; i < 6; i++) {
+                const row = document.createElement('tr');
+
+                for (let j = 1; j <= 7; j++) {
+                    const cell = document.createElement('td');
+                    cell.className = 'text-center p-2';
+
+                    if (i === 0 && j < firstDayOfMonth) {
+                        cell.innerHTML = '';
+                    } else if (date > daysInMonth) {
+                        break;
+                    } else {
+                        const fechaActual = new Date(anio, mes, date);
+                        const fechaActualStr = fechaActual.toISOString().split('T')[0];
+
+                        cell.textContent = date;
+                        cell.setAttribute('data-date', fechaActualStr);
+
+
+                        if (fechasConEstado[fechaActualStr]) {
+                            const estado = fechasConEstado[fechaActualStr];
+                            if (estado === 'ACEPTADA') {
+                                cell.classList.add('estado-aceptada');
+                            } else if (estado === 'PENDIENTE') {
+                                cell.classList.add('estado-pendiente');
+                            } else if (estado === 'RECHAZADA') {
+                                cell.classList.add('estado-rechazada');
+                            }
+                            cell.setAttribute('title', `Estado: ${estado}`);
+                        }
+
+
+                        if (j === 6 || j === 7) {
+                            cell.classList.add('fin-de-semana');
+                        }
+
+                        date++;
+                    }
+                    row.appendChild(cell);
+                }
+                calendarBody.appendChild(row);
+            }
+        }
+
+        function prevMonth() {
+            currentMonth = (currentMonth - 1 + 12) % 12;
+            if (currentMonth === 11) currentYear--;
             generarCalendario(currentMonth, currentYear);
+        }
 
-            // Event listeners
-            document.getElementById('prev-month').addEventListener('click', prevMonth);
-            document.getElementById('next-month').addEventListener('click', nextMonth);
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        function nextMonth() {
+            currentMonth = (currentMonth + 1) % 12;
+            if (currentMonth === 0) currentYear++;
+            generarCalendario(currentMonth, currentYear);
+        }
+
+
+        function setupSearch() {
             const searchInput = document.getElementById('searchInput');
-            const appointmentList = document.getElementById('appointmentList');
-            const appointments = appointmentList.getElementsByClassName('appointment');
+            searchInput.addEventListener('input', function() {
+                const searchText = this.value.toLowerCase();
+                const appointments = document.querySelectorAll('.appointment');
 
-            // Función para filtrar 
-            function filterAppointments(searchText) {
-                Array.from(appointments).forEach(function(appointment) {
+                appointments.forEach(appointment => {
                     const fechaInicio = appointment.getAttribute('data-fecha-inicio').toLowerCase();
                     const fechaFinal = appointment.getAttribute('data-fecha-final').toLowerCase();
                     const horaInicio = appointment.getAttribute('data-hora-inicio').toLowerCase();
@@ -406,28 +386,31 @@ if ($stmt->rowCount() > 0) {
                     const apartamento = appointment.getAttribute('data-apartamento').toLowerCase();
                     const estado = appointment.getAttribute('data-estado').toLowerCase();
 
-                    if (
-                        fechaInicio.includes(searchText) ||
-                        fechaFinal.includes(searchText) ||
-                        horaInicio.includes(searchText) ||
-                        horaFinal.includes(searchText) ||
-                        apartamento.includes(searchText) ||
-                        estado.includes(searchText)
-                    ) {
-                        appointment.style.display = 'block'; // Muestra
+                    if ([fechaInicio, fechaFinal, horaInicio, horaFinal, apartamento, estado].some(
+                            text => text.includes(searchText)
+                        )) {
+                        appointment.style.display = 'block';
                     } else {
-                        appointment.style.display = 'none'; // Oculta 
+                        appointment.style.display = 'none';
                     }
                 });
-            }
-
-            searchInput.addEventListener('input', function() {
-                const searchText = searchInput.value.toLowerCase();
-                filterAppointments(searchText);
             });
+        }
 
 
-            filterAppointments('');
+        document.addEventListener('DOMContentLoaded', function() {
+
+            document.getElementById('prev-month').addEventListener('click', prevMonth);
+            document.getElementById('next-month').addEventListener('click', nextMonth);
+
+
+            setupSearch();
+
+
+            loadSolicitudes();
+
+
+            generarCalendario(currentMonth, currentYear);
         });
     </script>
     <script>
@@ -469,7 +452,7 @@ if ($stmt->rowCount() > 0) {
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
 </body>
 
 </html>

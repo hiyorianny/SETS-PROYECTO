@@ -80,7 +80,6 @@ app.use('/api/solicitudes-zonas', solicitudZonaRoutes);
 app.use('/api/solicitudes-parqueadero', solicitudParqueaderoRoutes);
 
 
-
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ error: 'Algo salió mal en el servidor' });
