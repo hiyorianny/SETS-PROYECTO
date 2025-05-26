@@ -11,13 +11,15 @@ function getApiData($endpoint) {
     return json_decode($response, true);
 }
 
-
+// Obtener datos para los gráficos
 $anunciosData = getApiData('/api/anuncios');
 $zonasComunesData = getApiData('/api/zonas-comunes');
 $solicitudesZonasData = getApiData('/api/solicitudes-zonas');
 $parqueaderosData = getApiData('/api/solicitudes-parqueadero');
 $estadoParqueaderosData = getApiData('/api/solicitudes-parqueadero/estado');
 $ingresosData = getApiData('/api/ingresos');
+$citasData = getApiData('/api/citas');
+$pagosData = getApiData('/api/pagos');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -49,7 +51,6 @@ $ingresosData = getApiData('/api/ingresos');
             border-radius: 10px;
             padding: 15px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-           
         }
         h1 {
             text-align: center;
@@ -81,7 +82,6 @@ $ingresosData = getApiData('/api/ingresos');
                 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
                     <div class="offcanvas-header">
                         <img src="img/C.png" alt="Logo" width="90" height="94" class="d-inline-block align-text-top">
-
                         <center>
                             <h5 class="offcanvas-title" id="offcanvasNavbarLabel" style="text-align: center;">SETS</h5>
                         </center>
@@ -95,18 +95,16 @@ $ingresosData = getApiData('/api/ingresos');
                                     <a href="./inicioprincipal.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Inicio</b></a>
                                 </center>
                             </div>
-                               <center>
+                            <center>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <img src="img/usuario.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
-
                                         <b style="font-size: 20px;"> Perfil</b>
                                     </a>
                                     <ul class="dropdown-menu" role="menu">
                                         <li>
                                             <center><a href="Perfil.php"><b>Perfil</b></a></center>
                                         </li>
-
                                         <li>
                                             <center> <a href="../../Backend/auth/logout.php"><b>Cerrar Sesión</b></a></center>
                                         </li>
@@ -114,311 +112,455 @@ $ingresosData = getApiData('/api/ingresos');
                             </center>
                             </li>
                             <br>
-                  
-                            
                             <div class="offcanvas-header">
                                 <img src="img/notificacion.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
-
-
                                 <center>
                                     <a href="notificaciones.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;">Notificaciones</a>
                                 </center>
                             </div>
-                        
+                        </ul>
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
     
- <main class="container" style="margin-top: 100px;">
-    <h1>Reportes e Informes</h1>
-    
-    <div class="chart-row">
-        <div class="chart-box">
-            <h2>Anuncios Publicados (Últimos 6 meses)</h2>
-            <div class="chart-container">
-                <canvas id="anunciosChart"></canvas>
-            </div>
-        </div>
-          <div class="chart-box">
-            <h2>Solicitudes de Parqueaderos</h2>
-            <div class="chart-container">
-                <canvas id="solicitudesParqueaderoChart"></canvas>
-            </div>
-        </div>
-    </div>
-    <center>
-    <div class="chart-row">
-    
+    <main class="container" style="margin-top: 100px;">
+        <h1>Reportes e Informes</h1>
         
-        <div class="chart-box">
-            <h2>Estado Actual de Parqueaderos</h2>
-            <div class="chart-container">
-                <canvas id="estadoParqueaderosChart"></canvas>
+        <div class="chart-row">
+            <div class="chart-box">
+                <h2>Anuncios Publicados (Últimos 6 meses)</h2>
+                <div class="chart-container">
+                    <canvas id="anunciosChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-box">
+                <h2>Solicitudes de Parqueaderos</h2>
+                <div class="chart-container">
+                    <canvas id="solicitudesParqueaderoChart"></canvas>
+                </div>
             </div>
         </div>
-    </div>
-    </center>
-<a href="./inicioprincipal.php" type="button" class="btn btn-success">Volver</a>
-    <script>
-        // Datos desde PHP
-        const rawAnunciosData = <?php echo json_encode($anunciosData); ?>;
-        const rawZonasComunesData = <?php echo json_encode($zonasComunesData); ?>;
-        const rawSolicitudesZonasData = <?php echo json_encode($solicitudesZonasData); ?>;
-        const rawParqueaderosData = <?php echo json_encode($parqueaderosData); ?>;
-        const rawEstadoParqueaderosData = <?php echo json_encode($estadoParqueaderosData); ?>;
-        const rawIngresosData = <?php echo json_encode($ingresosData); ?>;
+        
+        <div class="chart-row">
+            <div class="chart-box">
+                <h2>Estado Actual de Parqueaderos</h2>
+                <div class="chart-container">
+                    <canvas id="estadoParqueaderosChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-box">
+                <h2>Estados de Citas</h2>
+                <div class="chart-container">
+                    <canvas id="citasChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-row">
+            <div class="chart-box">
+                <h2>Estados de Pagos</h2>
+                <div class="chart-container">
+                    <canvas id="pagosChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-box">
+                <h2>Métodos de Pago</h2>
+                <div class="chart-container">
+                    <canvas id="metodosPagoChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <center>
+            <a href="./inicioprincipal.php" type="button" class="btn btn-success">Volver</a>
+        </center>
 
-        console.log('Datos de anuncios:', rawAnunciosData);
-        console.log('Datos de zonas comunes:', rawZonasComunesData);
-        console.log('Datos de solicitudes de zonas:', rawSolicitudesZonasData);
-        console.log('Datos de parqueaderos:', rawParqueaderosData);
-        console.log('Estado de parqueaderos:', rawEstadoParqueaderosData);
+        <script>
+            // Datos desde PHP
+            const rawAnunciosData = <?php echo json_encode($anunciosData); ?>;
+            const rawZonasComunesData = <?php echo json_encode($zonasComunesData); ?>;
+            const rawSolicitudesZonasData = <?php echo json_encode($solicitudesZonasData); ?>;
+            const rawParqueaderosData = <?php echo json_encode($parqueaderosData); ?>;
+            const rawEstadoParqueaderosData = <?php echo json_encode($estadoParqueaderosData); ?>;
+            const rawIngresosData = <?php echo json_encode($ingresosData); ?>;
+            const rawCitasData = <?php echo json_encode($citasData); ?>;
+            const rawPagosData = <?php echo json_encode($pagosData); ?>;
 
-        // Procesamiento de datos para Anuncios
-        function processAnunciosData(data) {
-            if (!data || data.length === 0) {
-                return {
-                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
-                    data: [0, 0, 0, 0, 0, 0]
-                };
-            }
+            console.log('Datos de pagos:', rawPagosData);
 
-            const last6Months = Array(6).fill(0);
-            const monthNames = [];
-            
-            const currentDate = new Date();
-            for (let i = 5; i >= 0; i--) {
-                const date = new Date();
-                date.setMonth(currentDate.getMonth() - i);
-                const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-                monthNames.push(new Intl.DateTimeFormat('es-ES', { month: 'short' }).format(date));
+            // Procesamiento de datos para Anuncios
+            function processAnunciosData(data) {
+                if (!data || data.length === 0) {
+                    return {
+                        labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+                        data: [0, 0, 0, 0, 0, 0]
+                    };
+                }
+
+                const last6Months = Array(6).fill(0);
+                const monthNames = [];
                 
-                data.forEach(anuncio => {
-                    if (anuncio.fechaPublicacion) {
-                        const anuncioDate = new Date(anuncio.fechaPublicacion);
-                        const anuncioMonth = `${anuncioDate.getFullYear()}-${String(anuncioDate.getMonth() + 1).padStart(2, '0')}`;
-                        if (anuncioMonth === monthKey) {
-                            last6Months[5 - i]++;
+                const currentDate = new Date();
+                for (let i = 5; i >= 0; i--) {
+                    const date = new Date();
+                    date.setMonth(currentDate.getMonth() - i);
+                    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                    monthNames.push(new Intl.DateTimeFormat('es-ES', { month: 'short' }).format(date));
+                    
+                    data.forEach(anuncio => {
+                        if (anuncio.fechaPublicacion) {
+                            const anuncioDate = new Date(anuncio.fechaPublicacion);
+                            const anuncioMonth = `${anuncioDate.getFullYear()}-${String(anuncioDate.getMonth() + 1).padStart(2, '0')}`;
+                            if (anuncioMonth === monthKey) {
+                                last6Months[5 - i]++;
+                            }
                         }
-                    }
-                });
-            }
-            
-            return {
-                labels: monthNames.map(name => name.charAt(0).toUpperCase() + name.slice(1)),
-                data: last6Months
-            };
-        }
-
-        // Procesamiento de datos para Solicitudes por Zona
-       function processSolicitudesPorZona(zonasComunes, solicitudes) {
-    // Verificar que tenemos datos
-    if (!zonasComunes || zonasComunes.length === 0) {
-        console.error('No hay datos de zonas comunes');
-        return {
-            labels: ['Sin datos de zonas'],
-            data: [0],
-            colors: ['rgba(200, 200, 200, 0.7)']
-        };
-    }
-
-    if (!solicitudes || solicitudes.length === 0) {
-        console.error('No hay datos de solicitudes');
-        return {
-            labels: zonasComunes.map(z => z.descripcion),
-            data: zonasComunes.map(() => 0),
-            colors: zonasComunes.map((_, i) => 
-                `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.7)`
-            )
-        };
-    }
-
-    // Contar solicitudes por zona
-    const solicitudesPorZona = {};
-    solicitudes.forEach(solicitud => {
-        const zonaId = solicitud.ID_zonaComun;
-        solicitudesPorZona[zonaId] = (solicitudesPorZona[zonaId] || 0) + 1;
-    });
-
-    // Preparar datos para el gráfico
-    const labels = [];
-    const data = [];
-    const colors = [];
-    
-    zonasComunes.forEach(zona => {
-        labels.push(zona.descripcion);
-        data.push(solicitudesPorZona[zona.idZona] || 0);
-        colors.push(getColorForZona(zona.idZona));
-    });
-
-    console.log('Datos procesados para gráfico:', { labels, data, colors });
-    
-    return {
-        labels: labels,
-        data: data,
-        colors: colors
-    };
-}
-
-// Función auxiliar para generar colores consistentes
-function getColorForZona(zonaId) {
-    const colores = [
-        'rgba(255, 99, 132, 0.7)',
-        'rgba(54, 162, 235, 0.7)',
-        'rgba(255, 206, 86, 0.7)',
-        'rgba(75, 192, 192, 0.7)',
-        'rgba(153, 102, 255, 0.7)'
-    ];
-    return colores[zonaId % colores.length];
-}
-
-        // Procesamiento de datos para Solicitudes de Parqueaderos
-        function processSolicitudesParqueaderoData(data) {
-            if (!data || data.length === 0) {
+                    });
+                }
+                
                 return {
-                    labels: ['Pendientes', 'Aprobadas', 'Rechazadas'],
-                    data: [0, 0, 0],
-                    colors: [
-                        'rgba(255, 206, 86, 0.7)',
-                        'rgba(75, 192, 192, 0.7)',
-                        'rgba(255, 99, 132, 0.7)'
-                    ]
+                    labels: monthNames.map(name => name.charAt(0).toUpperCase() + name.slice(1)),
+                    data: last6Months
                 };
             }
 
-            const estados = {
-                pendiente: { count: 0, color: 'rgb(255, 186, 11)' },
-                aprobado: { count: 0, color: 'rgba(15, 77, 23, 0.7)' },
-                rechazado: { count: 0, color: 'rgb(102, 8, 8)' }
-            };
-            
-            data.forEach(item => {
-                if (item.estado && estados[item.estado.toLowerCase()]) {
-                    estados[item.estado.toLowerCase()].count++;
+            // Procesamiento de datos para Solicitudes de Parqueaderos
+            function processSolicitudesParqueaderoData(data) {
+                if (!data || data.length === 0) {
+                    return {
+                        labels: ['Pendientes', 'Aprobadas', 'Rechazadas'],
+                        data: [0, 0, 0],
+                        colors: [
+                            'rgba(255, 186, 11, 0.7)',
+                            'rgba(15, 77, 23, 0.7)',
+                            'rgba(102, 8, 8, 0.7)'
+                        ]
+                    };
                 }
-            });
-            
-            return {
-                labels: Object.keys(estados).map(e => e.charAt(0).toUpperCase() + e.slice(1)),
-                data: Object.values(estados).map(e => e.count),
-                colors: Object.values(estados).map(e => e.color)
-            };
-        }
 
-        // Procesamiento de datos para Estado de Parqueaderos
-        function processEstadoParqueaderosData(data) {
-            if (!data || data.length === 0) {
+                const estados = {
+                    pendiente: { count: 0, color: 'rgba(255, 186, 11, 0.7)' },
+                    aprobado: { count: 0, color: 'rgba(15, 77, 23, 0.7)' },
+                    rechazado: { count: 0, color: 'rgba(102, 8, 8, 0.7)' }
+                };
+                
+                data.forEach(item => {
+                    if (item.estado && estados[item.estado.toLowerCase()]) {
+                        estados[item.estado.toLowerCase()].count++;
+                    }
+                });
+                
                 return {
-                    labels: ['Disponibles', 'Ocupados', 'Reservados'],
-                    data: [0, 0, 0],
-                    colors: [
-                        'rgba(13, 37, 15, 0.7)',
-                        'rgba(255, 99, 132, 0.7)',
-                        'rgba(255, 206, 86, 0.7)'
-                    ]
+                    labels: Object.keys(estados).map(e => e.charAt(0).toUpperCase() + e.slice(1)),
+                    data: Object.values(estados).map(e => e.count),
+                    colors: Object.values(estados).map(e => e.color)
                 };
             }
 
-            const estados = {
-                disponible: { count: 0, color: 'rgba(13, 39, 20, 0.7)' },
-                ocupado: { count: 0, color: 'rgba(255, 99, 132, 0.7)' },
-                reservado: { count: 0, color: 'rgba(255, 206, 86, 0.7)' }
-            };
-            
-            data.forEach(item => {
-                if (item.estado && estados[item.estado.toLowerCase()]) {
-                    estados[item.estado.toLowerCase()].count++;
+            // Procesamiento de datos para Estado de Parqueaderos
+            function processEstadoParqueaderosData(data) {
+                if (!data || data.length === 0) {
+                    return {
+                        labels: ['Disponibles', 'Ocupados', 'Reservados'],
+                        data: [0, 0, 0],
+                        colors: [
+                            'rgba(13, 37, 15, 0.7)',
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(255, 206, 86, 0.7)'
+                        ]
+                    };
+                }
+
+                const estados = {
+                    disponible: { count: 0, color: 'rgba(13, 39, 20, 0.7)' },
+                    ocupado: { count: 0, color: 'rgba(255, 99, 132, 0.7)' },
+                    reservado: { count: 0, color: 'rgba(255, 206, 86, 0.7)' }
+                };
+                
+                data.forEach(item => {
+                    if (item.estado && estados[item.estado.toLowerCase()]) {
+                        estados[item.estado.toLowerCase()].count++;
+                    }
+                });
+                
+                return {
+                    labels: Object.keys(estados).map(e => e.charAt(0).toUpperCase() + e.slice(1)),
+                    data: Object.values(estados).map(e => e.count),
+                    colors: Object.values(estados).map(e => e.color)
+                };
+            }
+
+            // Procesamiento de datos para Citas
+            function processCitasData(data) {
+                if (!data || data.length === 0) {
+                    return {
+                        labels: ['Pendientes', 'Respondidas'],
+                        data: [0, 0],
+                        colors: [
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)'
+                        ]
+                    };
+                }
+
+                const estados = {
+                    pendiente: { count: 0, color: 'rgba(255, 206, 86, 0.7)' },
+                    respondida: { count: 0, color: 'rgba(75, 192, 192, 0.7)' }
+                };
+                
+                data.forEach(item => {
+                    if (item.estado && estados[item.estado.toLowerCase()]) {
+                        estados[item.estado.toLowerCase()].count++;
+                    }
+                });
+                
+                return {
+                    labels: Object.keys(estados).map(e => e.charAt(0).toUpperCase() + e.slice(1)),
+                    data: Object.values(estados).map(e => e.count),
+                    colors: Object.values(estados).map(e => e.color)
+                };
+            }
+
+            // Procesamiento de datos para Pagos
+            function processPagosData(data) {
+                if (!data || data.length === 0) {
+                    return {
+                        labels: ['Pendientes', 'Pagados', 'Vencidos'],
+                        data: [0, 0, 0],
+                        colors: [
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(255, 99, 132, 0.7)'
+                        ]
+                    };
+                }
+
+                const estados = {
+                    pendiente: { count: 0, color: 'rgba(255, 206, 86, 0.7)' },
+                    pagado: { count: 0, color: 'rgba(75, 192, 192, 0.7)' },
+                    vencido: { count: 0, color: 'rgba(255, 99, 132, 0.7)' }
+                };
+                
+                data.forEach(item => {
+                    if (item.estado && estados[item.estado.toLowerCase()]) {
+                        estados[item.estado.toLowerCase()].count++;
+                    }
+                });
+                
+                return {
+                    labels: Object.keys(estados).map(e => e.charAt(0).toUpperCase() + e.slice(1)),
+                    data: Object.values(estados).map(e => e.count),
+                    colors: Object.values(estados).map(e => e.color)
+                };
+            }
+
+            // Procesamiento de datos para Métodos de Pago
+            function processMetodosPagoData(data) {
+                if (!data || data.length === 0) {
+                    return {
+                        labels: ['Efectivo', 'Transferencia', 'Tarjeta'],
+                        data: [0, 0, 0],
+                        colors: [
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(255, 206, 86, 0.7)'
+                        ]
+                    };
+                }
+
+                const metodos = {
+                    efectivo: { count: 0, color: 'rgba(54, 162, 235, 0.7)' },
+                    transferencia: { count: 0, color: 'rgba(255, 99, 132, 0.7)' },
+                    tarjeta: { count: 0, color: 'rgba(255, 206, 86, 0.7)' }
+                };
+                
+                data.forEach(item => {
+                    if (item.mediopago) {
+                        const metodo = item.mediopago.toLowerCase();
+                        if (metodos[metodo]) {
+                            metodos[metodo].count++;
+                        }
+                    }
+                });
+                
+                return {
+                    labels: Object.keys(metodos).map(e => e.charAt(0).toUpperCase() + e.slice(1)),
+                    data: Object.values(metodos).map(e => e.count),
+                    colors: Object.values(metodos).map(e => e.color)
+                };
+            }
+
+            // Crear gráficos
+            document.addEventListener('DOMContentLoaded', function() {
+                try {
+                    // 1. Gráfico de Anuncios
+                    const anunciosProcessed = processAnunciosData(rawAnunciosData);
+                    new Chart(document.getElementById('anunciosChart'), {
+                        type: 'bar',
+                        data: {
+                            labels: anunciosProcessed.labels,
+                            datasets: [{
+                                label: 'Anuncios',
+                                data: anunciosProcessed.data,
+                                backgroundColor: 'rgba(54, 235, 54, 0.7)',
+                                borderColor: 'rgb(12, 34, 20)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    // 2. Gráfico de Solicitudes de Parqueaderos
+                    const parqueaderosProcessed = processSolicitudesParqueaderoData(rawParqueaderosData);
+                    new Chart(document.getElementById('solicitudesParqueaderoChart'), {
+                        type: 'pie',
+                        data: {
+                            labels: parqueaderosProcessed.labels,
+                            datasets: [{
+                                data: parqueaderosProcessed.data,
+                                backgroundColor: parqueaderosProcessed.colors,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    });
+
+                    // 3. Gráfico de Estado de Parqueaderos
+                    const estadoProcessed = processEstadoParqueaderosData(rawEstadoParqueaderosData);
+                    new Chart(document.getElementById('estadoParqueaderosChart'), {
+                        type: 'bar',
+                        data: {
+                            labels: estadoProcessed.labels,
+                            datasets: [{
+                                label: 'Parqueaderos',
+                                data: estadoProcessed.data,
+                                backgroundColor: estadoProcessed.colors,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    // 4. Gráfico de Citas
+                    const citasProcessed = processCitasData(rawCitasData);
+                    new Chart(document.getElementById('citasChart'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: citasProcessed.labels,
+                            datasets: [{
+                                data: citasProcessed.data,
+                                backgroundColor: citasProcessed.colors,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = total > 0 ? Math.round((context.raw / total) * 100) : 0;
+                                            return `${context.label}: ${context.raw} (${percentage}%)`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    // 5. Gráfico de Estados de Pagos
+                    const pagosProcessed = processPagosData(rawPagosData);
+                    new Chart(document.getElementById('pagosChart'), {
+                        type: 'pie',
+                        data: {
+                            labels: pagosProcessed.labels,
+                            datasets: [{
+                                data: pagosProcessed.data,
+                                backgroundColor: pagosProcessed.colors,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = total > 0 ? Math.round((context.raw / total) * 100) : 0;
+                                            return `${context.label}: ${context.raw} (${percentage}%)`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    // 6. Gráfico de Métodos de Pago
+                    const metodosPagoProcessed = processMetodosPagoData(rawPagosData);
+                    new Chart(document.getElementById('metodosPagoChart'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: metodosPagoProcessed.labels,
+                            datasets: [{
+                                data: metodosPagoProcessed.data,
+                                backgroundColor: metodosPagoProcessed.colors,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = total > 0 ? Math.round((context.raw / total) * 100) : 0;
+                                            return `${context.label}: ${context.raw} (${percentage}%)`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                } catch (error) {
+                    console.error('Error al crear gráficos:', error);
                 }
             });
-            
-            return {
-                labels: Object.keys(estados).map(e => e.charAt(0).toUpperCase() + e.slice(1)),
-                data: Object.values(estados).map(e => e.count),
-                colors: Object.values(estados).map(e => e.color)
-            };
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            try {
-                // 1. Gráfico de Anuncios
-                const anunciosProcessed = processAnunciosData(rawAnunciosData);
-                new Chart(document.getElementById('anunciosChart'), {
-                    type: 'bar',
-                    data: {
-                        labels: anunciosProcessed.labels,
-                        datasets: [{
-                            label: 'Anuncios',
-                            data: anunciosProcessed.data,
-                            backgroundColor: 'rgba(54, 235, 54, 0.7)',
-                            borderColor: 'rgb(12, 34, 20)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1
-                                }
-                            }
-                        }
-                    }
-                });
-
-                const parqueaderosProcessed = processSolicitudesParqueaderoData(rawParqueaderosData);
-                new Chart(document.getElementById('solicitudesParqueaderoChart'), {
-                    type: 'pie',
-                    data: {
-                        labels: parqueaderosProcessed.labels,
-                        datasets: [{
-                            data: parqueaderosProcessed.data,
-                            backgroundColor: parqueaderosProcessed.colors,
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false
-                    }
-                });
-
-                // 4. Gráfico de Estado de Parqueaderos
-                const estadoProcessed = processEstadoParqueaderosData(rawEstadoParqueaderosData);
-                new Chart(document.getElementById('estadoParqueaderosChart'), {
-                    type: 'bar',
-                    data: {
-                        labels: estadoProcessed.labels,
-                        datasets: [{
-                            label: 'Parqueaderos',
-                            data: estadoProcessed.data,
-                            backgroundColor: estadoProcessed.colors,
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1
-                                }
-                            }
-                        }
-                    }
-                });
-
-            } catch (error) {
-                console.error('Error al crear gráficos:', error);
-            }
-        });
-    </script>
-</main>
+        </script>
+    </main>
 
     <footer>
         <div class="footer-content">
