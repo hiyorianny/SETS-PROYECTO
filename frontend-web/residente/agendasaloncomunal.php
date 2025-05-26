@@ -1,25 +1,5 @@
 <?php
-require '../../MODEL/backend/authMiddleware.php';
-session_start();
-header("Access-Control-Allow-Origin: http://localhost:3000");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Credentials: true");
-$decoded = authenticate();
-
-$idRegistro = $decoded->id;
-$Usuario = $decoded->Usuario;
-$idRol = $decoded->idRol;
-
-
-if ($idRol != 3333) {
-    header("Location: http://localhost/sets/error.php");
-    exit();
-}
-
-include_once "conexion.php";
-
-
+require __DIR__ . '/../../Backend/auth/controller/residente.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -27,12 +7,13 @@ include_once "conexion.php";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SETS - Solicitud Zonas </title>
+    <title>SETS - Solicitud Zonas</title>
     <link rel="stylesheet" href="css/agendacomunal.css?v=<?php echo (rand()); ?>">
     <link href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <script src="https://kit.fontawesome.com/a81368914c.js"></script>
     <link rel="shortcut icon" href="img/c.png" type="image/x-icon" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -57,20 +38,26 @@ include_once "conexion.php";
                     </div>
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                            <li class="nav-item">
-                                <center><a class="nav-link active" aria-current="page" href="#" style="font-size: 20px;"><b>Inicio</b></a></center>
-                            </li>
+                            <div class="offcanvas-header">
+                                <img src="img/pagina-de-inicio.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                <center>
+                                    <a href="./inicioprincipal.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Inicio</b></a>
+                                </center>
+                            </div>
                             <center>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <img src="img/usuario.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
+
                                         <b style="font-size: 20px;"> Perfil</b>
                                     </a>
                                     <ul class="dropdown-menu" role="menu">
                                         <li>
-                                            <center><a href="Perfil.php">Editar datos</a></center>
+                                            <center><a href="Perfil.php"><b>Perfil</b></a></center>
                                         </li>
+
                                         <li>
-                                            <center> <a href="../../MODEL/backend/logout.php">Cerrar sesión</a></center>
+                                            <center> <a href="../../Backend/auth/logout.php"><b>Cerrar Sesión</b></a></center>
                                         </li>
                                     </ul>
                             </center>
@@ -82,33 +69,17 @@ include_once "conexion.php";
                                 </center>
                             </div>
 
-                        </ul>
-                        <form class="d-flex mt-3" role="search">
-                            <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-                            <button class="btn btn-outline-success" type="submit">Buscar</button>
-                        </form>
                     </div>
                 </div>
             </div>
         </nav>
     </header>
     <main>
-        <div id="chatContainer" class="chat-container">
-            <div class="chat-header">
-                <span id="chatHeader">Chat</span>
-                <button class="close-btn" onclick="closeChat()">×</button>
-            </div>
-            <div class="chat-messages" id="chatMessages">
-            </div>
-            <div class="chat-input">
-                <input type="text" id="chatInput" placeholder="Escribe tu mensaje...">
-                <button onclick="sendMessage()">Enviar</button>
-            </div>
-        </div>
+
         <br><br><br><br><br><br><br><br><br><br><br><br>
         <section class="container">
             <div class="login-content">
-                <form action="../../CONTROLLER/inzona.php" method="post" enctype="multipart/form-data">
+                <form id="solicitudZonaForm">
                     <img src="img/personas.png" alt="Logo" class="imgp">
                     <h2 class="title"><b>Solicitud Zona<b></h2>
                     <div class="input-div one">
@@ -169,185 +140,104 @@ include_once "conexion.php";
                             <input type="time" class="input" id="Hora_final" name="Hora_final" required>
                         </div>
                     </div>
-                    <input type="submit" class="btn btn-success" value="Enviar" style="color: aliceblue;">
+                    <button type="submit" class="btn btn-success" style="color: aliceblue;">Enviar</button>
                     <a href="zonas_comunes.php" class="btn btn-danger" style="color: aliceblue;"><b> VOLVER</b></a>
                 </form>
             </div>
             <br>
         </section>
     </main>
-    <script type="text/javascript" src="JAVA/main.js"></script>
-    <script>
-        document.querySelector('.admin-img').addEventListener('click', function() {
-            document.querySelector('.dropdown-menu').classList.toggle('show');
-        });
-
-        document.querySelector('.chat-button').addEventListener('click', function() {
-            document.querySelector('.chat-menu').classList.toggle('show');
-        });
-
-        function filterChat() {
-            const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-            const chatItems = document.querySelectorAll('.chat-item');
-            chatItems.forEach(item => {
-                if (item.textContent.toLowerCase().includes(searchInput)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
-    </script>
-    <script>
-        function openChat(chatName) {
-            const chatContainer = document.getElementById('chatContainer');
-            const chatHeader = document.getElementById('chatHeader');
-            chatHeader.textContent = chatName;
-            chatContainer.classList.add('show');
-        }
-
-        function closeChat() {
-            const chatContainer = document.getElementById('chatContainer');
-            chatContainer.classList.remove('show');
-        }
-
-        function sendMessage() {
-            const messageInput = document.getElementById('chatInput');
-            const messageText = messageInput.value.trim();
-            if (messageText) {
-                const chatMessages = document.getElementById('chatMessages');
-                const messageElement = document.createElement('p');
-                messageElement.textContent = messageText;
-                chatMessages.appendChild(messageElement);
-                messageInput.value = '';
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-        }
-
-        function filterChat() {
-            const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-            const chatItems = document.querySelectorAll('.chat-item');
-            chatItems.forEach(item => {
-                if (item.textContent.toLowerCase().includes(searchInput)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('form');
-            const fechaInicioInput = document.getElementById('fechainicio');
-            const fechaFinalInput = document.getElementById('fechafinal');
-            const horaInicioInput = document.getElementById('Hora_inicio');
-            const horaFinalInput = document.getElementById('Hora_final');
-
-            // Establecer fecha mínima como hoy
-            const today = new Date();
-            const dd = String(today.getDate()).padStart(2, '0');
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const yyyy = today.getFullYear();
-            const fechaHoy = yyyy + '-' + mm + '-' + dd;
-
-            fechaInicioInput.setAttribute('min', fechaHoy);
-            fechaFinalInput.setAttribute('min', fechaHoy);
-
-            // Validación al cambiar fecha de inicio
-            fechaInicioInput.addEventListener('change', function() {
-                const fechaInicio = new Date(this.value);
-                const hoy = new Date();
-                hoy.setHours(0, 0, 0, 0);
-
-                if (fechaInicio < hoy) {
-                    alert('No puedes seleccionar una fecha en el pasado');
-                    this.value = fechaHoy;
-                }
-
-                // Actualizar fecha mínima para fecha final
-                fechaFinalInput.min = this.value;
-
-
-                if (new Date(fechaFinalInput.value) < fechaInicio) {
-                    fechaFinalInput.value = this.value;
-                }
-            });
-
-
-            fechaFinalInput.addEventListener('change', function() {
-                const fechaInicio = new Date(fechaInicioInput.value);
-                const fechaFinal = new Date(this.value);
-
-                if (fechaFinal < fechaInicio) {
-                    alert('La fecha final no puede ser anterior a la fecha de inicio');
-                    this.value = fechaInicioInput.value;
-                }
-            });
-
-            horaInicioInput.addEventListener('change', function() {
-                if (fechaInicioInput.value === fechaFinalInput.value) {
-                    const horaInicio = this.value;
-                    const horaFinal = horaFinalInput.value;
-
-                    if (horaFinal && horaInicio > horaFinal) {
-                        alert('La hora de inicio no puede ser posterior a la hora final en el mismo día');
-                        this.value = '';
-                    }
-                }
-            });
-
-            horaFinalInput.addEventListener('change', function() {
-                if (fechaInicioInput.value === fechaFinalInput.value) {
-                    const horaInicio = horaInicioInput.value;
-                    const horaFinal = this.value;
-
-                    if (horaInicio && horaFinal < horaInicio) {
-                        alert('La hora final no puede ser anterior a la hora de inicio en el mismo día');
-                        this.value = '';
-                    }
-                }
-            });
-
-
-            form.addEventListener('submit', function(e) {
-                const fechaInicio = new Date(fechaInicioInput.value);
-                const fechaFinal = new Date(fechaFinalInput.value);
-                const hoy = new Date();
-                hoy.setHours(0, 0, 0, 0);
-
-                // Validar fechas
-                if (fechaInicio < hoy) {
-                    alert('No puedes solicitar zonas con fecha en el pasado');
-                    e.preventDefault();
-                    return false;
-                }
-
-                if (fechaFinal < fechaInicio) {
-                    alert('La fecha final no puede ser anterior a la fecha de inicio');
-                    e.preventDefault();
-                    return false;
-                }
-
-                // Validar horas si es el mismo día
-                if (fechaInicioInput.value === fechaFinalInput.value) {
-                    const horaInicio = horaInicioInput.value;
-                    const horaFinal = horaFinalInput.value;
-
-                    if (horaInicio > horaFinal) {
-                        alert('La hora de inicio no puede ser posterior a la hora final');
-                        e.preventDefault();
-                        return false;
-                    }
-                }
-
-                return true;
-            });
-        });
-    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-</body>
 
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('solicitudZonaForm');
+            
+
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('fechainicio').min = today;
+            document.getElementById('fechafinal').min = today;
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+
+                const fechaInicio = new Date(document.getElementById('fechainicio').value);
+                const fechaFinal = new Date(document.getElementById('fechafinal').value);
+                const hoy = new Date();
+                hoy.setHours(0, 0, 0, 0);
+
+                if (fechaInicio < hoy) {
+                    Swal.fire('Error', 'No puedes seleccionar una fecha en el pasado', 'error');
+                    return;
+                }
+
+                if (fechaFinal < fechaInicio) {
+                    Swal.fire('Error', 'La fecha final no puede ser anterior a la fecha de inicio', 'error');
+                    return;
+                }
+
+
+                const formData = {
+                    ID_Apartamentooss: document.getElementById('ID_Apartamentooss').value,
+                    ID_zonaComun: document.getElementById('ID_zonaComun').value,
+                    fechainicio: document.getElementById('fechainicio').value,
+                    fechafinal: document.getElementById('fechafinal').value,
+                    Hora_inicio: document.getElementById('Hora_inicio').value,
+                    Hora_final: document.getElementById('Hora_final').value
+                };
+
+                try {
+
+                    Swal.fire({
+                        title: 'Procesando solicitud',
+                        html: 'Por favor espera...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+
+                    const response = await fetch('http://192.168.1.100:3001/api/reservar-zona', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.error || 'Error en el servidor');
+                    }
+
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Éxito',
+                        text: data.message || 'Solicitud registrada correctamente'
+                    }).then(() => {
+
+                        form.reset();
+                    });
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error.message || 'Ocurrió un error al enviar la solicitud'
+                    });
+                }
+            });
+        });
+    </script>
+    </script>
+</body>
 
 </html>
