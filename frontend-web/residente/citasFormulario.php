@@ -11,6 +11,9 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="css/citasFormulario.css?v=<?php echo (rand()); ?>">
     <link rel="shortcut icon" href="img/c.png" type="image/x-icon" />
+    <!-- Biblioteca para generar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 
 <body>
@@ -34,20 +37,26 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                     </div>
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                            <li class="nav-item">
-                                <center><a class="nav-link active" aria-current="page" href="#" style="font-size: 20px;"><b>Inicio</b></a></center>
-                            </li>
-                            <center>
+                              <div class="offcanvas-header">
+                                <img src="img/pagina-de-inicio.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                <center>
+                                    <a href="./inicioprincipal.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Inicio</b></a>
+                                </center>
+                            </div>
+                               <center>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <img src="img/usuario.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
+
                                         <b style="font-size: 20px;"> Perfil</b>
                                     </a>
                                     <ul class="dropdown-menu" role="menu">
                                         <li>
-                                            <center><a href="Perfil.php">Editar datos</a></center>
+                                            <center><a href="Perfil.php"><b>Perfil</b></a></center>
                                         </li>
+
                                         <li>
-                                            <center> <a href="../../MODEL/backend/logout.php">Cerrar sesión</a></center>
+                                            <center> <a href="../../Backend/auth/logout.php"><b>Cerrar Sesión</b></a></center>
                                         </li>
                                     </ul>
                             </center>
@@ -58,7 +67,6 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                                     <a href="notificaciones.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;">Notificaciones</a>
                                 </center>
                             </div>
-
                         </ul>
                     </div>
                 </div>
@@ -84,15 +92,16 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
         <div class="container">
             <div class="row">
                 <div class="col-sm-12 col-md-3 col-lg-4 mt-5">
-                    <form action="../../CONTROLLER/citaresi.php" method="post">
+                    <form id="citaForm">
                         <fieldset>
                             <center>
-                                <legend><b>formulario</b> </legend>
+                                <legend><b>Formulario</b></legend>
                             </center>
                             <div class="mb-3">
                                 <label for="tipocita" class="form-label">Tipo de cita:</label>
-                                <select name="tipocita" id="tipocita" class="form-select">
-                                    <option selected value="Administrativo">Administrativo (1h)</option>
+                                <select name="tipocita" id="tipocita" class="form-select" required>
+                                    <option value="" disabled selected>Seleccione un tipo</option>
+                                    <option value="Administrativo">Administrativo (1h)</option>
                                     <option value="Reclamo">Reclamo (1h)</option>
                                     <option value="Duda">Duda (1h)</option>
                                 </select>
@@ -106,7 +115,7 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                                 <input type="time" class="form-control" id="horacita" name="horacita" min="08:00" max="17:00" step="3600" required>
                             </div>
                             <div class="mb-3">
-                                <label for="apa" class="form-label">Ingresa tu numero de apartamento:</label>
+                                <label for="apa" class="form-label">Ingresa tu número de apartamento:</label>
                                 <input type="text" class="form-control" id="apa" name="apa" required>
                             </div>
                             <div class="d-grid gap-2">
@@ -120,41 +129,24 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                         <h2><b>Panel de Citas</b></h2>
                     </center>
                     <br>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">Tipo de cita</th>
-                                <th scope="col">Fecha</th>
-                                <th scope="col">Hora</th>
-                                <th scope="col">Apartamento</th>
-                                <th scope="col">Estado</th>
-                                <th scope="col">Comentario</th>
-                                <th scope="col">Acciones</th>
-
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($citas as $cita): ?>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
                                 <tr>
-                                    <td><?php echo htmlspecialchars($cita['tipocita']); ?></td>
-                                    <td><?php echo htmlspecialchars($cita['fechacita']); ?></td>
-                                    <td><?php echo htmlspecialchars($cita['horacita']); ?></td>
-                                    <td><?php echo htmlspecialchars($cita['apa']); ?></td>
-                                    <td><?php echo htmlspecialchars($cita['estado']); ?></td>
-                                    <td><?php echo htmlspecialchars($cita['respuesta']); ?></td>
-                                    <td>
-
-
-                                        <form action="" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta cita?');">
-                                            <input type="hidden" name="delete_idcita" value="<?php echo $cita['idcita']; ?>">
-                                            <button class="btn btn-danger mt-3 type=" submit" name="delete">Eliminar</button>
-                                        </form>
-                                    </td>
-
+                                    <th scope="col">Tipo de cita</th>
+                                    <th scope="col">Fecha</th>
+                                    <th scope="col">Hora</th>
+                                    <th scope="col">Apartamento</th>
+                                    <th scope="col">Estado</th>
+                                    <th scope="col">Comentario</th>
+                                    <th scope="col">Acciones</th>
                                 </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody id="citasTableBody">
+   
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -162,28 +154,345 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
             <a href="citas.php" class="btn btn-success">Volver</a>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-        <script type="text/javascript" src="JAVA/main.js"></script>
+
         <script>
-            document.querySelector('.admin-img').addEventListener('click', function() {
-                document.querySelector('.dropdown-menu').classList.toggle('show');
-            });
-            document.querySelector('.chat-button').addEventListener('click', function() {
-                document.querySelector('.chat-menu').classList.toggle('show');
+        
+            const API_BASE_URL = 'http://192.168.1.100:3001/api/citas';
+
+    
+            document.addEventListener('DOMContentLoaded', function() {
+                loadCitas();
+                setupFormValidation();
             });
 
-            function filterChat() {
-                const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-                const chatItems = document.querySelectorAll('.chat-item');
-                chatItems.forEach(item => {
-                    if (item.textContent.toLowerCase().includes(searchInput)) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
+            
+            async function loadCitas() {
+                try {
+                    const response = await fetch(API_BASE_URL);
+                    if (!response.ok) {
+                        throw new Error('Error al cargar las citas');
                     }
+                    const citas = await response.json();
+                    renderCitas(citas);
+                } catch (error) {
+                    console.error('Error:', error);
+                    showAlert('Error al cargar las citas', 'danger');
+                }
+            }
+
+ 
+            function renderCitas(citas) {
+                const tableBody = document.getElementById('citasTableBody');
+                tableBody.innerHTML = '';
+
+                citas.forEach(cita => {
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                        <td>${escapeHtml(cita.tipocita)}</td>
+                        <td>${formatDate(cita.fechacita)}</td>
+                        <td>${escapeHtml(cita.horacita)}</td>
+                        <td>${escapeHtml(cita.apa)}</td>
+                        <td><span class="badge ${getStatusBadgeClass(cita.estado)}">${escapeHtml(cita.estado)}</span></td>
+                        <td>${escapeHtml(cita.respuesta || 'Sin respuesta')}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="deleteCita(${cita.idcita})">Eliminar</button>
+                            <button class="btn btn-success btn-sm mt-1" onclick="generatePDF(${cita.idcita}, '${escapeHtml(cita.tipocita)}', '${escapeHtml(cita.fechacita)}', '${escapeHtml(cita.horacita)}', '${escapeHtml(cita.apa)}', '${escapeHtml(cita.estado)}', '${escapeHtml(cita.respuesta || '')}')">PDF</button>
+                        </td>
+                    `;
+
+                    tableBody.appendChild(row);
                 });
             }
-        </script>
-        <script>
+
+     
+            function setupFormValidation() {
+                const form = document.getElementById('citaForm');
+                const fechaInput = document.getElementById('fechacita');
+                const horaInput = document.getElementById('horacita');
+
+                
+                const today = new Date();
+                const dd = String(today.getDate()).padStart(2, '0');
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
+                const yyyy = today.getFullYear();
+                const fechaHoy = yyyy + '-' + mm + '-' + dd;
+                fechaInput.setAttribute('min', fechaHoy);
+
+         
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+
+                    
+                    if (!validateDateTime()) {
+                        return;
+                    }
+
+           
+                    const formData = {
+                        fechacita: fechaInput.value,
+                        horacita: horaInput.value,
+                        tipocita: document.getElementById('tipocita').value,
+                        apa: document.getElementById('apa').value,
+                        estado: 'pendiente'
+                    };
+
+                    try {
+                    
+                        const response = await fetch(`${API_BASE_URL}/solicitud`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(formData)
+                        });
+
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.error || 'Error al crear la cita');
+                        }
+
+                        const data = await response.json();
+                        showAlert('Cita creada con éxito', 'success');
+
+                        
+                        generatePDF(
+                            data.id,
+                            formData.tipocita,
+                            formData.fechacita,
+                            formData.horacita,
+                            formData.apa,
+                            'pendiente',
+                            ''
+                        );
+
+
+                        loadCitas();
+
+
+                        form.reset();
+                    } catch (error) {
+                        console.error('Error:', error);
+                        showAlert(error.message, 'danger');
+                    }
+                });
+
+
+                fechaInput.addEventListener('change', function() {
+                    validateDate();
+                });
+
+
+                horaInput.addEventListener('change', function() {
+                    validateTime();
+                });
+            }
+
+
+            function validateDate() {
+                const fechaInput = document.getElementById('fechacita');
+                const fechaSeleccionada = new Date(fechaInput.value);
+                const hoy = new Date();
+                hoy.setHours(0, 0, 0, 0);
+                fechaSeleccionada.setHours(0, 0, 0, 0);
+
+                if (fechaSeleccionada < hoy) {
+                    showAlert('No puedes seleccionar una fecha pasada', 'warning');
+
+                    const dd = String(hoy.getDate()).padStart(2, '0');
+                    const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+                    const yyyy = hoy.getFullYear();
+                    const fechaHoy = yyyy + '-' + mm + '-' + dd;
+                    fechaInput.value = fechaHoy;
+                    return false;
+                }
+                return true;
+            }
+
+
+            function validateTime() {
+                const fechaInput = document.getElementById('fechacita');
+                const horaInput = document.getElementById('horacita');
+                const ahora = new Date();
+                const fechaSeleccionada = new Date(fechaInput.value);
+                const hoy = new Date();
+                hoy.setHours(0, 0, 0, 0);
+                fechaSeleccionada.setHours(0, 0, 0, 0);
+
+      
+                const hora = parseInt(horaInput.value.split(':')[0]);
+                if (hora < 8 || hora >= 17) {
+                    showAlert('El horario de atención es de 8:00 AM a 17:00 PM', 'warning');
+                    horaInput.value = '08:00';
+                    return false;
+                }
+
+                if (fechaSeleccionada.getTime() === hoy.getTime()) {
+                    const [horaSel, minutoSel] = horaInput.value.split(':').map(Number);
+                    const horaActual = ahora.getHours();
+                    const minutoActual = ahora.getMinutes();
+
+                    if (horaSel < horaActual || (horaSel === horaActual && minutoSel < minutoActual)) {
+                        showAlert('No puedes agendar una cita en horario pasado para hoy', 'warning');
+
+                        const nuevaHora = horaActual < 17 ? horaActual + 1 : 8;
+                        horaInput.value = `${String(nuevaHora).padStart(2, '0')}:00`;
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            function validateDateTime() {
+                return validateDate() && validateTime();
+            }
+
+
+            async function deleteCita(idcita) {
+                if (!confirm('¿Estás seguro de que deseas eliminar esta cita?')) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}/${idcita}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Error al eliminar la cita');
+                    }
+
+                    showAlert('Cita eliminada con éxito', 'success');
+                    loadCitas();
+                } catch (error) {
+                    console.error('Error:', error);
+                    showAlert('Error al eliminar la cita', 'danger');
+                }
+            }
+
+
+            function generatePDF(id, tipo, fecha, hora, apa, estado, respuesta) {
+                const {
+                    jsPDF
+                } = window.jspdf;
+                const doc = new jsPDF();
+
+    
+                const img = new Image();
+                img.src = 'img/c.png';
+
+
+                img.onload = function() {
+                    // Encabezado
+                    doc.addImage(img, 'PNG', 10, 10, 30, 30);
+                    doc.setFontSize(20);
+                    doc.setTextColor(40);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('Comprobante de Cita', 105, 20, {
+                        align: 'center'
+                    });
+
+ 
+                    doc.setFontSize(12);
+                    doc.setTextColor(100);
+                    doc.setFont('helvetica', 'normal');
+
+                    const yStart = 40;
+                    let y = yStart;
+
+                    doc.text(`ID de Cita: ${id}`, 14, y);
+                    y += 8;
+                    doc.text(`Tipo: ${tipo}`, 14, y);
+                    y += 8;
+                    doc.text(`Fecha: ${formatDate(fecha)}`, 14, y);
+                    y += 8;
+                    doc.text(`Hora: ${hora}`, 14, y);
+                    y += 8;
+                    doc.text(`Apartamento: ${apa}`, 14, y);
+                    y += 8;
+                    doc.text(`Estado: ${estado}`, 14, y);
+                    y += 8;
+
+                    if (respuesta) {
+                        doc.text(`Respuesta: ${respuesta}`, 14, y);
+                        y += 8;
+                    }
+
+
+                    doc.setDrawColor(200);
+                    doc.line(10, y, 200, y);
+                    y += 10;
+
+
+                    doc.setFontSize(10);
+                    doc.text('Este documento sirve como comprobante de su cita solicitada tiene valor despues de haber recibido la confirmacion.', 14, y);
+                    y += 5;
+                    doc.text('Por favor presentarlo al llegar a su cita.', 14, y);
+                    y += 5;
+                    doc.text('SETS - Sistema de Gestión ', 105, y, {
+                        align: 'center'
+                    });
+
+     
+                    doc.save(`comprobante_cita_${id}.pdf`);
+                };
+            }
+
+            function showAlert(message, type) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+                alertDiv.role = 'alert';
+                alertDiv.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+
+                const container = document.querySelector('.container');
+                container.prepend(alertDiv);
+
+                setTimeout(() => {
+                    alertDiv.classList.remove('show');
+                    setTimeout(() => alertDiv.remove(), 150);
+                }, 5000);
+            }
+
+
+            function formatDate(dateString) {
+                if (!dateString) return '';
+                const date = new Date(dateString);
+                return date.toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+
+
+            function getStatusBadgeClass(status) {
+                switch (status.toLowerCase()) {
+                    case 'pendiente':
+                        return 'bg-warning text-dark';
+                    case 'respondida':
+                        return 'bg-success';
+                    case 'cancelada':
+                        return 'bg-danger';
+                    default:
+                        return 'bg-secondary';
+                }
+            }
+
+
+            function escapeHtml(unsafe) {
+                if (unsafe == null) return '';
+                return unsafe.toString()
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
+
             function openChat(chatName) {
                 const chatContainer = document.getElementById('chatContainer');
                 const chatHeader = document.getElementById('chatHeader');
@@ -208,126 +517,10 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                     chatMessages.scrollTop = chatMessages.scrollHeight;
                 }
             }
-
-            function filterChat() {
-                const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-                const chatItems = document.querySelectorAll('.chat-item');
-                chatItems.forEach(item => {
-                    if (item.textContent.toLowerCase().includes(searchInput)) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
-            }
-        </script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const form = document.querySelector('form');
-                const fechaInput = document.getElementById('fechacita');
-                const horaInput = document.getElementById('horacita');
-
-
-                const today = new Date();
-                const dd = String(today.getDate()).padStart(2, '0');
-                const mm = String(today.getMonth() + 1).padStart(2, '0');
-                const yyyy = today.getFullYear();
-                const fechaHoy = yyyy + '-' + mm + '-' + dd;
-                fechaInput.setAttribute('min', fechaHoy);
-
-
-                form.addEventListener('submit', function(e) {
-                    const fechaSeleccionada = new Date(fechaInput.value);
-                    const horaSeleccionada = horaInput.value;
-                    const ahora = new Date();
-
-
-                    fechaSeleccionada.setHours(0, 0, 0, 0);
-                    const hoy = new Date();
-                    hoy.setHours(0, 0, 0, 0);
-
-                    if (fechaSeleccionada < hoy) {
-                        alert('No puedes agendar citas en fechas pasadas');
-                        e.preventDefault();
-                        return false;
-                    }
-
-
-                    if (fechaSeleccionada.getTime() === hoy.getTime()) {
-                        const [hora, minutos] = horaSeleccionada.split(':').map(Number);
-                        const horaActual = ahora.getHours();
-                        const minutoActual = ahora.getMinutes();
-
-                        if (hora < horaActual || (hora === horaActual && minutos < minutoActual)) {
-                            alert('No puedes agendar una cita en horario pasado para el día de hoy');
-                            e.preventDefault();
-                            return false;
-                        }
-                    }
-
-
-                    const horaCita = parseInt(horaSeleccionada.split(':')[0]);
-                    if (horaCita < 8 || horaCita >= 17) {
-                        alert('Las citas solo pueden agendarse entre 8:00 y 17:00 horas');
-                        e.preventDefault();
-                        return false;
-                    }
-
-                    return true;
-                });
-
-
-                fechaInput.addEventListener('change', function() {
-                    const fechaSeleccionada = new Date(this.value);
-                    const hoy = new Date();
-                    hoy.setHours(0, 0, 0, 0);
-                    fechaSeleccionada.setHours(0, 0, 0, 0);
-
-                    if (fechaSeleccionada < hoy) {
-                        alert('No puedes seleccionar una fecha pasada');
-                        this.value = fechaHoy;
-                    }
-                });
-
-
-                horaInput.addEventListener('change', function() {
-                    const fechaSeleccionada = new Date(fechaInput.value);
-                    const hoy = new Date();
-                    hoy.setHours(0, 0, 0, 0);
-                    fechaSeleccionada.setHours(0, 0, 0, 0);
-
-
-                    if (fechaSeleccionada.getTime() === hoy.getTime()) {
-                        const ahora = new Date();
-                        const [hora, minutos] = this.value.split(':').map(Number);
-                        const horaActual = ahora.getHours();
-                        const minutoActual = ahora.getMinutes();
-
-                        if (hora < horaActual || (hora === horaActual && minutos < minutoActual)) {
-                            alert('No puedes agendar una cita en horario pasado para hoy');
-
-                            const nuevaHora = horaActual < 17 ? horaActual + 1 : 8;
-                            this.value = `${String(nuevaHora).padStart(2, '0')}:00`;
-                        }
-                    }
-
-
-                    const hora = parseInt(this.value.split(':')[0]);
-                    if (hora < 8 || hora >= 17) {
-                        alert('El horario de atención es de 8:00 AM a 17:00 PM horas');
-                        this.value = '08:00';
-                    }
-                });
-            });
         </script>
 </body>
-<br>
-<br>
-<br>
-<br>
-<br>
+<br><br><br><br><br>
 <footer>
-
     <div class="footer-content">
         <li>&copy; 2025 SETS. Todos los derechos reservados.</li>
         <ul>

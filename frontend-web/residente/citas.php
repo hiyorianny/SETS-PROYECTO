@@ -1,5 +1,22 @@
 <?php
 require __DIR__ . '/../../Backend/auth/controller/residente.php';
+include_once "conexion.php";
+$sql = "SELECT idcita, tipocita, fechacita, horacita, respuesta FROM cita";
+$stmt = $base_de_datos->query($sql);
+if (!$stmt) {
+    die('Error en la consulta: ' . print_r($base_de_datos->errorInfo(), true));
+}
+$citas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$eventos = [];
+foreach ($citas as $row) {
+    $eventos[] = [
+        'id' => $row['idcita'],
+        'title' => $row['tipocita'],
+        'start' => $row['fechacita'] . 'T' . $row['horacita'],
+        'respuesta' => $row['respuesta'] 
+    ];
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -70,24 +87,23 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
             </div>
         </nav>
     </header>
-    <main>
+  <main>
         <section class="anuncio">
-            <h2 style="text-align: center;">Citas</h2>
+            <h2 style="text-align: center;"><b>Citas</b></h2>
         </section>
         <div class="container">
             <div class="calendar-container">
                 <div class="calendar">
                     <div class="calendar-header">
-                        <h2 id="calendar-title" style="font-size: 25px;"><b>Calendario de Disponibilidad</b></h2>
-
-
+                        <h2 id="calendar-title"><b>Calendario de Disponibilidad</b></h2>
+                        <p id="month-year" style="color: #0e2c0a;"><b></b></p>
                         <div id="calendar-controls">
                             <button id="prev-month" onclick="prevMonth()">
                                 <
-                                    <button id="next-month" onclick="nextMonth()">>
-                            </button>
+                                    <button id="next-month" onclick="nextMonth()">></button>
                         </div>
                     </div>
+
                     <table id="calendar-table">
                         <thead>
                             <tr>
@@ -101,16 +117,15 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                             </tr>
                         </thead>
                         <tbody id="calendar-body">
-                            <center>
-                                <p id="month-year" style="color: #0e2c0a;"><b></b></p>
-                            </center>
+                            <!-- Las fechas serán generadas aquí por JavaScript -->
                         </tbody>
-                        
                     </table>
                     <br>
-                    <h2 id="calendar-title" style="font-size: 15px;"><b>Verde : Aceptada , Amarilla:Pendiente  , Rojo: Rechazada</b></h2>
+                    <h2 id="calendar-title" style="font-size: 15px;"><b>Verde : Aceptada , Amarilla:Pendiente , Rojo: Rechazada</b></h2>
                 </div>
             </div>
+
+
         </div>
     </main>
     <center>
@@ -118,7 +133,9 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
         <br>
         <br>
         <a href="inicioprincipal.php" class="btn btn-outline-success" style="font-size: 30px;">Volver</a>
-        <script>
+      
+    </center>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const calendarBody = document.getElementById('calendar-body');
             const eventos = <?php echo json_encode($eventos); ?>;
@@ -134,7 +151,7 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                 let date = 1;
                 const totalCells = 42;
                 let dayCounter = (firstDay === 0 ? 6 : firstDay - 1);
-                
+
                 for (let i = 0; i < totalCells; i++) {
                     if (i % 7 === 0) {
                         var row = document.createElement('tr');
@@ -143,7 +160,7 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                     if (i >= dayCounter && date <= daysInMonth) {
                         const formattedDate = `${anio}-${(mes + 1).toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}`;
                         cell.textContent = date;
-                        
+
                         // Modificamos solo esta parte para manejar los estados
                         eventos.forEach(evento => {
                             if (evento.start.startsWith(formattedDate)) {
@@ -155,12 +172,12 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                                 } else if (evento.respuesta === 'Rechazada') {
                                     cell.classList.add('celda-rechazada');
                                 }
-                                cell.title = evento.title + " - " + 
-                                    (evento.respuesta === 'Aceptada' ? 'Aceptada' : 
-                                     evento.respuesta === 'Pendiente' ? 'Pendiente' : 'Rechazada');
+                                cell.title = evento.title + " - " +
+                                    (evento.respuesta === 'Aceptada' ? 'Aceptada' :
+                                        evento.respuesta === 'Pendiente' ? 'Pendiente' : 'Rechazada');
                             }
                         });
-                        
+
                         date++;
                     }
                     row.appendChild(cell);
@@ -256,23 +273,24 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
             });
         }
     </script>
-         <br>
-         <br>
-         <br>
-         <br>
-         <br>
-         <br>
-        <footer> 
-  <div class="footer-content">
-    <p>&copy; 2025 SETS. Todos los derechos reservados.</p>
-    <ul>
-      <li><a href="#">Términos y Condiciones</a></li>
-      <li><a href="#">Política de Privacidad</a></li>
-      <li><a href="#">Contacto</a></li>
-    </ul>
-  </div>
-</footer>
+
+
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
 </body>
+<br>
+<br>
+<br>
+<footer>
+    <div class="footer-content">
+        <li>&copy; 2025 SETS. Todos los derechos reservados.</li>
+        <ul>
+            <li><a href="#">Términos y Condiciones</a></li>
+            <li><a href="#">Política de Privacidad</a></li>
+            <li><a href="#">Contacto</a></li>
+        </ul>
+    </div>
+</footer>
 
 </html>
