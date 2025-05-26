@@ -1,44 +1,5 @@
 <?php
-require '../../MODEL/backend/authMiddleware.php';
-session_start();
-header("Access-Control-Allow-Origin: http://localhost:3000");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Credentials: true");
-$decoded = authenticate();
-
-$idRegistro = $decoded->id;
-$Usuario = $decoded->Usuario;
-$idRol = $decoded->idRol;
-
-
-if ($idRol != 3333) {
-    header("Location: http://localhost/sets/error.php");
-    exit();
-}
-
-include_once "conexion.php";
-
-
-
-// Verificar si se ha proporcionado el ID de la solicitud
-if (isset($_GET['ID_Apartamentooss'])) {
-    $idSolicitud = $_GET['ID_Apartamentooss'];
-    // Consulta para obtener los datos de la solicitud
-    $query = "SELECT * FROM solicitud_zona WHERE ID_Apartamentooss = :ID_Apartamentooss";
-    $statement = $base_de_datos->prepare($query);
-    $statement->bindParam(':ID_Apartamentooss', $idSolicitud);
-    $statement->execute();
-    $solicitud = $statement->fetch(PDO::FETCH_ASSOC);
-    // Verificar si la solicitud existe
-    if (!$solicitud) {
-        echo "Solicitud no encontrada.";
-        exit();
-    }
-} else {
-    echo "ID de solicitud no proporcionado";
-    exit();
-}
+require __DIR__ . '/../../Backend/auth/controller/residente.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -75,20 +36,26 @@ if (isset($_GET['ID_Apartamentooss'])) {
                     </div>
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                            <li class="nav-item">
-                                <center><a class="nav-link active" aria-current="page" href="#" style="font-size: 20px;"><b>Inicio</b></a></center>
-                            </li>
+                            <div class="offcanvas-header">
+                                <img src="img/pagina-de-inicio.png" alt="Logo" width="70" height="74" class="d-inline-block align-text-top">
+                                <center>
+                                    <a href="./inicioprincipal.php" class="btn" id="offcanvasNavbarLabel" style="text-align: center;"><b>Inicio</b></a>
+                                </center>
+                            </div>
                             <center>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <img src="img/usuario.png" alt="Logo" width="30" height="34" class="d-inline-block align-text-top">
+
                                         <b style="font-size: 20px;"> Perfil</b>
                                     </a>
                                     <ul class="dropdown-menu" role="menu">
                                         <li>
-                                            <center><a href="Perfil.php">Editar datos</a></center>
+                                            <center><a href="Perfil.php"><b>Perfil</b></a></center>
                                         </li>
+
                                         <li>
-                                            <center> <a href="../../MODEL/backend/logout.php">Cerrar sesión</a></center>
+                                            <center> <a href="../../Backend/auth/logout.php"><b>Cerrar Sesión</b></a></center>
                                         </li>
                                     </ul>
                             </center>
@@ -101,30 +68,14 @@ if (isset($_GET['ID_Apartamentooss'])) {
                             </div>
 
                         </ul>
-                        <form class="d-flex mt-3" role="search">
-                            <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-                            <button class="btn btn-outline-success" type="submit">Buscar</button>
-                        </form>
+
                     </div>
                 </div>
             </div>
         </nav>
     </header>
     <br><br>
-    <main>
-        <section class="chat-container" id="chatContainer">
-            <header class="chat-header">
-                <span id="chatHeader">Chat</span>
-                <button class="close-btn" onclick="closeChat()">×</button>
-            </header>
-            <div class="chat-messages" id="chatMessages">
-            </div>
-            <div class="chat-input">
-                <input type="text" id="chatInput" placeholder="Escribe tu mensaje...">
-                <button onclick="sendMessage()">Enviar</button>
-            </div>
-        </section>
-    </main>
+
     <br><br><br>
     <div class="alert alert-success" role="alert">
         <h2 style="text-align: center;">Actualizar Solicitud de Agendación Futbol</h2>
@@ -134,27 +85,27 @@ if (isset($_GET['ID_Apartamentooss'])) {
     <div class="container">
         <section class="login-content">
             <div class="container">
-                <form action="../../CONTROLLER/soccer.php" method="POST">
+                <form id="formEditarSolicitud">
                     <img src="img/objetivo.png" alt="Logo" class="imgp">
 
-                    <input type="hidden" name="idSolicitud" value="<?= htmlspecialchars($solicitud['ID_Apartamentooss']) ?>">
-                    <div class="form-group">
-                        <label for="fechainicio">Fecha de Inicio:</label>
-                        <input type="date" name="fechainicio" value="<?= htmlspecialchars($solicitud['fechainicio']) ?>" required class="form-control">
+                    <div class="mb-3">
+                        <label for="fechainicio" class="form-label">Fecha de Inicio:</label>
+                        <input type="date" class="form-control" id="fechainicio" required>
                     </div>
-                    <div class="form-group">
-                        <label for="Hora_inicio">Hora de Inicio:</label>
-                        <input type="time" name="Hora_inicio" value="<?= htmlspecialchars($solicitud['Hora_inicio']) ?>" required class="form-control">
+                    <div class="mb-3">
+                        <label for="Hora_inicio" class="form-label">Hora de Inicio:</label>
+                        <input type="time" class="form-control" id="Hora_inicio" required>
                     </div>
-                    <div class="form-group">
-                        <label for="fechafinal">Fecha de Finalización:</label>
-                        <input type="date" name="fechafinal" value="<?= htmlspecialchars($solicitud['fechafinal']) ?>" required class="form-control">
+                    <div class="mb-3">
+                        <label for="fechafinal" class="form-label">Fecha de Finalización:</label>
+                        <input type="date" class="form-control" id="fechafinal" required>
                     </div>
-                    <div class="form-group">
-                        <label for="Hora_final">Hora de Finalización:</label>
-                        <input type="time" name="Hora_final" value="<?= htmlspecialchars($solicitud['Hora_final']) ?>" required class="form-control">
+                    <div class="mb-3">
+                        <label for="Hora_final" class="form-label">Hora de Finalización:</label>
+                        <input type="time" class="form-control" id="Hora_final" required>
                     </div>
                     <button type="submit" class="btn btn-success">Guardar Cambios</button>
+
                 </form>
                 <br>
         </section>
@@ -164,200 +115,107 @@ if (isset($_GET['ID_Apartamentooss'])) {
     <br>
     <br>
     <a href="solicitarfutbol.php" class="btn btn-danger btn-lg">volver</a>
-    <script type="text/javascript" src="JAVA/main.js"></script>
-    <script>
-        document.querySelector('.admin-img').addEventListener('click', function() {
-            document.querySelector('.dropdown-menu').classList.toggle('show');
-        });
-        document.querySelector('.chat-button').addEventListener('click', function() {
-            document.querySelector('.chat-menu').classList.toggle('show');
-        });
-
-        function filterChat() {
-            const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-            const chatItems = document.querySelectorAll('.chat-item');
-            chatItems.forEach(item => {
-                if (item.textContent.toLowerCase().includes(searchInput)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
-    </script>
-    <script>
-        function openChat(chatName) {
-            const chatContainer = document.getElementById('chatContainer');
-            const chatHeader = document.getElementById('chatHeader');
-            chatHeader.textContent = chatName;
-            chatContainer.classList.add('show');
-        }
-
-        function closeChat() {
-            const chatContainer = document.getElementById('chatContainer');
-            chatContainer.classList.remove('show');
-        }
-
-        function sendMessage() {
-            const messageInput = document.getElementById('chatInput');
-            const messageText = messageInput.value.trim();
-            if (messageText) {
-                const chatMessages = document.getElementById('chatMessages');
-                const messageElement = document.createElement('p');
-                messageElement.textContent = messageText;
-                chatMessages.appendChild(messageElement);
-                messageInput.value = '';
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-        }
-
-        function filterChat() {
-            const searchInput = document.querySelector('.search-bar').value.toLowerCase();
-            const chatItems = document.querySelectorAll('.chat-item');
-            chatItems.forEach(item => {
-                if (item.textContent.toLowerCase().includes(searchInput)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
-    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('form');
-            const fechaInicioInput = document.querySelector('input[name="fechainicio"]');
-            const fechaFinalInput = document.querySelector('input[name="fechafinal"]');
-            const horaInicioInput = document.querySelector('input[name="Hora_inicio"]');
-            const horaFinalInput = document.querySelector('input[name="Hora_final"]');
+            const solicitudStr = sessionStorage.getItem('solicitudEditar');
+            if (!solicitudStr) {
+                alert('No se encontraron datos de la solicitud');
+                window.location.href = './solicitarfutbol.php';
+                return;
+            }
 
-            const today = new Date();
-            const dd = String(today.getDate()).padStart(2, '0');
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const yyyy = today.getFullYear();
-            const fechaHoy = yyyy + '-' + mm + '-' + dd;
+            const solicitud = JSON.parse(solicitudStr);
 
-            fechaInicioInput.setAttribute('min', fechaHoy);
-            fechaFinalInput.setAttribute('min', fechaHoy);
+            // Formatear fechas para los inputs
+            const fechaInicio = new Date(solicitud.fechainicio);
+            const fechaFinal = new Date(solicitud.fechafinal);
 
+            document.getElementById('fechainicio').value = fechaInicio.toISOString().split('T')[0];
+            document.getElementById('Hora_inicio').value = solicitud.Hora_inicio;
+            document.getElementById('fechafinal').value = fechaFinal.toISOString().split('T')[0];
+            document.getElementById('Hora_final').value = solicitud.Hora_final;
+
+            // Manejar envío del formulario
+            document.getElementById('formEditarSolicitud').addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                try {
+                    // Formatear fechas correctamente
+                    const nuevaFechaInicio = document.getElementById('fechainicio').value;
+                    const nuevaHoraInicio = document.getElementById('Hora_inicio').value;
+                    const nuevaFechaFinal = document.getElementById('fechafinal').value;
+                    const nuevaHoraFinal = document.getElementById('Hora_final').value;
+
+                    // Fecha original formateada
+                    const fechaOriginal = new Date(solicitud.fechainicio);
+                    const fechaOriginalFormateada = fechaOriginal.toISOString().split('T')[0];
+
+                    const datos = {
+                        ID_Apartamentooss: solicitud.ID_Apartamentooss,
+                        ID_zonaComun: solicitud.ID_zonaComun,
+                        fechainicio: nuevaFechaInicio,
+                        Hora_inicio: nuevaHoraInicio,
+                        fechafinal: nuevaFechaFinal,
+                        Hora_final: nuevaHoraFinal,
+                        fecha_original: fechaOriginalFormateada,
+                        hora_original: solicitud.Hora_inicio
+                    };
+
+                    const response = await fetch('http://192.168.1.100:3001/api/solicitudes-zonas/actualizar', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(datos)
+                    });
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(result.message || 'Error al actualizar');
+                    }
+
+                    if (result.success) {
+                        alert('Solicitud actualizada con éxito');
+                        window.location.href = './solicitarfutbol.php';
+                    } else {
+                        throw new Error(result.error || 'Error desconocido al actualizar');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error al actualizar: ' + error.message);
+                }
+            });
+
+            // Validaciones de fechas y horas (mantén las que ya tienes)
+            const fechaInicioInput = document.getElementById('fechainicio');
+            const fechaFinalInput = document.getElementById('fechafinal');
+            const horaInicioInput = document.getElementById('Hora_inicio');
+            const horaFinalInput = document.getElementById('Hora_final');
 
             fechaInicioInput.addEventListener('change', function() {
-                const fechaInicio = new Date(this.value);
-                const hoy = new Date();
-                hoy.setHours(0, 0, 0, 0);
-
-                if (fechaInicio < hoy) {
-                    alert('No puedes seleccionar una fecha en el pasado');
-                    this.value = fechaHoy;
-                    return;
-                }
-
-
                 fechaFinalInput.min = this.value;
-
-
-                if (new Date(fechaFinalInput.value) < fechaInicio) {
+                if (fechaFinalInput.value < this.value) {
                     fechaFinalInput.value = this.value;
                 }
-
-                if (fechaInicioInput.value === fechaFinalInput.value) {
-                    validarHorasMismoDia();
-                }
             });
 
-
-            fechaFinalInput.addEventListener('change', function() {
-                const fechaInicio = new Date(fechaInicioInput.value);
-                const fechaFinal = new Date(this.value);
-
-                if (fechaFinal < fechaInicio) {
-                    alert('La fecha final no puede ser anterior a la fecha de inicio');
-                    this.value = fechaInicioInput.value;
-                    return;
-                }
-
-
-                if (fechaInicioInput.value === fechaFinalInput.value) {
-                    validarHorasMismoDia();
-                }
-            });
-
-
-            horaInicioInput.addEventListener('change', validarHorasMismoDia);
-            horaFinalInput.addEventListener('change', validarHorasMismoDia);
-
-            function validarHorasMismoDia() {
+            function validarHoras() {
                 if (fechaInicioInput.value === fechaFinalInput.value) {
                     if (horaInicioInput.value && horaFinalInput.value) {
                         if (horaInicioInput.value >= horaFinalInput.value) {
-                            alert('La hora de inicio no puede ser posterior o igual a la hora final en el mismo día');
-                            horaInicioInput.value = '';
+                            alert('La hora de inicio debe ser anterior a la hora final');
                             horaFinalInput.value = '';
                         }
                     }
                 }
             }
 
-
-            form.addEventListener('submit', function(e) {
-                const fechaInicio = new Date(fechaInicioInput.value);
-                const fechaFinal = new Date(fechaFinalInput.value);
-                const hoy = new Date();
-                hoy.setHours(0, 0, 0, 0);
-
-                // Validar fechas
-                if (fechaInicio < hoy) {
-                    alert('No puedes actualizar la solicitud con fecha en el pasado');
-                    e.preventDefault();
-                    return false;
-                }
-
-                if (fechaFinal < fechaInicio) {
-                    alert('La fecha final no puede ser anterior a la fecha de inicio');
-                    e.preventDefault();
-                    return false;
-                }
-
-
-                if (fechaInicioInput.value === fechaFinalInput.value) {
-                    if (!horaInicioInput.value || !horaFinalInput.value) {
-                        alert('Debes especificar ambas horas cuando es el mismo día');
-                        e.preventDefault();
-                        return false;
-                    }
-
-                    if (horaInicioInput.value >= horaFinalInput.value) {
-                        alert('La hora de inicio no puede ser posterior o igual a la hora final');
-                        e.preventDefault();
-                        return false;
-                    }
-                }
-
-
-                if (fechaInicioInput.value === fechaFinalInput.value) {
-                    const [horaIni, minIni] = horaInicioInput.value.split(':').map(Number);
-                    const [horaFin, minFin] = horaFinalInput.value.split(':').map(Number);
-
-                    const diffHoras = horaFin - horaIni;
-                    const diffMinutos = minFin - minIni;
-                    const totalMinutos = diffHoras * 60 + diffMinutos;
-
-                    if (totalMinutos < 60) {
-                        alert('La reserva debe tener al menos 1 hora de duración');
-                        e.preventDefault();
-                        return false;
-                    }
-                }
-
-                return true;
-            });
-
-
-            if (fechaInicioInput.value === fechaFinalInput.value) {
-                validarHorasMismoDia();
-            }
+            horaInicioInput.addEventListener('change', validarHoras);
+            horaFinalInput.addEventListener('change', validarHoras);
         });
     </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 

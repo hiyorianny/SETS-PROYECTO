@@ -5,5 +5,7 @@ const SolicitudZonaController = require('../controllers/SolicitudZonaController'
 router.get('/', SolicitudZonaController.getAll);
 router.post('/actualizar-estado', SolicitudZonaController.updateStatus);
 router.put('/:ID_Apartamentooss/actualizar-estado', SolicitudZonaController.updateStatusById);
+router.put('/actualizar', SolicitudZonaController.actualizarSolicitud);
+router.delete('/cancelar', SolicitudZonaController.cancelarSolicitud);
 
 module.exports = router;
