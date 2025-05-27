@@ -93,82 +93,82 @@ class SolicitudZonaController {
         }
     }
 
-   static async actualizarSolicitud(req, res) {
-    try {
-        const { 
-            ID_Apartamentooss, 
-            ID_zonaComun, 
-            fechainicio, 
-            Hora_inicio, 
-            fechafinal, 
-            Hora_final,
-            fecha_original,
-            hora_original
-        } = req.body;
-
-        // Validaciones básicas
-        if (!ID_Apartamentooss || !ID_zonaComun || !fechainicio || !Hora_inicio || !fechafinal || !Hora_final) {
-            return res.status(400).json({ 
-                success: false,
-                error: 'Todos los campos son requeridos' 
-            });
-        }
-
-        // Validación de fechas
-        if (new Date(fechafinal) < new Date(fechainicio)) {
-            return res.status(400).json({ 
-                success: false,
-                error: 'La fecha final no puede ser anterior a la fecha de inicio' 
-            });
-        }
-
-        // Validación de horas si es el mismo día
-        if (fechainicio === fechafinal && Hora_inicio >= Hora_final) {
-            return res.status(400).json({ 
-                success: false,
-                error: 'La hora de inicio debe ser anterior a la hora final' 
-            });
-        }
-
-        SolicitudZonaModel.actualizarSolicitud(
-            { 
-                ID_Apartamentooss, 
-                ID_zonaComun, 
-                fechainicio, 
-                Hora_inicio, 
-                fechafinal, 
+    static async actualizarSolicitud(req, res) {
+        try {
+            const {
+                ID_Apartamentooss,
+                ID_zonaComun,
+                fechainicio,
+                Hora_inicio,
+                fechafinal,
                 Hora_final,
                 fecha_original,
                 hora_original
-            },
-            (err, results) => {
-                if (err) {
-                    console.error('Error en la base de datos:', err);
-                    return res.status(500).json({ 
-                        success: false,
-                        error: 'Error en la base de datos',
-                        details: err.message 
-                    });
-                }
+            } = req.body;
 
-                if (results.affectedRows === 0) {
-                    return res.status(404).json({ 
-                        success: false,
-                        error: 'No se encontró la solicitud para actualizar' 
-                    });
-                }
-
-                res.json({ success: true });
+            // Validaciones básicas
+            if (!ID_Apartamentooss || !ID_zonaComun || !fechainicio || !Hora_inicio || !fechafinal || !Hora_final) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Todos los campos son requeridos'
+                });
             }
-        );
-    } catch (error) {
-        console.error('Error en el controlador:', error);
-        res.status(500).json({ 
-            success: false,
-            error: error.message 
-        });
+
+            // Validación de fechas
+            if (new Date(fechafinal) < new Date(fechainicio)) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'La fecha final no puede ser anterior a la fecha de inicio'
+                });
+            }
+
+            // Validación de horas si es el mismo día
+            if (fechainicio === fechafinal && Hora_inicio >= Hora_final) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'La hora de inicio debe ser anterior a la hora final'
+                });
+            }
+
+            SolicitudZonaModel.actualizarSolicitud(
+                {
+                    ID_Apartamentooss,
+                    ID_zonaComun,
+                    fechainicio,
+                    Hora_inicio,
+                    fechafinal,
+                    Hora_final,
+                    fecha_original,
+                    hora_original
+                },
+                (err, results) => {
+                    if (err) {
+                        console.error('Error en la base de datos:', err);
+                        return res.status(500).json({
+                            success: false,
+                            error: 'Error en la base de datos',
+                            details: err.message
+                        });
+                    }
+
+                    if (results.affectedRows === 0) {
+                        return res.status(404).json({
+                            success: false,
+                            error: 'No se encontró la solicitud para actualizar'
+                        });
+                    }
+
+                    res.json({ success: true });
+                }
+            );
+        } catch (error) {
+            console.error('Error en el controlador:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message
+            });
+        }
     }
-}
     static async cancelarSolicitud(req, res) {
         try {
             const { ID_Apartamentooss, ID_zonaComun, fechainicio, Hora_inicio } = req.body;
@@ -196,6 +196,7 @@ class SolicitudZonaController {
             res.status(500).json({ error: error.message });
         }
     }
+
 }
 
 module.exports = SolicitudZonaController;

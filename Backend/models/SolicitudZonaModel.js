@@ -8,6 +8,13 @@ class SolicitudZonaModel {
             callback(null, results);
         });
     }
+    static getAll(callback) {
+        const query = 'SELECT * FROM solicitud_zona';
+        db.query(query, (err, results) => {
+            if (err) return callback(err, null);
+            callback(null, results);
+        });
+    }
 
     static updateStatusById(ID_Apartamentooss, estado, callback) {
         if (!ID_Apartamentooss || !estado) {

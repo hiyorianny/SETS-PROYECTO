@@ -237,56 +237,102 @@ const ZonasComunes = () => {
   };
 
   const validateForm = () => {
-    let valid = true;
-    const newErrors = {
-      ID_Apartamentooss: '',
-      ID_zonaComun: '',
-      fechainicio: '',
-      fechafinal: '',
-      Hora_inicio: '',
-      Hora_final: ''
-    };
+  let valid = true;
+  const newErrors = {
+    ID_Apartamentooss: '',
+    ID_zonaComun: '',
+    fechainicio: '',
+    fechafinal: '',
+    Hora_inicio: '',
+    Hora_final: ''
+  };
 
-    if (!formData.ID_Apartamentooss.trim()) {
-      newErrors.ID_Apartamentooss = 'Debe ingresar el número de apartamento';
+  // Validaciones básicas de campos requeridos
+  if (!formData.ID_Apartamentooss.trim()) {
+    newErrors.ID_Apartamentooss = 'Debe ingresar el número de apartamento';
+    valid = false;
+  }
+
+  if (!formData.ID_zonaComun) {
+    newErrors.ID_zonaComun = 'Debe seleccionar una zona común';
+    valid = false;
+  }
+
+  // Validaciones de fecha
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Eliminar la parte de la hora para comparar solo fechas
+
+  if (!formData.fechainicio) {
+    newErrors.fechainicio = 'Debe seleccionar una fecha de inicio';
+    valid = false;
+  } else {
+    const fechaInicio = new Date(formData.fechainicio);
+    
+    // Validar que la fecha de inicio no sea anterior al día actual
+    if (fechaInicio < today) {
+      newErrors.fechainicio = 'La fecha de inicio no puede ser anterior al día actual';
       valid = false;
     }
+  }
 
-    if (!formData.ID_zonaComun) {
-      newErrors.ID_zonaComun = 'Debe seleccionar una zona común';
+  if (!formData.fechafinal) {
+    newErrors.fechafinal = 'Debe seleccionar una fecha de finalización';
+    valid = false;
+  } else if (formData.fechainicio) {
+    const fechaInicio = new Date(formData.fechainicio);
+    const fechaFinal = new Date(formData.fechafinal);
+    
+    // Validar que la fecha final sea posterior o igual a la fecha inicial
+    if (fechaFinal < fechaInicio) {
+      newErrors.fechafinal = 'La fecha final debe ser posterior o igual a la fecha inicial';
       valid = false;
     }
-
-    if (!formData.fechainicio) {
-      newErrors.fechainicio = 'Debe seleccionar una fecha de inicio';
+    
+    // Validar que el rango no exceda 30 días (opcional)
+    const diffTime = Math.abs(fechaFinal.getTime() - fechaInicio.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays > 30) {
+      newErrors.fechafinal = 'El rango de fechas no puede exceder los 30 días';
       valid = false;
     }
+  }
 
-    if (!formData.fechafinal) {
-      newErrors.fechafinal = 'Debe seleccionar una fecha de finalización';
-      valid = false;
-    } else if (formData.fechainicio && new Date(formData.fechafinal) < new Date(formData.fechainicio)) {
-      newErrors.fechafinal = 'La fecha final debe ser posterior a la fecha inicial';
-      valid = false;
-    }
+  // Validaciones de hora
+  if (!formData.Hora_inicio) {
+    newErrors.Hora_inicio = 'Debe seleccionar una hora de inicio';
+    valid = false;
+  }
 
-    if (!formData.Hora_inicio) {
-      newErrors.Hora_inicio = 'Debe seleccionar una hora de inicio';
-      valid = false;
-    }
-
-    if (!formData.Hora_final) {
-      newErrors.Hora_final = 'Debe seleccionar una hora de finalización';
-      valid = false;
-    } else if (formData.Hora_inicio && formData.Hora_final <= formData.Hora_inicio && formData.fechainicio === formData.fechafinal) {
+  if (!formData.Hora_final) {
+    newErrors.Hora_final = 'Debe seleccionar una hora de finalización';
+    valid = false;
+  } else if (formData.Hora_inicio && formData.fechainicio && formData.fechafinal) {
+    const fechaInicio = new Date(formData.fechainicio);
+    const fechaFinal = new Date(formData.fechafinal);
+    
+    // Si es el mismo día, validar que la hora final sea posterior a la inicial
+    if (formData.fechainicio === formData.fechafinal && formData.Hora_final <= formData.Hora_inicio) {
       newErrors.Hora_final = 'La hora final debe ser posterior a la hora inicial';
       valid = false;
     }
+    
+    // Validar que no se seleccione hora en el pasado si la fecha es hoy
+    if (formData.fechainicio === today.toISOString().split('T')[0]) {
+      const now = new Date();
+      const [hours, minutes] = formData.Hora_inicio.split(':').map(Number);
+      const selectedTime = new Date();
+      selectedTime.setHours(hours, minutes, 0, 0);
+      
+      if (selectedTime < now) {
+        newErrors.Hora_inicio = 'La hora de inicio no puede ser en el pasado para el día actual';
+        valid = false;
+      }
+    }
+  }
 
-    setErrors(newErrors);
-    return valid;
-  };
-
+  setErrors(newErrors);
+  return valid;
+};
   const submitSolicitud = async () => {
     if (!validateForm()) {
       Alert.alert('Error', 'Por favor complete todos los campos correctamente');

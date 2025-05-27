@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 09-04-2025 a las 18:37:24
+-- Tiempo de generación: 29-05-2025 a las 05:03:38
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -337,9 +337,9 @@ CREATE TABLE `anuncio` (
   `descripcion` varchar(45) DEFAULT NULL,
   `fechaPublicacion` date DEFAULT NULL,
   `horaPublicacion` time DEFAULT NULL,
-  `persona` int(11) NOT NULL,
+  `persona` int(11) DEFAULT NULL,
   `apart` varchar(222) DEFAULT NULL,
-  `img_anuncio` varchar(70) NOT NULL
+  `img_anuncio` varchar(70) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -347,9 +347,10 @@ CREATE TABLE `anuncio` (
 --
 
 INSERT INTO `anuncio` (`idAnuncio`, `titulo`, `descripcion`, `fechaPublicacion`, `horaPublicacion`, `persona`, `apart`, `img_anuncio`) VALUES
-(20, 'corte de luz', 'entre la 1 y 2 am el día 24/marxo', '2025-04-07', '14:35:00', 136, '101A', 'img/alarma.png'),
-(21, 'SEGURIDAD', 'CUIDADO AL SALIR DEL CONJUNTO ', '2025-04-14', '13:59:00', 137, NULL, 'img/alerta.png'),
-(22, 'actualizaciones', 'se actualizarán algunos datos', '2025-04-07', '01:04:00', 138, '303D', 'img/alerta.png');
+(29, 'corte de agua', 'este domingo hasta lunes', '2025-05-25', '12:32:32', 136, NULL, NULL),
+(30, 'daño en tuberia', 'se haran reparaciones', '2025-05-25', '01:30:43', 143, NULL, NULL),
+(31, 'Se hara capacitacion de seguridad ', 'capacitaciones', '2025-05-29', '09:22:45', 140, NULL, NULL),
+(32, 'venta de pasteles ', 'se haran una venta en las instalaciones del c', '2025-05-29', '09:26:24', 136, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -368,7 +369,46 @@ CREATE TABLE `apartamento` (
 --
 
 INSERT INTO `apartamento` (`numApartamento`, `pisos`, `torre`) VALUES
-
+('1001A', '10A', '1A'),
+('1001B', '10B', '2B'),
+('1001C', '10C', '3C'),
+('1001D', '10D', '4D'),
+('1001E', '10E', '5E'),
+('1001F', '10F', '6F'),
+('1001G', '10G', '7G'),
+('1001H', '10H', '8H'),
+('1001I', '10I', '9I'),
+('1001J', '10J', '10J'),
+('1002A', '10A', '1A'),
+('1002B', '10B', '2B'),
+('1002C', '10C', '3C'),
+('1002D', '10D', '4D'),
+('1002E', '10E', '5E'),
+('1002F', '10F', '6F'),
+('1002G', '10G', '7G'),
+('1002H', '10H', '8H'),
+('1002I', '10I', '9I'),
+('1002J', '10J', '10J'),
+('1003A', '10A', '1'),
+('1003B', '10B', '2'),
+('1003C', '10C', '3'),
+('1003D', '10D', '4'),
+('1003E', '10E', '5'),
+('1003F', '10F', '6'),
+('1003G', '10G', '7'),
+('1003H', '10H', '8'),
+('1003I', '10I', '9'),
+('1003J', '10J', '10'),
+('1004A', '10A', '1'),
+('1004B', '10B', '2'),
+('1004C', '10C', '3'),
+('1004D', '10D', '4'),
+('1004E', '10E', '5'),
+('1004F', '10F', '6'),
+('1004G', '10G', '7'),
+('1004H', '10H', '8'),
+('1004I', '10I', '9'),
+('1004J', '10J', '10'),
 ('101A', '1A', '1'),
 ('101B', '1B', '2'),
 ('101C', '1C', '3'),
@@ -728,47 +768,7 @@ INSERT INTO `apartamento` (`numApartamento`, `pisos`, `torre`) VALUES
 ('904G', '9G', '7'),
 ('904H', '9H', '8'),
 ('904I', '9I', '9'),
-('904J', '9J', '10'),
-('1001A', '10A', '1A'),
-('1001B', '10B', '2B'),
-('1001C', '10C', '3C'),
-('1001D', '10D', '4D'),
-('1001E', '10E', '5E'),
-('1001F', '10F', '6F'),
-('1001G', '10G', '7G'),
-('1001H', '10H', '8H'),
-('1001I', '10I', '9I'),
-('1001J', '10J', '10J'),
-('1002A', '10A', '1A'),
-('1002B', '10B', '2B'),
-('1002C', '10C', '3C'),
-('1002D', '10D', '4D'),
-('1002E', '10E', '5E'),
-('1002F', '10F', '6F'),
-('1002G', '10G', '7G'),
-('1002H', '10H', '8H'),
-('1002I', '10I', '9I'),
-('1002J', '10J', '10J'),
-('1003A', '10A', '1'),
-('1003B', '10B', '2'),
-('1003C', '10C', '3'),
-('1003D', '10D', '4'),
-('1003E', '10E', '5'),
-('1003F', '10F', '6'),
-('1003G', '10G', '7'),
-('1003H', '10H', '8'),
-('1003I', '10I', '9'),
-('1003J', '10J', '10'),
-('1004A', '10A', '1'),
-('1004B', '10B', '2'),
-('1004C', '10C', '3'),
-('1004D', '10D', '4'),
-('1004E', '10E', '5'),
-('1004F', '10F', '6'),
-('1004G', '10G', '7'),
-('1004H', '10H', '8'),
-('1004I', '10I', '9'),
-('1004J', '10J', '10');
+('904J', '9J', '10');
 
 -- --------------------------------------------------------
 
@@ -791,11 +791,9 @@ CREATE TABLE `cita` (
 --
 
 INSERT INTO `cita` (`idcita`, `fechacita`, `horacita`, `tipocita`, `apa`, `respuesta`, `estado`) VALUES
-(3, '2025-03-17', '10:00:00', 'Reclamo', '903A', '', 'pendiente'),
-(4, '2025-03-22', '16:00:00', 'Duda', '404A', '', 'pendiente'),
-(5, '2025-03-30', '11:00:00', 'Reclamo', '404A', '', 'pendiente'),
-(6, '2025-04-17', '14:00:00', 'Reclamo', '101A', '', 'pendiente'),
-(7, '2025-04-22', '13:00:00', 'Duda', '101A', '', 'pendiente');
+(10, '2025-06-01', '08:00:00', 'Administrativo', '101A', '', 'pendiente'),
+(11, '2025-06-10', '09:00:00', 'Reclamo', '101A', '', 'pendiente'),
+(12, '2025-06-02', '10:00:00', 'Duda', '101A', '', 'pendiente');
 
 -- --------------------------------------------------------
 
@@ -825,9 +823,7 @@ INSERT INTO `contactarnos` (`idcontactarnos`, `nombre`, `correo`, `telefono`, `c
 (6, 'Lance Armstrong', 'lance.armstrong@residencial.com', '321-456-7895', 'Al intentar registrarme, el sistema me da un error de datos duplicados.', '2024-10-16 01:10:00'),
 (7, 'Alberto Contador', 'alberto.contador@residencial.com', '321-456-7896', '¿Puedo usar el sistema para agendar eventos en la zona social?', '2024-10-17 02:20:00'),
 (8, 'Chris Froome', 'chris.froome@residencial.com', '321-456-7897', '¿Cuáles son los pasos para registrarse en la plataforma?', '2024-10-18 03:30:00'),
-(9, 'Marco Pantani', 'marco.pantani@residencial.com', '321-456-7898', 'No puedo acceder a la página desde mi teléfono móvil, ¿hay soporte para dispositivos móviles?', '2024-10-19 04:40:00'),
-(10, 'Gino Bartali', 'gino.bartali@residencial.com', '321-456-7899', 'Quisiera saber si se pueden hacer reservas para la cancha de fútbol antes de iniciar sesión.', '2024-10-20 05:50:00'),
-(23, 'EGAN BERNAL', 'EGAN@GMAIL.COM', '344545454545', 'NO ME DEJO REGISTRARME', '2025-04-09 13:08:06');
+(9, 'Marco Pantani', 'marco.pantani@residencial.com', '321-456-7898', 'No puedo acceder a la página desde mi teléfono móvil, ¿hay soporte para dispositivos móviles?', '2024-10-19 04:40:00');
 
 -- --------------------------------------------------------
 
@@ -851,8 +847,8 @@ CREATE TABLE `ingreso_peatonal` (
 INSERT INTO `ingreso_peatonal` (`idIngreso_Peatonal`, `personasIngreso`, `horaFecha`, `documento`, `tipo_ingreso`, `placa`) VALUES
 (2, 'Cristiano Ronaldo', '2025-02-22 21:16:00', 'cc.3232323223', 'visitante', ''),
 (4, 'lionel messi', '2025-03-26 01:25:00', 'cc.23323232', 'visitante', ''),
-(5, 'taded pogachar', '2025-04-16 23:57:00', 'CC.23323223', 'vehiculo', 'fe343443'),
-(6, 'ESTEVAN CHAVES', '2025-04-29 23:57:00', 'CC.23322323', 'visitante', '');
+(9, 'Saul Goodman', '2025-05-26 15:11:00', 'c.c 224343443', 'visitante', ''),
+(12, 'Don eladio', '2025-05-29 21:15:00', 'CC.12344343', 'visitante', '');
 
 -- --------------------------------------------------------
 
@@ -880,8 +876,21 @@ INSERT INTO `mensajes_chat` (`id_mensaje`, `id_remitente`, `id_destinatario`, `c
 (46, 136, NULL, 'hola', '2025-04-05 23:50:35', 'grupal', 'comunal', 0, 0),
 (47, 137, 136, 'hola', '2025-04-06 00:00:24', 'privado', NULL, 0, 0),
 (48, 136, 137, 'hola', '2025-04-06 00:16:56', 'privado', NULL, 0, 0),
-(49, 138, NULL, 'hols', '2025-04-06 00:28:16', 'grupal', 'comunal', 0, 0),
-(50, 138, 137, 'er', '2025-04-06 00:28:34', 'privado', NULL, 1, 0);
+(51, 140, NULL, 'holA', '2025-05-24 15:27:45', 'grupal', 'comunal', 0, 0),
+(52, 140, NULL, 'GGJH', '2025-05-24 15:27:55', 'grupal', 'comunal', 0, 0),
+(53, 140, NULL, 'HGTF', '2025-05-24 15:30:09', 'grupal', 'comunal', 1, 0),
+(54, 140, NULL, 'tyi', '2025-05-24 15:31:50', 'grupal', 'comunal', 1, 0),
+(55, 140, 142, 'hola', '2025-05-24 15:32:25', 'privado', NULL, 0, 0),
+(56, 136, NULL, 'hola ?', '2025-05-25 00:43:21', 'grupal', 'comunal', 0, 0),
+(57, 140, 136, 'hola Buenas Noches', '2025-05-25 00:43:51', 'privado', NULL, 0, 0),
+(58, 136, 140, 'buenas como le va', '2025-05-25 00:44:09', 'privado', NULL, 0, 0),
+(59, 143, 140, 'hola', '2025-05-25 15:52:37', 'privado', NULL, 0, 0),
+(60, 140, 143, 'hola+', '2025-05-25 15:53:15', 'privado', NULL, 0, 0),
+(61, 136, 140, 'hola', '2025-05-25 17:47:17', 'privado', NULL, 0, 0),
+(62, 143, 140, 'hhola', '2025-05-25 17:47:38', 'privado', NULL, 0, 0),
+(63, 136, NULL, 'hola', '2025-05-27 11:39:54', 'grupal', 'comunal', 0, 0),
+(64, 140, NULL, 'hoola', '2025-05-27 11:43:11', 'grupal', 'comunal', 0, 0),
+(65, 136, NULL, 'venta de pasteles', '2025-05-28 21:27:08', 'grupal', 'comunal', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -906,7 +915,7 @@ CREATE TABLE `pagos` (
 
 INSERT INTO `pagos` (`idPagos`, `pagoPor`, `cantidad`, `mediopago`, `apart`, `fechaPago`, `estado`, `referenciaPago`) VALUES
 (4, 'Reserva Zona BBQ', 50.00, 'Tarjeta', '102A', '2025-02-22', 'Pendiente', 'TARJ567890'),
-(10, 'LIMITE DE TIEMPO EN PARQUEADERO', 15.00, 'Efectivo', '903A', '2025-03-14', 'Pendiente', 'PARKING2323'),
+(10, 'LIMITE DE TIEMPO EN PARQUEADERO', 15.00, 'Efectivo', '903A', '2025-03-14', 'Pagado', 'PARKING2323'),
 (11, 'gym', 50.00, 'Transferencia', '101A', '2025-04-28', 'Pagado', 'GYMN455');
 
 -- --------------------------------------------------------
@@ -969,10 +978,13 @@ CREATE TABLE `registro` (
 --
 
 INSERT INTO `registro` (`id_Registro`, `idRol`, `PrimerNombre`, `SegundoNombre`, `PrimerApellido`, `SegundoApellido`, `apartamento`, `Correo`, `Usuario`, `Clave`, `Id_tipoDocumento`, `numeroDocumento`, `telefonoUno`, `telefonoDos`, `imagenPerfil`, `tipo_propietario`) VALUES
-(136, 3333, 'Nairo', 'Alexander', 'Quintana', 'Rojas', '101A', 'nairo.q@gmail.com', 'nairo', '$2y$10$F0EhaGS7w8edZk4FYPllHued12XZWpc1qZNETw3UxFijr2TmDRL/q', 1, 2147483647, 2147483647, 2147483647, 'img/alarma.png', 'residente'),
+(136, 3333, 'Nairo', 'Alexander', 'Quintana', 'Rojas', '101A', 'nairo@gmail.com', 'nairo', '$2y$10$ROsySbXfhxMzdtn0r57nZOtKnUVFJSJHu403rUAuY8Hel.59z5KTa', 1, 2147483647, 2147483647, 2147483647, 'uploads/perfiles/68338037aa544_67e40bb0b99b3.jpeg', 'residente'),
 (137, 2222, 'Primoz', '', 'Roglic', '', NULL, 'primos@gmail.com', 'primoz', '$2y$10$Z2Oh1369PDn/veGJx0fStuiFaLH5TJNduUPuOHX9Rqs685VSvlXWG', 1, 1212122112, 2147483647, 2147483647, 'uploads/YR3HFCGBQ5ETFBLFFH6FT63KSM.jpg', NULL),
-(138, 1111, 'lalo', 'eduardo', 'salamanca', 'salamanca', '303D', 'apirazanesquivel@gmail.com', 'lalo', '$2y$10$Xtzq7UxfX36ZWstBridc5.BQDl/w4XK.suWSWwZuM2F8ZSRrOu6ie', 1, 1221212121, 2147483647, 2147483647, 'uploads/Better-Call-Saul-Lalo-Salamanca-Jacket-Christmas-Sale.jpg', 'dueño'),
-(139, 2222, 'Egan ', 'Arley', 'Bernal ', 'Rojas', '202A', 'ineos@gmail.com', 'egan ', '$2b$10$c6JZQPqZchIPjU.UYK6HKeQKTeMUS2teJRrVnHHIjYn7sJRE4gpGe', 1, 2147483647, 325566855, 665589423, NULL, 'residente');
+(139, 2222, 'Egan ', 'Arley', 'Bernal ', 'Rojas', '202A', 'ineos@gmail.com', 'egan ', '$2b$10$c6JZQPqZchIPjU.UYK6HKeQKTeMUS2teJRrVnHHIjYn7sJRE4gpGe', 1, 2147483647, 325566855, 665589423, NULL, 'residente'),
+(140, 2222, 'lalo', 'eduardo', 'salamanca', 'salamanca', NULL, 'lalo@gmail.com', 'lalo', '$2y$10$sWZCwGvW67lJiI6zv8p9I.MJTaB/9yOGOGWDdnr9t.6sEiN.qrdri', 1, 1212121212, 2147483647, 2147483647, 'uploads/perfiles/68325cb538b65_better-call-saul.jpg', NULL),
+(142, 3333, 'Luiz', 'Diaz', 'Diaz', 'Marunanda', '203D', 'Luiz@gmail.com', 'diaz', '$2b$10$YJmPngnjjIWcyCtmWYvmYey5khSk9PzaG1L5gvpYaLj1/tznjirFe', 1, 2147483647, 2147483647, 2147483647, 'http://192.168.1.100:3001/uploads/profile-images/profile-1748002426429-657834308.jpg', 'dueño'),
+(143, 1111, 'Alberto ', 'Andys', 'Contador ', 'Schleck', '1001A', 'apirazanesquivel@gmail.com', 'alberto', '$2y$10$xmNxvNfv3KBnqUIgz/eGj.66EvH9tbnj23P1G.DH0HuWt2j/hR/1y', 1, 1646465665, 2147483647, 2147483647, 'uploads/perfiles/6833677ad6be4_2N6WaBMUyPKyGxpVk6q7cD.jpg', 'dueño'),
+(144, 3333, 'Juan ', 'Psblo', 'Montoya ', 'Montoya ', '1003A', 'Juanm@gmail.com', 'Juan ', '$2b$10$1VW/Xx4TL74/x/QdVARfhu8JO83wW/i95RVPenZMZ8P9Bf85AdG..', 1, 53096789, 2147483647, 2147483647, 'http://192.168.1.100:3001/uploads/profile-images/profile-1748485242342-87239024.jpg', 'residente');
 
 -- --------------------------------------------------------
 
@@ -1020,12 +1032,10 @@ CREATE TABLE `solicitud_parqueadero` (
 --
 
 INSERT INTO `solicitud_parqueadero` (`id_solicitud`, `id_apartamento`, `parqueadero_visitante`, `nombre_visitante`, `placaVehiculo`, `colorVehiculo`, `tipoVehiculo`, `modelo`, `marca`, `fecha_inicio`, `fecha_final`, `estado`) VALUES
-(1, '1002E', 'V10', 'Tadej Pogachar', '32ds45', 'Blanco', 'Moto', '2002', 'suzuki', '2025-02-27 10:22:13', '2025-02-20 21:22:13', 'pendiente'),
-(3, '202A', 'V1', 'PEDRI', 'SDDWE22', 'ROJO', 'CARRO', 'DSDS34', 'DSDSDS', '2025-02-14 12:55:00', '2025-02-26 12:55:00', 'aprobado'),
-(8, '903A', 'V10', 'juan fernando quintero', '3erw34', 'rojo y blanco', 'carro', '34', 'ferrrari', '2025-03-14 09:45:00', '2025-03-17 09:45:00', 'pendiente'),
-(9, '903A', 'V3', 'Egan Bernal', 'yt655try', 'negro', 'moto', 'e2024', 'suzuki', '2025-03-14 08:46:00', '2025-03-15 22:46:00', 'pendiente'),
-(10, '101A', 'V2', 'LIONEL MESSI', 'SDDS3223', 'AZUL', 'carro', 'sv3443', 'mazda', '2025-04-16 12:42:00', '2025-04-20 23:42:00', 'aprobado'),
-(11, '101A', 'V3', 'CRISTIANO RONALDO JR', 'CR7656565', 'MORADO', 'moto', 'suzuki3443', 'suzuki', '2025-04-13 23:43:00', '2025-04-14 23:43:00', 'aprobado');
+(26, '101A', 'V1', 'JOHN WICK', 'wwsdsdsd', 'AZUL OSCURO', 'carro', 'dsafd', 'nissan', '2025-05-29 21:48:00', '2025-05-30 12:48:00', 'pendiente'),
+(27, '101A', 'V5', 'walter white', 'RTTRE', 'verde', 'carro', 'erwrew', 'nissan', '2025-06-01 21:49:00', '2025-06-02 21:49:00', 'pendiente'),
+(28, '101A', 'V7', 'ISAAC DEL TORO', 'wwsdsdsd', 'BLANCO', 'moto', 'UAE', 'SHIMANO', '2025-06-03 21:50:00', '2025-06-04 21:50:00', 'pendiente'),
+(29, '101A', 'V6', 'RICHARD CARAPAZ', 'DSFD', 'ROSA', 'moto', 'EF ', 'ROSAW23', '2025-06-04 21:50:00', '2025-06-05 21:50:00', 'pendiente');
 
 -- --------------------------------------------------------
 
@@ -1046,6 +1056,14 @@ CREATE TABLE `solicitud_zona` (
 --
 -- Volcado de datos para la tabla `solicitud_zona`
 --
+
+INSERT INTO `solicitud_zona` (`ID_Apartamentooss`, `ID_zonaComun`, `fechainicio`, `fechafinal`, `Hora_inicio`, `Hora_final`, `estado`) VALUES
+('1001C', 4, '2025-05-28', '2025-06-02', '03:50:00', '20:50:00', 'PENDIENTE'),
+('802A', 3, '2025-06-04', '2025-06-07', '05:00:00', '23:44:00', 'ACEPTADA'),
+('1003E', 5, '2025-06-02', '2025-06-03', '00:03:00', '09:03:00', 'PENDIENTE'),
+('1002E', 1, '2025-05-28', '2025-05-30', '07:04:00', '11:04:00', 'ACEPTADA'),
+('1001I', 2, '2025-05-26', '2025-05-26', '02:20:00', '13:20:00', 'ACEPTADA'),
+('101A', 1, '2025-05-29', '2025-05-31', '14:35:00', '14:35:00', 'ACEPTADA');
 
 -- --------------------------------------------------------
 
@@ -1086,10 +1104,13 @@ CREATE TABLE `tokens` (
 --
 
 INSERT INTO `tokens` (`id_token`, `id_Registro`, `token`, `fecha_creacion`, `fecha_expiracion`) VALUES
-(102, 136, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjEzNiIsIlVzdWFyaW8iOiJuYWlybyIsIkNvcnJlbyI6Im5haXJvLnFAZ21haWwuY29tIiwiaWRSb2wiOiIzMzMzIiwiZXhwIjoxNzQzOTE3NjQ3fQ.Y3Rt9y3zQ_JWxixfD5tFk4skt9FBZf_dZ3A9xwZpOmo', '2025-04-06 04:34:07', '2025-04-06 07:34:07'),
 (103, 137, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjEzNyIsIlVzdWFyaW8iOiJwcmltb3oiLCJDb3JyZW8iOiJwcmltb3NAZ21haWwuY29tIiwiaWRSb2wiOiIyMjIyIiwiZXhwIjoxNzQzOTE5MDE1fQ.LhtYleP52U9dpFnBmyTj6wNWlsGpoc7rsYlnKZj3pS0', '2025-04-06 04:56:55', '2025-04-06 07:56:55'),
-(104, 138, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjEzOCIsIlVzdWFyaW8iOiJsYWxvIiwiQ29ycmVvIjoiYXBpcmF6YW5lc3F1aXZlbEBnbWFpbC5jb20iLCJpZFJvbCI6IjExMTEiLCJleHAiOjE3NDM5MTk0MTl9.bHn2NIqNj4-06Y1xbBzGg3oSlXRF85GuYGLNiZvMsp8', '2025-04-06 05:03:39', '2025-04-06 08:03:39'),
-(105, 139, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTM5LCJpYXQiOjE3NDQxMTM2MTAsImV4cCI6MTc0NDIwMDAxMH0.Rp15rrFtjdnadLWYVRqExbSnhJyGtMksvNLu0ejtq0M', '2025-04-08 12:00:10', '2025-04-09 07:00:10');
+(105, 139, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTM5LCJpYXQiOjE3NDQxMTM2MTAsImV4cCI6MTc0NDIwMDAxMH0.Rp15rrFtjdnadLWYVRqExbSnhJyGtMksvNLu0ejtq0M', '2025-04-08 12:00:10', '2025-04-09 07:00:10'),
+(116, 142, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQyLCJpYXQiOjE3NDgwMDE5MTksImV4cCI6MTc0ODA4ODMxOX0.fURYKgwloyJpDgpnLv3IsR5XOlLG1z8_j3F5if2aLlQ', '2025-05-23 12:05:19', '2025-05-24 07:05:19'),
+(193, 140, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJsb2NhbGhvc3QiLCJhdWQiOiJsb2NhbGhvc3QiLCJpYXQiOjE3NDg0ODQ4OTksImV4cCI6MTc0ODQ4OTQ5OSwiZGF0YSI6eyJpZF9SZWdpc3RybyI6MTQwLCJVc3VhcmlvIjoibGFsbyIsImlkUm9sIjoyMjIyLCJSb2xkZXNjcmlwY2lvbiI6Ikd1YXJkYSBkZSBTZWd1cmlkYW', '2025-05-29 02:14:59', '2025-05-28 22:31:39'),
+(194, 144, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQ0LCJpYXQiOjE3NDg0ODUxODAsImV4cCI6MTc0ODU3MTU4MH0.T92uInszkW6WWekASs4RC41xelm-z3F510k0A1OsyT4', '2025-05-29 02:19:40', '2025-05-29 21:19:40'),
+(198, 143, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJsb2NhbGhvc3QiLCJhdWQiOiJsb2NhbGhvc3QiLCJpYXQiOjE3NDg0ODY3ODAsImV4cCI6MTc0ODQ5MTM4MCwiZGF0YSI6eyJpZF9SZWdpc3RybyI6MTQzLCJVc3VhcmlvIjoiYWxiZXJ0byIsImlkUm9sIjoxMTExLCJSb2xkZXNjcmlwY2lvbiI6ImFkbWluIn19.fbfqOuwZy', '2025-05-29 02:46:20', '2025-05-28 23:03:00'),
+(199, 136, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJsb2NhbGhvc3QiLCJhdWQiOiJsb2NhbGhvc3QiLCJpYXQiOjE3NDg0ODY4ODcsImV4cCI6MTc0ODQ5MTQ4NywiZGF0YSI6eyJpZF9SZWdpc3RybyI6MTM2LCJVc3VhcmlvIjoibmFpcm8iLCJpZFJvbCI6MzMzMywiUm9sZGVzY3JpcGNpb24iOiJyZXNpZGVudGUifX0.j-7-kt', '2025-05-29 02:48:07', '2025-05-28 23:04:47');
 
 -- --------------------------------------------------------
 
@@ -1532,37 +1553,37 @@ ALTER TABLE `zona_comun`
 -- AUTO_INCREMENT de la tabla `anuncio`
 --
 ALTER TABLE `anuncio`
-  MODIFY `idAnuncio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `idAnuncio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT de la tabla `cita`
 --
 ALTER TABLE `cita`
-  MODIFY `idcita` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `idcita` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `contactarnos`
 --
 ALTER TABLE `contactarnos`
-  MODIFY `idcontactarnos` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `idcontactarnos` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT de la tabla `ingreso_peatonal`
 --
 ALTER TABLE `ingreso_peatonal`
-  MODIFY `idIngreso_Peatonal` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `idIngreso_Peatonal` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `mensajes_chat`
 --
 ALTER TABLE `mensajes_chat`
-  MODIFY `id_mensaje` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `id_mensaje` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
 
 --
 -- AUTO_INCREMENT de la tabla `pagos`
 --
 ALTER TABLE `pagos`
-  MODIFY `idPagos` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `idPagos` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `parqueadero`
@@ -1574,7 +1595,7 @@ ALTER TABLE `parqueadero`
 -- AUTO_INCREMENT de la tabla `registro`
 --
 ALTER TABLE `registro`
-  MODIFY `id_Registro` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=140;
+  MODIFY `id_Registro` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=145;
 
 --
 -- AUTO_INCREMENT de la tabla `rol`
@@ -1586,13 +1607,13 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `solicitud_parqueadero`
 --
 ALTER TABLE `solicitud_parqueadero`
-  MODIFY `id_solicitud` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id_solicitud` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT de la tabla `tokens`
 --
 ALTER TABLE `tokens`
-  MODIFY `id_token` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=106;
+  MODIFY `id_token` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=200;
 
 -- --------------------------------------------------------
 

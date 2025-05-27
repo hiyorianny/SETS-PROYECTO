@@ -20,19 +20,19 @@ export const RegisterScreen = () => {
     const [roles, setRoles] = useState<Role[]>([]);
     const [loadingRoles, setLoadingRoles] = useState(true);
     const [errors, setErrors] = useState<Record<string, string>>({});
-    
+
     const [userData, setUserData] = useState({
-        idRol: '', 
+        idRol: '',
         PrimerNombre: '',
         SegundoNombre: '',
         PrimerApellido: '',
         SegundoApellido: '',
         Correo: '',
-        Id_tipoDocumento: '', 
+        Id_tipoDocumento: '',
         numeroDocumento: '',
         telefonoUno: '',
         telefonoDos: '',
-        tipo_propietario: '', 
+        tipo_propietario: '',
         apartamento: '',
         Usuario: '',
         Clave: '',
@@ -44,7 +44,7 @@ export const RegisterScreen = () => {
             try {
                 const response = await fetch('http://192.168.1.100:3001/api/auth/roles');
                 const data = await response.json();
-                
+
                 if (response.ok && data.success) {
                     setRoles(data.roles);
                 } else {
@@ -66,7 +66,7 @@ export const RegisterScreen = () => {
                 setLoadingRoles(false);
             }
         };
-        
+
         fetchRoles();
     }, []);
 
@@ -83,19 +83,18 @@ export const RegisterScreen = () => {
                     return "Este campo es obligatorio";
                 }
                 return null;
-            
+
             case "Correo":
                 if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|co|mx|ar|cl|es)$/i.test(value)) {
                     return "El correo debe ser válido";
                 }
                 return null;
-            
+
             case "numeroDocumento":
-                if (!/^\d{10,}$/.test(value)) {
-                    return "El número  al menos 10 dígitos.";
+                if (!/^\d{6,10}$/.test(value)) {
+                    return "El número de documento debe tener entre 6 y 10 dígitos.";
                 }
                 return null;
-            
             case "telefonoUno":
             case "telefonoDos":
                 if (name === "telefonoUno" && !value) {
@@ -105,19 +104,19 @@ export const RegisterScreen = () => {
                     return "El teléfono debe tener  10 dígitos.";
                 }
                 return null;
-            
+
             case "Clave":
                 if (value.length < 8 || value.length > 17) {
                     return " Entre 8 y 17 caracteres.";
                 }
                 return null;
-            
+
             case "confirmPassword":
                 if (value !== userData.Clave) {
                     return "Las contraseñas no coinciden.";
                 }
                 return null;
-            
+
             default:
                 return null;
         }
@@ -133,27 +132,27 @@ export const RegisterScreen = () => {
             delete newErrors[name];
             setErrors(newErrors);
         }
-        
+
         setUserData({ ...userData, [name]: value });
     };
 
     const validateForm = (): boolean => {
         const baseRequiredFields = [
-            'idRol', 'PrimerNombre', 'PrimerApellido', 'Correo', 
+            'idRol', 'PrimerNombre', 'PrimerApellido', 'Correo',
             'Id_tipoDocumento', 'numeroDocumento', 'telefonoUno',
             'Usuario', 'Clave', 'confirmPassword'
         ];
-        
+
         // Solo agregar estos campos si no es Guarda de Seguridad
-        const additionalRequiredFields = userData.idRol !== '2222' 
-            ? ['tipo_propietario', 'apartamento'] 
+        const additionalRequiredFields = userData.idRol !== '2222'
+            ? ['tipo_propietario', 'apartamento']
             : [];
-        
+
         const requiredFields = [...baseRequiredFields, ...additionalRequiredFields];
-        
+
         const newErrors: Record<string, string> = {};
         let isValid = true;
-        
+
         // Validar campos requeridos
         requiredFields.forEach(field => {
             if (!userData[field as keyof typeof userData]) {
@@ -161,14 +160,14 @@ export const RegisterScreen = () => {
                 isValid = false;
             }
         });
-        
+
         // Validar campos con reglas específicas
         Object.keys(userData).forEach(key => {
             // No validar tipo_propietario y apartamento si el rol es guarda
             if (userData.idRol === '2222' && (key === 'tipo_propietario' || key === 'apartamento')) {
                 return;
             }
-            
+
             const value = userData[key as keyof typeof userData];
             const error = validateField(key, value || '');
             if (error) {
@@ -176,7 +175,7 @@ export const RegisterScreen = () => {
                 isValid = false;
             }
         });
-        
+
         setErrors(newErrors);
         return isValid;
     };
@@ -186,7 +185,7 @@ export const RegisterScreen = () => {
             Alert.alert('Error', 'Por favor corrija los errores en el formulario');
             return;
         }
-    
+
         try {
             const requestData = {
                 ...userData,
@@ -197,7 +196,7 @@ export const RegisterScreen = () => {
                 tipo_propietario: userData.idRol === '2222' ? null : userData.tipo_propietario,
                 apartamento: userData.idRol === '2222' ? null : userData.apartamento
             };
-    
+
             const response = await fetch('http://192.168.1.100:3001/api/auth/register', {
                 method: 'POST',
                 headers: {
@@ -205,13 +204,13 @@ export const RegisterScreen = () => {
                 },
                 body: JSON.stringify(requestData),
             });
-    
+
             const data = await response.json();
-    
+
             if (response.ok) {
                 await login(data.user, data.token);
-                
-                switch(userData.idRol) {
+
+                switch (userData.idRol) {
                     case '1111': // Admin
                         navigation.replace('registeradminloading');
                         break;
@@ -268,10 +267,10 @@ export const RegisterScreen = () => {
                             >
                                 <Picker.Item label="Seleccione un rol..." value="" />
                                 {roles.map((role) => (
-                                    <Picker.Item 
-                                        key={role.id} 
-                                        label={role.Roldescripcion} 
-                                        value={role.id.toString()} 
+                                    <Picker.Item
+                                        key={role.id}
+                                        label={role.Roldescripcion}
+                                        value={role.id.toString()}
                                     />
                                 ))}
                             </Picker>
@@ -354,7 +353,7 @@ export const RegisterScreen = () => {
                         </Picker>
                         {errors.Id_tipoDocumento && <Text style={styles.errorText}>{errors.Id_tipoDocumento}</Text>}
                     </View>
-                   
+
                     <View style={styles.formInput}>
                         <Image style={styles.formIcon} source={require('../../../../assets/nuevo.png')} />
                         <TextInput
