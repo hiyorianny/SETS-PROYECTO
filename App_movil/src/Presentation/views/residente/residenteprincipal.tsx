@@ -31,7 +31,7 @@ const ResidentePrincipal = () => {
     const fetchAnuncios = async () => {
       try {
 
-        const response = await fetch('http://192.168.1.100:3001/api/anuncios');
+        const response = await fetch('http://192.168.1.102:3001/api/anuncios');
         if (!response.ok) {
           throw new Error('Error al obtener anuncios');
         }
@@ -98,7 +98,7 @@ const ResidentePrincipal = () => {
           text: 'Eliminar',
           onPress: async () => {
             try {
-              const response = await fetch(`http://192.168.1.100:3001/api/elanuncios/${idAnuncio}`, {
+              const response = await fetch(`http://192.168.1.102:3001/api/elanuncios/${idAnuncio}`, {
                 method: 'DELETE'
               });
 

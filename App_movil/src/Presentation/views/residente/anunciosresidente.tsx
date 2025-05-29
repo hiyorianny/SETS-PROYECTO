@@ -10,7 +10,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 const Anunciosresi = () => {
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
     const { user, logout } = useAuth();
-    const BASE_URL = 'http://192.168.1.100:3001';
+    const BASE_URL = 'http://192.168.1.102:3001';
 
     const [formData, setFormData] = useState({
         titulo: '',

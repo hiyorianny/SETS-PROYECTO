@@ -409,7 +409,7 @@ class AuthController {
 
 
             const imageUrl = `/uploads/profile-images/${req.file.filename}`;
-            const fullUrl = `http://192.168.1.100:3001${imageUrl}`;
+            const fullUrl = `http://192.168.1.102:3001${imageUrl}`;
 
             connection.query(
                 'UPDATE registro SET imagenPerfil = ? WHERE id_Registro = ?',

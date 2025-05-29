@@ -68,12 +68,12 @@ const ZonasComunes = () => {
       try {
         setLoading(true);
 
-        const zonasResponse = await fetch('http://192.168.1.100:3001/api/zonas-comunes');
+        const zonasResponse = await fetch('http://192.168.1.102:3001/api/zonas-comunes');
         if (!zonasResponse.ok) throw new Error('Error al obtener zonas comunes');
         const zonasData = await zonasResponse.json();
         setZonasComunes(zonasData);
 
-        const solicitudesResponse = await fetch('http://192.168.1.100:3001/api/solicitudes-zonas');
+        const solicitudesResponse = await fetch('http://192.168.1.102:3001/api/solicitudes-zonas');
         if (!solicitudesResponse.ok) throw new Error('Error al obtener solicitudes');
         let solicitudesData = await solicitudesResponse.json();
 
@@ -340,7 +340,7 @@ const ZonasComunes = () => {
     }
 
     try {
-      const response = await fetch('http://192.168.1.100:3001/api/reservar-zona', {
+      const response = await fetch('http://192.168.1.102:3001/api/reservar-zona', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -390,7 +390,7 @@ const ZonasComunes = () => {
       if (!currentSolicitud) return;
 
       // Primero eliminamos la solicitud existente
-      const deleteResponse = await fetch('http://192.168.1.100:3001/api/cancelar-reserva', {
+      const deleteResponse = await fetch('http://192.168.1.102:3001/api/cancelar-reserva', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -408,7 +408,7 @@ const ZonasComunes = () => {
         throw new Error(errorData.error || 'Error al actualizar la solicitud');
       }
 
-      const createResponse = await fetch('http://192.168.1.100:3001/api/reservar-zona', {
+      const createResponse = await fetch('http://192.168.1.102:3001/api/reservar-zona', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -463,7 +463,7 @@ const ZonasComunes = () => {
           {
             text: 'Eliminar',
             onPress: async () => {
-              const response = await fetch('http://192.168.1.100:3001/api/cancelar-reserva', {
+              const response = await fetch('http://192.168.1.102:3001/api/cancelar-reserva', {
                 method: 'DELETE',
                 headers: {
                   'Content-Type': 'application/json',

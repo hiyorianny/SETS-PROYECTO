@@ -58,7 +58,7 @@ const CitasScreen = () => {
 
   const fetchCitas = async () => {
     try {
-      const response = await fetch('http://192.168.1.100:3001/api/citas');
+      const response = await fetch('http://192.168.1.102:3001/api/citas');
       if (!response.ok) {
         throw new Error('Error al obtener citas');
       }
