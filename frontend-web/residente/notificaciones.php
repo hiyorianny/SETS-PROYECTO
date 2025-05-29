@@ -76,17 +76,7 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
         </nav>
     </header>
     <br><br><br> <br>
-    <section id="chatContainer" class="chat-container position-fixed p-5 rounded-3" style="z-index: 1000; bottom: 20px; right: 20px;">
-        <div class="chat-header">
-            <span id="chatHeader">Chat</span>
-            <button class="close-btn" onclick="closeChat()">×</button>
-        </div>
-        <div class="chat-messages" id="chatMessages"></div>
-        <div class="chat-input">
-            <input type="text" id="chatInput" placeholder="Escribe tu Mensaje...">
-            <button onclick="sendMessage()">Enviar</button>
-        </div>
-    </section>
+
     </main>
     <br>
     <br>
@@ -112,7 +102,7 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const apiBaseUrl = 'http://192.168.1.100:3001/api';
+            const apiBaseUrl = 'http://192.168.1.102:3001/api';
             const usuario = "<?php echo htmlspecialchars($Usuario); ?>";
             const idRegistro = "<?php echo $idRegistro; ?>";
             let hiddenNotifications = JSON.parse(localStorage.getItem("hiddenNotifications_" + usuario)) || [];

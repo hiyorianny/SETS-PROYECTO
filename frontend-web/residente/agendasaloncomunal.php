@@ -200,7 +200,7 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                     });
 
 
-                    const response = await fetch('http://192.168.1.100:3001/api/reservar-zona', {
+                    const response = await fetch('http://192.168.1.102:3001/api/reservar-zona', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

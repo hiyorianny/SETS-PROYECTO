@@ -126,7 +126,7 @@ async function cargarZonasComunes() {
         const container = document.getElementById('zonasContainer');
         
 
-        const response = await fetch('http://192.168.1.100:3001/api/zonas-comunes', {
+        const response = await fetch('http://192.168.1.102:3001/api/zonas-comunes', {
             headers: {
                 'Content-Type': 'application/json',
 

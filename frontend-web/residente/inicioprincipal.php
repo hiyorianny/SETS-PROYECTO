@@ -209,7 +209,7 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
 
             async function loadAnnouncements() {
                 try {
-                    const response = await fetch('http://192.168.1.100:3001/api/anuncios');
+                    const response = await fetch('http://192.168.1.102:3001/api/anuncios');
                     const anuncios = await response.json();
 
                     const announcementsContainer = document.getElementById('announcements');
@@ -249,7 +249,7 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                 const query = document.getElementById('search-input').value.toLowerCase();
 
                 try {
-                    const response = await fetch('http://192.168.1.100:3001/api/anuncios');
+                    const response = await fetch('http://192.168.1.102:3001/api/anuncios');
                     const anuncios = await response.json();
 
                     const filtered = query ?
@@ -297,7 +297,7 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                 }
 
                 try {
-                    const response = await fetch(`http://192.168.1.100:3001/api/elanuncios/${id}`, {
+                    const response = await fetch(`http://192.168.1.102:3001/api/elanuncios/${id}`, {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json'

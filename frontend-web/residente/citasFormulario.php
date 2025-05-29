@@ -74,18 +74,6 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
         </nav>
     </header>
     <br><br>
-    <section class="chat-container" id="chatContainer">
-        <header class="chat-header">
-            <span id="chatHeader">Chat</span>
-            <button class="close-btn" onclick="closeChat()">×</button>
-        </header>
-        <div class="chat-messages" id="chatMessages">
-        </div>
-        <div class="chat-input">
-            <input type="text" id="chatInput" placeholder="Escribe tu mensaje...">
-            <button onclick="sendMessage()">Enviar</button>
-        </div>
-    </section>
     <main>
         <br> <br> <br>
         <div class="alert alert-success" role="alert" style="text-align: center; font-size :30px;"><b>Agendar Cita</b></div>
@@ -157,7 +145,7 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
 
         <script>
         
-            const API_BASE_URL = 'http://192.168.1.100:3001/api/citas';
+            const API_BASE_URL = 'http://192.168.1.102:3001/api/citas';
 
     
             document.addEventListener('DOMContentLoaded', function() {

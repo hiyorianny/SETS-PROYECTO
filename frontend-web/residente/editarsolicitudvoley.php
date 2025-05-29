@@ -160,7 +160,7 @@ require __DIR__ . '/../../Backend/auth/controller/residente.php';
                         hora_original: solicitud.Hora_inicio
                     };
 
-                    const response = await fetch('http://192.168.1.100:3001/api/solicitudes-zonas/actualizar', {
+                    const response = await fetch('http://192.168.1.102:3001/api/solicitudes-zonas/actualizar', {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',

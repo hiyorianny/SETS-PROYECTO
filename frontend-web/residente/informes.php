@@ -2,7 +2,7 @@
 require __DIR__ . '/../../Backend/auth/controller/residente.php';
 
 function getApiData($endpoint) {
-    $apiUrl = 'http://192.168.1.100:3001'.$endpoint;
+    $apiUrl = 'http://192.168.1.102:3001'.$endpoint;
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $apiUrl);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
