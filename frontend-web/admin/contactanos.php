@@ -135,7 +135,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
         <script>
             async function cargarContactos() {
                 try {
-                    const response = await fetch('http://192.168.1.100:3001/api/contactarnos');
+                    const response = await fetch('http://192.168.1.102:3001/api/contactarnos');
                     if (!response.ok) {
                         throw new Error('Error al obtener los datos');
                     }
@@ -186,7 +186,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                 }
 
                 try {
-                    const response = await fetch(`http://192.168.1.100:3001/api/contactarnos/${id}`, {
+                    const response = await fetch(`http://192.168.1.102:3001/api/contactarnos/${id}`, {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json',

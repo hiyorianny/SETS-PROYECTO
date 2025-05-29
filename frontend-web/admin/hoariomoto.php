@@ -113,20 +113,7 @@ $estado_parqueaderos = $stmt_estado->fetchAll(PDO::FETCH_ASSOC);
         </nav>
     </header>
     <br>
-    <main>
-        <section class="chat-container" id="chatContainer">
-            <header class="chat-header">
-                <span id="chatHeader">Chat</span>
-                <button class="close-btn" onclick="closeChat()">×</button>
-            </header>
-            <div class="chat-messages" id="chatMessages">
-            </div>
-            <div class="chat-input">
-                <input type="text" id="chatInput" placeholder="Escribe tu mensaje...">
-                <button onclick="sendMessage()">Enviar</button>
-            </div>
-        </section>
-    </main>
+
     <main>
 
 

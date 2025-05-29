@@ -145,7 +145,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
   
         async function loadSolicitudes() {
             try {
-                const response = await fetch(`http://192.168.1.100:3001/api/solicitudes-zonas?zona=${ZONA_ID}`);
+                const response = await fetch(`http://192.168.1.102:3001/api/solicitudes-zonas?zona=${ZONA_ID}`);
 
                 if (!response.ok) {
                     throw new Error('Error al cargar las solicitudes');
@@ -263,7 +263,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
 
                 console.log(`Cambiando estado de solicitud ${ID_Apartamentooss} a ${nuevoEstado}`);
 
-                const response = await fetch(`http://192.168.1.100:3001/api/solicitudes-zonas/${ID_Apartamentooss}/actualizar-estado`, {
+                const response = await fetch(`http://192.168.1.102:3001/api/solicitudes-zonas/${ID_Apartamentooss}/actualizar-estado`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',

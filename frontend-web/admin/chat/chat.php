@@ -2,19 +2,19 @@
 require __DIR__.'/conexion.php';
 require __DIR__.'/../../../Backend/auth/controller/admin.php';
 
-// Configuración
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Headers
+
 header("Access-Control-Allow-Origin: http://localhost:3000");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE, PUT");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 header("Access-Control-Allow-Credentials: true");
 header('Content-Type: application/json');
 
-// Manejar OPTIONS
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
@@ -28,12 +28,11 @@ try {
         throw new Exception('Usuario no autenticado', 401);
     }
 
-    // Solo aceptar POST
+
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         throw new Exception('Método no permitido', 405);
     }
 
-    // Obtener datos de entrada
     $input = json_decode(file_get_contents('php://input'), true);
     if (json_last_error() !== JSON_ERROR_NONE) {
         throw new Exception('Error al decodificar JSON: ' . json_last_error_msg());

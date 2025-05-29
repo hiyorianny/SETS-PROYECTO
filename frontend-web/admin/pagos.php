@@ -178,7 +178,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
             
      
             function cargarPagos() {
-                fetch('http://192.168.1.100:3001/api/pagos')
+                fetch('http://192.168.1.102:3001/api/pagos')
                     .then(response => response.json())
                     .then(data => {
                         pagosData = data;
@@ -282,7 +282,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                     }
                     
                
-                    fetch('http://192.168.1.100:3001/api/pagos', {
+                    fetch('http://192.168.1.102:3001/api/pagos', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -307,7 +307,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
             
           
             function actualizarEstadoPago(idPago, nuevoEstado) {
-                fetch(`http://192.168.1.100:3001/api/pagos/${idPago}`, {
+                fetch(`http://192.168.1.102/api/pagos/${idPago}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -335,7 +335,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                     return;
                 }
                 
-                fetch(`http://192.168.1.100:3001/api/pagos/${idPago}`, {
+                fetch(`http://192.168.1.102:3001/api/pagos/${idPago}`, {
                     method: 'DELETE'
                 })
                 .then(response => response.json())

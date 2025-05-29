@@ -67,7 +67,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                                     <b style="font-size: 20px;"> CHAT</b>
 
                                     <ul class="dropdown-menu" role="menu">
-                                       
+
                                         <li>
                                             <center><a href="#" class="chat-item" onclick="openChat('Guarda de Seguridad')">Guarda de Seguridad</a></center>
                                         </li>
@@ -89,20 +89,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                 </div>
             </div>
         </nav>
-        <main>
-        <div id="chatContainer" class="chat-container">
-            <div class="chat-header">
-                <span id="chatHeader">Chat</span>
-                <button class="close-btn" onclick="closeChat()">×</button>
-            </div>
-            <div class="chat-messages" id="chatMessages">
-            </div>
-            <div class="chat-input">
-                <input type="text" id="chatInput" style="font-size: 14px;" placeholder="Escribe tu mensaje...">
-                <button onclick="sendMessage()">Enviar</button>
-            </div>
-        </div>
-        </main>
+
     </header>
     <br><br><br><br>
     <div class="container">
@@ -144,10 +131,9 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
     </div>
 
     <script>
-
         async function loadCitas() {
             try {
-                const response = await fetch('http://192.168.1.100:3001/api/citas');
+                const response = await fetch('http://192.168.1.102:3001/api/citas');
                 if (!response.ok) {
                     throw new Error('Error al cargar las citas');
                 }
@@ -166,7 +152,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
 
             citas.forEach(cita => {
                 const row = document.createElement('tr');
-                
+
                 row.innerHTML = `
                     <td>${escapeHtml(cita.tipocita)}</td>
                     <td>${escapeHtml(cita.fechacita)}</td>
@@ -185,7 +171,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
                             '<span>Respondida</span>'}
                     </td>
                 `;
-                
+
                 tableBody.appendChild(row);
             });
         }
@@ -194,20 +180,23 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
         async function responderCita(event, idcita) {
             event.preventDefault();
             const respuesta = event.target.respuesta.value;
-            
+
             try {
-                const response = await fetch('http://192.168.1.100:3001/api/citas/responder', {
+                const response = await fetch('http://192.168.1.102:3001/api/citas/responder', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ idcita, respuesta })
+                    body: JSON.stringify({
+                        idcita,
+                        respuesta
+                    })
                 });
-                
+
                 if (!response.ok) {
                     throw new Error('Error al responder la cita');
                 }
-                
+
                 alert('Respuesta enviada con éxito');
                 loadCitas(); // Recargar las citas
             } catch (error) {
@@ -221,16 +210,16 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
             if (!confirm('¿Estás seguro de que deseas eliminar esta cita?')) {
                 return;
             }
-            
+
             try {
-                const response = await fetch(`http://192.168.1.100:3001/api/citas/${idcita}`, {
+                const response = await fetch(`http://192.168.1.102:3001/api/citas/${idcita}`, {
                     method: 'DELETE'
                 });
-                
+
                 if (!response.ok) {
                     throw new Error('Error al eliminar la cita');
                 }
-                
+
                 alert('Cita eliminada con éxito');
                 loadCitas(); // Recargar las citas
             } catch (error) {
@@ -279,8 +268,8 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
             }
         }
     </script>
-    <br> <br>  <br>   <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>  <br>
-    <footer> 
+    <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
+    <footer>
         <div class="footer-content">
             <p>&copy; 2025 SETS. Todos los derechos reservados.</p>
             <ul>
@@ -292,4 +281,5 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
+
 </html>

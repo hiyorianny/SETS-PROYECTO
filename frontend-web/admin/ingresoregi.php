@@ -125,7 +125,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
   <script>
     async function cargarIngresos() {
       try {
-        const response = await fetch('http://192.168.1.100:3001/api/ingresos');
+        const response = await fetch('http://192.168.1.102:3001/api/ingresos');
         if (!response.ok) {
           throw new Error('Error al obtener los datos');
         }
@@ -185,7 +185,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
       }
 
       try {
-        const response = await fetch('http://192.168.1.100:3001/api/ingresos', {
+        const response = await fetch('http://192.168.1.102:3001/api/ingresos', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -214,7 +214,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
       }
 
       try {
-        const response = await fetch(`http://192.168.1.100:3001/api/ingresos/${id}`, {
+        const response = await fetch(`http://192.168.1.102:3001/api/ingresos/${id}`, {
           method: 'DELETE'
         });
 

@@ -94,15 +94,13 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
     <script>
-        // Función para obtener el token de autenticación (debes implementar cómo almacenas el token)
         function getAuthToken() {
             return localStorage.getItem('authToken');
         }
 
-        // Función para cargar las zonas comunes desde la API
         async function loadZonasComunes() {
             try {
-                const response = await fetch('http://192.168.1.100:3001/api/zonas-comunes', {
+                const response = await fetch('http://192.168.1.102:3001/api/zonas-comunes', {
                     headers: {
                         'Authorization': `Bearer ${getAuthToken()}`
                     }
@@ -120,7 +118,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
             }
         }
 
-        // Función para mostrar las zonas en el DOM
+
         function displayZonas(zonas) {
             const container = document.getElementById('zonasContainer');
             container.innerHTML = '';
@@ -166,7 +164,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
             });
         }
 
-        // Función para determinar la página de solicitud según el ID de zona
+
         function getPaginaSolicitud(idZona) {
         const zonasMap = {
             1: 'solicitarfutbol.php',
@@ -182,7 +180,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
         async function confirmDelete(idZona) {
             if (confirm('¿Estás seguro de que deseas eliminar esta zona común?')) {
                 try {
-                    const response = await fetch(`http://192.168.1.100:3001/api/zonas-comunes/${idZona}`, {
+                    const response = await fetch(`http://192.168.1.102:3001/api/zonas-comunes/${idZona}`, {
                         method: 'DELETE',
                         headers: {
                             'Authorization': `Bearer ${getAuthToken()}`
@@ -216,7 +214,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
         // Función para cargar información del usuario
         async function loadUserInfo() {
             try {
-                const response = await fetch('http://192.168.1.100:3001/api/auth/user', {
+                const response = await fetch('http://192.168.1.102:3001/api/auth/user', {
                     headers: {
                         'Authorization': `Bearer ${getAuthToken()}`
                     }

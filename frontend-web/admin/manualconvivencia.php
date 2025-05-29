@@ -77,18 +77,7 @@ require __DIR__ . '/../../Backend/auth/controller/admin.php';
             </div>
         </nav>
     </header>
-    <div id="chatContainer" class="chat-container">
-        <div class="chat-header">
-            <h2 id="chatHeader">Chat</h2>
-            <button class="close-btn" onclick="closeChat()">×</button>
-        </div>
-        <div class="chat-messages" id="chatMessages">
-        </div>
-        <div class="chat-input">
-            <input type="text" id="chatInput" placeholder="Escribe tu mensaje...">
-            <button onclick="sendMessage()">Enviar</button>
-        </div>
-    </div>
+
     <main>
         <br>
         <br>
