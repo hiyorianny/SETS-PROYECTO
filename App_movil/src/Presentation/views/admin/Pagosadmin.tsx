@@ -30,7 +30,7 @@ const Pagosadmin = () => {
   const fetchPagos = async () => {
     try {
       setRefreshing(true);
-      const response = await fetch('http://192.168.1.100:3001/api/pagos');
+      const response = await fetch('http://192.168.1.102:3001/api/pagos');
       const data = await response.json();
       setPagos(data);
     } catch (error) {
@@ -47,7 +47,7 @@ const Pagosadmin = () => {
 
   const handleDeletePago = async (idPagos: number) => {
     try {
-      const response = await fetch(`http://192.168.1.100:3001/api/pagos/${idPagos}`, {
+      const response = await fetch(`http://192.168.1.102:3001/api/pagos/${idPagos}`, {
         method: 'DELETE',
       });
 
@@ -104,7 +104,7 @@ const Pagosadmin = () => {
   const updateEstadoPago = async (idPagos: number, nuevoEstado: 'Pendiente' | 'Pagado' | 'Vencido') => {
     try {
 
-      const response = await fetch(`http://192.168.1.100:3001/api/pagos/${idPagos}`, { 
+      const response = await fetch(`http://192.168.1.102:3001/api/pagos/${idPagos}`, { 
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

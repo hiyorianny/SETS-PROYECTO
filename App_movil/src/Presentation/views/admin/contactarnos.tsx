@@ -31,7 +31,7 @@ const Contactanosadmin = () => {
     const fetchContactos = async () => {
         try {
             setLoading(true);
-            const response = await fetch('http://192.168.1.100:3001/api/contactarnos');
+            const response = await fetch('http://192.168.1.102:3001/api/contactarnos');
             if (!response.ok) {
                 throw new Error('Error al obtener contactos');
             }
@@ -46,7 +46,7 @@ const Contactanosadmin = () => {
 
     const handleDelete = async (id: number) => {
         try {
-            const response = await fetch(`http://192.168.1.100:3001/api/contactarnos/${id}`, {
+            const response = await fetch(`http://192.168.1.102:3001/api/contactarnos/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'

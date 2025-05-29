@@ -34,7 +34,7 @@ const DatosUsuarios = () => {
     useEffect(() => {
         const fetchUsuarios = async () => {
             try {
-                const response = await fetch('http://192.168.1.100:3001/api/usuarios');
+                const response = await fetch('http://192.168.1.102:3001/api/usuarios');
                 if (!response.ok) {
                     throw new Error('Error al obtener usuarios');
                 }
@@ -64,7 +64,7 @@ const DatosUsuarios = () => {
                     text: 'Eliminar',
                     onPress: async () => {
                         try {
-                            const response = await fetch(`http://192.168.1.100:3001/api/usuarios/${id}`, {
+                            const response = await fetch(`http://192.168.1.102:3001/api/usuarios/${id}`, {
                                 method: 'DELETE',
                             });
 

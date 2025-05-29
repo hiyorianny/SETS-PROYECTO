@@ -58,7 +58,7 @@ const PerfilAdmin = () => {
           throw new Error('ID de usuario no disponible');
         }
 
-        const response = await fetch(`http://192.168.1.100:3001/api/auth/user/${user.id_Registro}`);
+        const response = await fetch(`http://192.168.1.102:3001/api/auth/user/${user.id_Registro}`);
 
         if (!response.ok) {
           throw new Error(`Error HTTP: ${response.status}`);
@@ -137,7 +137,7 @@ const PerfilAdmin = () => {
          telefonoDos: editedUser.telefonoDos || usuario?.telefonoDos || null
        };
  
-       const response = await fetch(`http://192.168.1.100:3001/api/auth/user/${user?.id_Registro}`, {
+       const response = await fetch(`http://192.168.1.102:3001/api/auth/user/${user?.id_Registro}`, {
          method: 'PUT',
          headers: {
            'Content-Type': 'application/json',
@@ -276,7 +276,7 @@ const pickImage = async (source: 'camera' | 'gallery') => {
       } as any);
       formData.append('userId', user?.id_Registro?.toString() || '');
   
-      const uploadResponse = await fetch('http://192.168.1.100:3001/api/auth/upload-profile-image', {
+      const uploadResponse = await fetch('http://192.168.1.102:3001/api/auth/upload-profile-image', {
         method: 'POST',
         body: formData,
         headers: {
@@ -335,7 +335,7 @@ const pickImage = async (source: 'camera' | 'gallery') => {
   }
   
   // Si es una ruta relativa, construir la URL completa
-  const baseUrl = 'http://192.168.1.105:3000';
+  const baseUrl = 'http://192.168.1.102:3000';
   const fullUrl = url.startsWith('/') ? `${baseUrl}${url}` : `${baseUrl}/${url}`;
   const separator = fullUrl.includes('?') ? '&' : '?';
   return `${fullUrl}${separator}ts=${new Date().getTime()}`;
