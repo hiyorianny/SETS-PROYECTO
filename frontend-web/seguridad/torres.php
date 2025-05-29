@@ -128,7 +128,7 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
 
     async function cargarDatosTorres() {
       try {
-        const response = await fetch('http://192.168.1.100:3001/api/torres');
+        const response = await fetch('http://192.168.1.102:3001/api/torres');
         if (!response.ok) {
           throw new Error('Error al obtener los datos');
         }

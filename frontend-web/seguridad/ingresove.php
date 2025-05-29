@@ -163,7 +163,7 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
-            const API_BASE_URL = 'http://192.168.1.100:3001/api';
+            const API_BASE_URL = 'http://192.168.1.102:3001/api';
             let solicitudes = [];
             let deleteId = null;
             let confirmDeleteModal = null;

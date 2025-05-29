@@ -108,7 +108,7 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
     
     <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const apiBaseUrl = 'http://192.168.1.100:3001/api';
+        const apiBaseUrl = 'http://192.168.1.102:3001/api';
         const usuario = "<?php echo htmlspecialchars($Usuario); ?>";
         const idRegistro = "<?php echo $idRegistro; ?>";
         let hiddenNotifications = JSON.parse(localStorage.getItem("hiddenNotifications_" + usuario)) || [];

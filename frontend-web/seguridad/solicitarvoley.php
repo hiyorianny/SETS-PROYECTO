@@ -149,7 +149,7 @@ require __DIR__ . '/../../Backend/auth/controller/guarda.php';
         // Función para cargar las solicitudes desde la API
         async function cargarSolicitudes() {
             try {
-                const response = await fetch(`http://192.168.1.100:3001/api/solicitudes-zonas?zona=${zonaId}`);
+                const response = await fetch(`http://192.168.1.102:3001/api/solicitudes-zonas?zona=${zonaId}`);
 
                 if (!response.ok) {
                     throw new Error(`Error HTTP: ${response.status}`);

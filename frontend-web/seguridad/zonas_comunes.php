@@ -104,7 +104,7 @@ require __DIR__.'/../../Backend/auth/controller/guarda.php';
         // Función para cargar las zonas comunes desde la API
         async function cargarZonasComunes() {
             try {
-                const response = await fetch('http://192.168.1.100:3001/api/zonas-comunes');
+                const response = await fetch('http://192.168.1.102:3001/api/zonas-comunes');
                 
                 if (!response.ok) {
                     throw new Error(`Error HTTP: ${response.status}`);
