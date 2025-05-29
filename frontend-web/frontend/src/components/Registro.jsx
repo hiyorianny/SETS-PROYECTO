@@ -3,8 +3,8 @@ import axios from "axios";
 import "./registro.css";
 import logo from "../assets/img/c.png";
 import Cookies from "js-cookie";
-import { ToastContainer, toast } from "react-toastify"; 
-import "react-toastify/dist/ReactToastify.css"; 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Registro = () => {
   const [formData, setFormData] = useState({
@@ -75,9 +75,9 @@ const Registro = () => {
         }
         break;
       case "numeroDocumento":
-        if (!/^\d{10,}$/.test(value)) {
+        if (!/^\d{6,10}$/.test(value)) {
           errorMessage =
-            "El número de documento debe tener al menos 10 dígitos.";
+            "El número de documento debe tener entre 6 y 10 dígitos.";
         }
         break;
       case "telefonoUno":
@@ -105,7 +105,7 @@ const Registro = () => {
     e.preventDefault();
 
     // Filtramos los errores para eliminar los de campos que no son requeridos
-    const filteredErrors = {...errors};
+    const filteredErrors = { ...errors };
     if (formData.idRol === "2222") {
       delete filteredErrors.tipo_propietario;
       delete filteredErrors.apartamento;
@@ -113,59 +113,59 @@ const Registro = () => {
 
     const hasErrors = Object.values(filteredErrors).some((error) => error);
     if (hasErrors) {
-        setMensaje("Por favor corrige los errores antes de enviar.");
-        return;
+      setMensaje("Por favor corrige los errores antes de enviar.");
+      return;
     }
 
     // Preparamos los datos a enviar
-    const dataToSend = {...formData};
+    const dataToSend = { ...formData };
     if (formData.idRol === "2222") {
       dataToSend.tipo_propietario = "";
       dataToSend.apartamento = "";
     }
 
     try {
-        const response = await axios.post(
-            "http://localhost/SETS-PROYECTO/Backend/auth/regi.php",
-            dataToSend,
-            {
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                withCredentials: true,
-            }
-        );
-
-        console.log(response.data); 
-
-        const { redirect, token } = response.data;
-
-        if (token) {
-            Cookies.set("token", token, { expires: 1 });
+      const response = await axios.post(
+        "http://localhost/SETS-PROYECTO/Backend/auth/regi.php",
+        dataToSend,
+        {
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          withCredentials: true,
         }
+      );
 
-        if (redirect) {
-            toast.success("Registro realizado correctamente", {
-                position: "top-right",
-                autoClose: 2000, 
-                onClose: () => {
-                    const rutas = {
-                        1111: "http://localhost/SETS-PROYECTO/frontend-web/admin/BIENVENIDOADMI.php",
-                        2222: "http://localhost/SETS-PROYECTO/frontend-web/seguridad/BIENVENIDOGUARDA.php",
-                        3333: "http://localhost/SETS-PROYECTO/frontend-web/residente/BIENVENIDORESIDENTE.php",
-                        4444: "http://localhost/SETS-PROYECTO/frontend-web/dueño/BIENVENIDORESIDENTE.php",
-                        error: "http://localhost/SETS-PROYECTO/frontend-web/error.html",
-                    };
-                    window.location.href = rutas[redirect] || rutas["error"];
-                },
-            });
-        }
-    } catch (error) {
-        setMensaje(
-            error.response?.data?.error || "Error al registrar el usuario."
-        );
-        toast.error("Error al registrar el usuario", {
-            position: "top-right",
-            autoClose: 3000,
+      console.log(response.data);
+
+      const { redirect, token } = response.data;
+
+      if (token) {
+        Cookies.set("token", token, { expires: 1 });
+      }
+
+      if (redirect) {
+        toast.success("Registro realizado correctamente", {
+          position: "top-right",
+          autoClose: 2000,
+          onClose: () => {
+            const rutas = {
+              1111: "http://localhost/SETS-PROYECTO/frontend-web/admin/BIENVENIDOADMI.php",
+              2222: "http://localhost/SETS-PROYECTO/frontend-web/seguridad/BIENVENIDOGUARDA.php",
+              3333: "http://localhost/SETS-PROYECTO/frontend-web/residente/BIENVENIDORESIDENTE.php",
+              4444: "http://localhost/SETS-PROYECTO/frontend-web/dueño/BIENVENIDORESIDENTE.php",
+              error: "http://localhost/SETS-PROYECTO/frontend-web/error.html",
+            };
+            window.location.href = rutas[redirect] || rutas["error"];
+          },
         });
+      }
+    } catch (error) {
+      setMensaje(
+        error.response?.data?.error || "Error al registrar el usuario."
+      );
+      toast.error("Error al registrar el usuario", {
+        position: "top-right",
+        autoClose: 3000,
+      });
     }
   };
 
@@ -218,7 +218,7 @@ const Registro = () => {
         <h6>
           <b> Informacion Personal :</b>
         </h6>
-   
+
         <input
           type="text"
           name="PrimerNombre"
