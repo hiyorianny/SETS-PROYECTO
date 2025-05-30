@@ -86,6 +86,13 @@ class SolicitudZonaModel {
             callback(null, results);
         });
     }
+    static getWithLimit(limit, callback) {
+        const query = 'SELECT * FROM solicitud_zona LIMIT ?';
+        db.query(query, [limit], (err, results) => {
+            if (err) return callback(err, null);
+            callback(null, results);
+        });
+    }
 }
 
 module.exports = SolicitudZonaModel;

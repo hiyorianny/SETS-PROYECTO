@@ -196,6 +196,25 @@ class SolicitudZonaController {
             res.status(500).json({ error: error.message });
         }
     }
+    static async getLimited(req, res) {
+        try {
+            const limit = parseInt(req.query.limit) || 10;
+
+            if (isNaN(limit) || limit <= 0) {
+                return res.status(400).json({ error: 'El parámetro limit debe ser un número positivo' });
+            }
+
+            SolicitudZonaModel.getWithLimit(limit, (err, solicitudes) => {
+                if (err) {
+                    console.error('Error al obtener solicitudes limitadas:', err);
+                    return res.status(500).json({ error: 'Error al obtener solicitudes' });
+                }
+                res.json(solicitudes); 
+            });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
 
 }
 

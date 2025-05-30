@@ -50,7 +50,7 @@ const ZonasComunesadmin = () => {
         const zonasData = await zonasResponse.json();
         setZonasComunes(zonasData);
 
-        const solicitudesResponse = await fetch('http://192.168.1.102:3001/api/solicitudes-zonas');
+        const solicitudesResponse = await fetch('http://192.168.1.102:3001/api/solicitudes-zonas/limitadas');
         if (!solicitudesResponse.ok) throw new Error('Error al obtener solicitudes');
         let solicitudesData = await solicitudesResponse.json();
 
