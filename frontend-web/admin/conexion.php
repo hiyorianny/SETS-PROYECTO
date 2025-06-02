@@ -1,7 +1,7 @@
 <?php
-$host = 'localhost';
-$contrasena = "";
-$usuario = "root";
+$host = 'sets.mysql.database.azure.com';
+$contrasena = "Apartamento12";
+$usuario = "wolwerine24";
 $nombre_base_de_datos = "sets";
 
 try {

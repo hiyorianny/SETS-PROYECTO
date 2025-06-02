@@ -3,9 +3,9 @@ const mysql = require('mysql');
 
 // Configuración mejorada con manejo de errores
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
+  host: 'sets.mysql.database.azure.com',
+  user: 'wolwerine24',
+  password: 'Apartamento12',
   database: 'sets',
   connectTimeout: 10000 // 10 segundos de timeout
 });

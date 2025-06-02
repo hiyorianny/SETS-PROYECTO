@@ -2,11 +2,15 @@ const mysql = require('mysql');
 
 
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '', 
-    database: 'sets'
-});
+    host: 'sets.mysql.database.azure.com',
+    user: 'wolwerine24',
+    password: 'Apartamento12',
+    database: 'sets',
+    ssl: {
+        ca: fs.readFileSync(__dirname + '/BaltimoreCyberTrustRoot.crt.pem')
+    },
+    connectTimeout: 60000
+})
 
 
 db.connect((err) => {

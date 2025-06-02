@@ -300,7 +300,7 @@
 			};
 
 			try {
-				const response = await fetch('http://192.168.1.100:3001/api/contactarnos', {
+				const response = await fetch('http://192.168.1.102:3001/api/contactarnos', {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',

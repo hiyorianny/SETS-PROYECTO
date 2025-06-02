@@ -15,7 +15,7 @@ describe('AnuncioController', () => {
   });
 
   describe('getAll', () => {
-    it('debe manejar errores correctamente', async () => {
+    it('se deben manejar errores correctamente', async () => {
       const mockError = new Error('DB Error');
       AnuncioModel.getAll.mockImplementation(callback => callback(mockError, null));
 

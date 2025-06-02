@@ -9,7 +9,7 @@ describe('AnuncioModel', () => {
   });
 
   describe('getAll', () => {
-    it('debe retornar anuncios ordenados', async () => {
+    it('nos debe  retornar anuncios ordenados', async () => {
       const mockAnuncios = [{ id: 1, titulo: 'Test' }];
       db.query.mockImplementation((query, callback) => {
         callback(null, mockAnuncios);
