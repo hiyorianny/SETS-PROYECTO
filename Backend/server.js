@@ -103,6 +103,6 @@ app.options('*', cors());
 
 
 const port = process.env.PORT || 3001;
-app.listen(port, '192.168.1.102', () => {
-  console.log(`Servidor ejecutándose en http://192.168.1.102:${port}`);
+app.listen(port, () => {
+  console.log(`Servidor ejecutándose en el puerto ${port}`);
 });
