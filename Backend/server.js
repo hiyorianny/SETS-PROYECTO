@@ -101,8 +101,11 @@ app.use(cors({
 
 app.options('*', cors());
 
+app.get('/', (req, res) => {
+  res.send('✅ Backend funcionando en Azure');
+});
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Servidor ejecutándose en el puerto ${port}`);
 });
