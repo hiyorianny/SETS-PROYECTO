@@ -3,7 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 const authRoutes = require('./routes/authRoutes');
-const anuncioRoutes = require('./routes/anunciroutes'); 
+const anuncioRoutes = require('./routes/anunciroutes');
 const torreRoutes = require('./routes/torre');
 const reservaRoutes = require('./routes/reservarroutes');
 const pagoRoutes = require('./routes/pagosroue');
@@ -17,27 +17,30 @@ const solicitudZonaRoutes = require('./routes/solicitudZonaRoutes');
 const solicitudParqueaderoRoutes = require('./routes/solicitudParqueaderoRoutes');
 const mysql = require('mysql');
 const multer = require('multer');
+const fs = require('fs');
+
 
 
 
 const db = mysql.createConnection({
-    host: 'sets.mysql.database.azure.com',
-    user: 'wolwerine24',
-    password: 'Apartamento12',
-    database: 'sets',
-    ssl: {
-        ca: fs.readFileSync(__dirname + '/BaltimoreCyberTrustRoot.crt.pem')
-    },
-    connectTimeout: 60000
-})
+  host: 'sets.mysql.database.azure.com',
+  user: 'wolwerine24',
+  password: 'Apartamento12',
+  database: 'sets',
+  connectTimeout: 60000,
+  ssl: {
+    ca: fs.readFileSync(path.join(__dirname, './ssl/DigiCertGlobalRootCA.crt.pem')),
+    rejectUnauthorized: true
+  }
+});
 
 
 db.connect(err => {
-    if (err) {
-        console.error('Error conectando a la base de datos:', err);
-    } else {
-        console.log('Conectado a la base de datos MySQL');
-    }
+  if (err) {
+    console.error('Error conectando a la base de datos:', err);
+  } else {
+    console.log('Conectado a la base de datos MySQL');
+  }
 });
 
 
@@ -60,7 +63,7 @@ app.use('/uploads', express.static(uploadsPath, {
 
 app.use('/api/auth', authRoutes);
 
-app.use('/api', torreRoutes); 
+app.use('/api', torreRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api', anuncioRoutes);
@@ -74,10 +77,10 @@ app.use('/api/auth', authRoutes);
 
 app.use('/api', torreRoutes);
 app.use('/api', pagoRoutes);
-app.use('/api/citas', citaRoutes); 
+app.use('/api/citas', citaRoutes);
 app.use('/api/ingresos', ingresoRoutes);
 app.use('/api/contactarnos', contactoRoutes);
-app.use('/api/parqueaderos', parqueaderoRoutes); 
+app.use('/api/parqueaderos', parqueaderoRoutes);
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/zonas-comunes', zonaComunRoutes);
 app.use('/api/solicitudes-zonas', solicitudZonaRoutes);
@@ -85,12 +88,12 @@ app.use('/api/solicitudes-parqueadero', solicitudParqueaderoRoutes);
 
 
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ error: 'Algo salió mal en el servidor' });
+  console.error(err.stack);
+  res.status(500).json({ error: 'Algo salió mal en el servidor' });
 });
 
 app.use(cors({
-  origin: 'http://localhost', 
+  origin: 'http://localhost',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
@@ -101,5 +104,5 @@ app.options('*', cors());
 
 const port = process.env.PORT || 3001;
 app.listen(port, '192.168.1.102', () => {
-    console.log(`Servidor ejecutándose en http://192.168.1.102:${port}`);
+  console.log(`Servidor ejecutándose en http://192.168.1.102:${port}`);
 });
